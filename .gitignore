@@ -1,0 +1,14 @@
+*.aux
+*.log
+*.nlo
+*.nls
+*.ilg
+*.dvi
+*.toc
+*.lof
+*.lot
+*.out
+*.bbl
+*.blg
+*.synctex.gz
+pdfa.xmpi
