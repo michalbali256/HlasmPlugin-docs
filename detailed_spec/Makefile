@@ -7,10 +7,7 @@ endif
 all: main.pdf
 
 # LaTeX must be run multiple times to get references right
-main.pdf: main.tex $(wildcard *.tex) bibliography.bib
-	pdflatex $<
-	bibtex main
-	makeindex main.nlo -s nomencl.ist -o main.nls
+main.pdf: main.tex $(wildcard *.tex)
 	pdflatex $<
 	pdflatex $<
 
