@@ -28,7 +28,7 @@ HLASM program is sequence of \textit{statements}. Statement consists of four fie
 
 \subsection{Continuation}
 
-One line in HLASM source code can contain only up to 80 characters. However, sometimes statement is too long to be written in one line. Therefore, special handling is introduced called \textbf{continuation}.
+One line in HLASM source code can contain only up to 80 characters. However, sometimes statement is too long to be written in one line. Therefore, special handling is introduced called \textbf{continuation}\todo{Prosim nepouzivejte bold uprostred odstavce nebo v textu, na emphasis a definice je \textbackslash\emph{emph}. Pokud je neco potreba zvyraznit, je to potreba udelat systematictejc, idealne obrazkem.}.
 
 For indication that statement continues on the next line a character other than space is placed in \textbf{continuation column} (default is 72). Then the remainder of the statement must start on \textbf{continue column} (default is 15) to finally create a well formed statement (see \cref{fig01:line}).
 
