@@ -15,27 +15,12 @@
 %% Further useful packages (included in most LaTeX distributions)
 \usepackage{amsmath}        % extensions for typesetting of math
 \usepackage{amsfonts}       % math fonts
-\usepackage{amsthm}         % theorems, definitions, etc.
-%\usepackage{bbding}         % various symbols (squares, asterisks, scissors, ...)
-%\usepackage{bm}             % boldface symbols (\bm)
 \usepackage{graphicx}       % embedding of pictures
-\usepackage{caption}       % embedding of pictures
-\usepackage{subcaption}       % embedding of pictures
-%\usepackage{fancyvrb}       % improved verbatim environment
-%\usepackage[square]{natbib}         % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
-%\usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
-			    % of figures/tables are included in the table
-			    % of contents
-%\usepackage{dcolumn}        % improved alignment of table columns
 \usepackage{tikz}
 %\usetikzlibrary{shapes,fit,positioning,snakes,mindmap,trees,decorations.text,arrows.meta}
-\usepackage{nomencl}
-\usepackage{epigraph}
 %\makenomenclature
 \usepackage{algorithm,algpseudocode}
-\usepackage{enumitem}
 \usepackage{booktabs}
-\usepackage{mwe}
 
 \usepackage{listings}
 \lstset{basicstyle=\ttfamily,
@@ -47,18 +32,6 @@
 \usepackage{pdfpages}
 
 \usepackage[textsize=tiny]{todonotes}
-\newcommand{\XX}[1]{\textcolor{red}{#1}}
-\newcommand{\TT}[1]{\texttt{#1}}
-\newcommand{\X}[1]{\textsc{#1}}
-%\usepackage[a-2u]{pdfx} %PDFA not needed
-%\setitemize{itemsep=0pt}
-%\usepackage[usenames]{xcolor}  % typesetting in color
-\usepackage[textsize=tiny]{todonotes}
-
-
-
-\setlength\epigraphwidth{9cm}
-\setlength\epigraphrule{0pt}
 
 % links shall be clickable
 \usepackage[unicode]{hyperref}   % Must follow all other packages
@@ -87,11 +60,4 @@
 \include{technologies}
 \include{project_execution}
 
-%%% Abbreviations used in the thesis, if any, including their explanation
-%%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-%\chapwithtoc{List of Abbreviations}
-\renewcommand{\nomname}{List of Abbreviations}
-
-
-%\openright
 \end{document}
