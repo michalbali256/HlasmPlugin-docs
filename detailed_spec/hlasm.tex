@@ -118,7 +118,48 @@ The behavior of assembler is altered by this instructions in different ways. Let
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and start of relative addressing.
 \end{itemize}
 
+Here is example of simple HLASM program with the description of its statements.
 
+\begin{verbatim}
+         name        operation   operands
+         
+[01]                 MACRO                   
+[02]     &NAME       GEN_LABEL
+[03]     &NAME       EQU         *
+[04]                 MEND
+[05]             
+[06]                 COPY        REGS
+[07]             
+[08]     TEST        CSECT
+[09]     &VAR        SETA        L'DOUBLE
+[10]                 AIF         (&VAR EQ 4).END
+[11]     LBL1        GEN_LABEL
+[12]                 LR          3,2
+[13]                 L           8
+[14]     LBL2        GEN_LABEL
+[15]     LEN         EQU         LBL2-LBL1
+[16]                 DC          (LEN)C'HELLO'
+[17]     DOUBLE      DC          D'-3.729'
+[18]     .END        ANOP
+[19]                 END
+\end{verbatim} 
 
+In lines \verb|01-04| the reader can see \textit{macro definition}. It is defined with a name \verb|GEN_LABEL|, variable \verb|NAME| and has one instruction in body that assigns to label in \verb|NAME| current address.
+
+In line \verb|06| there is use of \textit{copy instruction} where it includes contents of \verb|REGS| file.
+
+Line \verb|08| establishes start of executable section called \verb|TEST|. 
+
+In line \verb|09| integer value is assigned to variable symbol \verb|VAR|. The value is the length attribute of non previously defined constant \verb|DOUBLE|. The assembler looks for definition of the constant to properly evaluate conditional assembly expression. In the next line there is CA branching instruction \verb|AIF|. If value of \verb|VAR| equals 4, next lines are skipped and assembling continues on line \verb|18| where branching symbol \verb|END| is located.  
+
+Lines \verb|12-13| shows example of machine instructions which are directly assembled into object code. Lines \verb|11,14| are examples of macro call.
+
+In line \verb|15| to constant \verb|LEN| is equated difference of two addresses. This value is next used to generate character data.
+
+Instruction \verb|DC| in line \verb|17| creates value of type double and assigns its address to constant \verb|DOUBLE|. This constant also holds information about length, type and other attributes of the data.  
+
+\verb|ANOP| is empty assembler action and line \verb|19| ends the program assembling. 
+
+\vspace{5mm}
 As the reader may see, HLASM is heavily extended assembler with complex assembling phases. 
 However, the result of that is programming language with large expressive power. 
