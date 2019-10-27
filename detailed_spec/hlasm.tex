@@ -6,20 +6,24 @@ IBM High Level Assembler (HLASM) comforts this definition and adds other feature
 
 \section{Syntax}
 
-HLASM has somehow complicated syntax.
+Because of historical reasons HLASM syntax is fairly complicated. Its line length is limited to 80 characters as it was in times when punch cards were used. 
+
+Besides this HLASM uses syntax common to regular assemblers.
 
 \subsection{Statement}
 
 HLASM program is sequence of \textit{statements}. Statement consists of four fields. Those are:
 \begin{itemize}
-	\item \textbf{Name field} --- Serves as place for named constants that are to be used in code.
+	\item \textbf{Name field} --- Serves as place for named constants that are to be used in code. The field is optional but when used it always starts in the first column of a line.
 	
-	\item \textbf{Operation field} --- Instruction that is executed.
+	\item \textbf{Operation field} --- Instruction that is executed. The only field that is mandatory. Must not begin in the first column as it would be interpreted as a name field.
 	
-	\item \textbf{Operands field} --- Field for instruction operands separated by comma.
+	\item \textbf{Operands field} --- Field for instruction operands separated by comma located immediately after operation field. According to instruction used it can be any sequence of characters, apostrophe separated string or blank. 
 	
-	\item \textbf{Remark field} --- Serves as line commentary.
+	\item \textbf{Remark field} --- Serves as inline commentary. Optionally located after operands field or operation field when operands are blank.
 \end{itemize}
+
+This is an example of basic statement using all field.
 \begin{verbatim}
  label   instruction     operands             remarks
 .NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
@@ -29,16 +33,42 @@ HLASM program is sequence of \textit{statements}. Statement consists of four fie
 
 One line in HLASM source code can contain only up to 80 characters. However, sometimes statement is too long to be written in one line. Therefore, special handling is introduced called \textbf{continuation}.
 
-For indication that statement continues on the next line a character other than space is placed in \textbf{continuation column} (default is 72). Then the remainder of the statement must start on \textbf{continue column} (default is 15) to finally create a well formed statement (see \ref{fig01:line}).
+Firstly, let us elaborate more on the topic of line column. There are four special columns:
+\begin{itemize}
+	\item \textbf{Begin column (default 1)}
+	
+	\item \textbf{End column (default 71)}
+	
+	\item \textbf{Continuation column (default 72)}
+	
+	\item \textbf{Continue column (default 16)}
+\end{itemize}
+They all serve different purpose. First, \textit{begin column} states start of the statement or where name field should be written. Anything after \textit{end column} does not count as the content of a statement, rather it is used as a place for the line sequence number (see \ref{fig01:line}). 
 
-\begin{figure}\centering
-	\includegraphics{img/line}
+\textit{Continuation column} is used for indication that statement continues on the next line (to indicate we write there arbitrary character other than space). Then the remainder of the statement must start on \textit{continue column} to finally create a well formed statement.
+
+Here is an example of an instruction where its last operand exceeded 72.~column of the line.
+\begin{verbatim}
+  OP1                    REG12,REG07,REG04,REG00,REG01,REG11,Rx
+        EG02
+\end{verbatim} 
+However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when line is not fully saturated.
+\begin{verbatim}
+  AIF   ('&VAR' FIND '~').A,     REMARK1                      x
+        ('&VAR'  EQ  'L').B,     REMARK2                      x
+        (T'&VAR  EQ  'U').C      REMARK3 
+\end{verbatim} 
+
+\begin{figure}[b]\centering
+	\includegraphics[scale=0.4]{img/line}
 	\caption{Description of line columns.}
 	\label{fig01:line}
 \end{figure}
 
 
 \section{Semantics}
+
+
 
 \subsection{Conditional assembly}
 
