@@ -52,14 +52,15 @@ Here is an example of an instruction where its last operand exceeded 72.~column 
   OP1                    REG12,REG07,REG04,REG00,REG01,REG11,Rx
         EG02
 \end{verbatim} 
-However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column.
+However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column. \todo{reference the figure, do not use [h].}
 \begin{verbatim}
   AIF   ('&VAR' FIND '~').A,     REMARK1                      x
         ('&VAR'  EQ  'L').B,     REMARK2                      x
         (T'&VAR  EQ  'U').C      REMARK3 
 \end{verbatim} 
-\begin{figure}[h]\centering
-	\includegraphics[scale=0.4]{img/line}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{img/line}
 	\caption{Description of line columns (source HLASM Language Reference https://www-01.ibm.com/servers/resourcelink/\-svc00100.nsf/\-pages/\-zOSV2R3sc264940/\-\$file/\-asmr1023.pdf).}
 	\label{fig01:line}
 \end{figure}
