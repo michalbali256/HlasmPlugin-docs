@@ -1,4 +1,4 @@
-\chapter{IBM High Level Assembler Language overview}
+\chapter{HLASM overview}
 
 In general, high-level assemblers provide for their assembly languages features that are commonly found in high-level programming languages. Hence, in addition to ordinary machine instructions they also contain control statements similar to \textit{if, while, for} as well as custom callable macros.
 
@@ -31,7 +31,7 @@ This is an example of basic statement using all field.
 
 \subsection{Continuation}
 
-One line in HLASM source code can contain only up to 80 characters. However, sometimes statement is too long to be written in one line. Therefore, special handling is introduced called \textbf{continuation}.
+One line in HLASM source code can contain only up to 80 characters. However, sometimes statement is too long to be written in one line. Therefore, special handling is introduced called \textbf{continuation}\todo{Prosim nepouzivejte bold uprostred odstavce nebo v textu, na emphasis a definice je \textbackslash\emph{emph}. Pokud je neco potreba zvyraznit, je to potreba udelat systematictejc, idealne obrazkem.}.
 
 Firstly, let us elaborate more on the topic of line column. There are four special columns:
 \begin{itemize}
@@ -52,14 +52,15 @@ Here is an example of an instruction where its last operand exceeded 72.~column 
   OP1                    REG12,REG07,REG04,REG00,REG01,REG11,Rx
         EG02
 \end{verbatim} 
-However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column.
+However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column. \todo{reference the figure, do not use [h].}
 \begin{verbatim}
   AIF   ('&VAR' FIND '~').A,     REMARK1                      x
         ('&VAR'  EQ  'L').B,     REMARK2                      x
         (T'&VAR  EQ  'U').C      REMARK3 
 \end{verbatim} 
-\begin{figure}[h]\centering
-	\includegraphics[scale=0.4]{img/line}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{img/line}
 	\caption{Description of line columns (source HLASM Language Reference https://www-01.ibm.com/servers/resourcelink/\-svc00100.nsf/\-pages/\-zOSV2R3sc264940/\-\$file/\-asmr1023.pdf).}
 	\label{fig01:line}
 \end{figure}
