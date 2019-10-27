@@ -1,4 +1,7 @@
 
+\newcommand{\cool}{\color{green!50!white!80!black}}
+\newcommand{\textcool}[1]{{\cool #1}}
+
 \newcommand{\XX}[1]{\textcolor{red}{#1}}
 \newcommand{\TT}[1]{\texttt{#1}}
 \newcommand{\X}[1]{\textsc{#1}}
@@ -19,4 +22,11 @@
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\Z}{\mathbb{Z}}
+
+% move the headings out of gutenberg era
+\setcounter{secnumdepth}{4}
+\titleformat{\chapter}{\cool\fontsize{24pt}{24pt}\bfseries}{\color{black!25}\thechapter.}{1em}{}
+\titleformat{\section}{\cool\fontsize{16pt}{18pt}\bfseries}{\scriptsize\color{black!25}\thesection}{1em}{}
+\titleformat{\subsection}{\cool\fontsize{14pt}{16pt}\bfseries}{\scriptsize\color{black!25}\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\cool\fontsize{12pt}{14pt}\bfseries}{\scriptsize\color{black!25}\thesubsubsection}{1em}{}
 
