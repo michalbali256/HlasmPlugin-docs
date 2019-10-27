@@ -29,7 +29,14 @@
 }
 
 % Draw black "slugs" whenever a line overflows, so that we can spot it easily.
+% TODO remove this later, no one actually cares for spec purposes
 \overfullrule=1mm
+
+% avoid some slugs naturally
+\clubpenalty=1000
+\widowpenalty=1000
+%\hyphenpenalty=100  % turn this on to prevent hyphenation
+\emergencystretch=2cm
 
 %%% Macros for definitions, theorems, claims, examples, ... (requires amsthm package)
 
@@ -48,14 +55,6 @@
 \newtheorem*{example}{Example}
 
 %%% An environment for proofs
-
-%%% FIXME %%% \newenvironment{proof}{
-%%% FIXME %%%   \par\medskip\noindent
-%%% FIXME %%%   \textit{Proof}.
-%%% FIXME %%% }{
-%%% FIXME %%% \newline
-%%% FIXME %%% \rightline{$\square$}  % or \SquareCastShadowBottomRight from bbding package
-%%% FIXME %%% }
 
 %%% An environment for typesetting of program code and input/output
 %%% of programs. (Requires the fancyvrb package -- fancy verbatim.)
