@@ -23,11 +23,15 @@ HLASM program is sequence of \textit{statements}. Statement consists of four fie
 	\item \textbf{Remark field} --- Serves as inline commentary. Optionally located after operands field or operation field when operands are blank.
 \end{itemize}
 
-This is an example of basic statement using all field.
+\Cref{lst:example} shows an example of basic statement using all field.
+\begin{listing}
 \begin{verbatim}
  label   instruction     operands             remarks
 .NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
 \end{verbatim}
+\caption{An example statement with fields.}
+\label{lst:example}
+\end{listing}
 
 \subsection{Continuation}
 
@@ -47,17 +51,26 @@ They all serve different purpose. \textit{Begin column} states start of the stat
 
 \textit{Continuation column} is used for indication that statement continues on the next line (to correctly indicate we write there arbitrary character other than space). Then the remainder of the statement must start on \textit{continue column} to finally create a well formed statement.
 
-Here is an example of an instruction where its last operand exceeded 72.~column of the line.
+An example of an instruction where its last operand exceeded 72.~column of the line can be seen in \cref{lst:overflow}.
+\begin{listing}
 \begin{verbatim}
   OP1                    REG12,REG07,REG04,REG00,REG01,REG11,Rx
         EG02
-\end{verbatim} 
-However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column. \todo{reference the figure, do not use [h].}
+\end{verbatim}
+\caption{Example program that uses continuation for overflowing the line.}
+\label{lst:overflow}
+\end{listing}
+
+However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column (see \cref{lst:extended}).
+\begin{listing}
 \begin{verbatim}
   AIF   ('&VAR' FIND '~').A,     REMARK1                      x
         ('&VAR'  EQ  'L').B,     REMARK2                      x
         (T'&VAR  EQ  'U').C      REMARK3 
 \end{verbatim} 
+\caption{Extended instruction format.}
+\label{lst:extended}
+\end{listing}
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
@@ -119,8 +132,8 @@ The behavior of assembler is altered by this instructions in different ways. Let
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and start of relative addressing.
 \end{itemize}
 
-Here is example of simple HLASM program with the description of its statements.
-
+An example of simple HLASM program with the description of its statements is shown in \cref{lst:example}.
+\begin{listing}
 \begin{verbatim}
          name        operation   operands
          
@@ -144,6 +157,9 @@ Here is example of simple HLASM program with the description of its statements.
 [18]     .END        ANOP
 [19]                 END
 \end{verbatim} 
+\caption{An example definition of a macro.}
+\label{lst:example}
+\end{listing}
 
 In lines \verb|01-04| the reader can see \textit{macro definition}. It is defined with a name \verb|GEN_LABEL|, variable \verb|NAME| and has one instruction in body that assigns to label in \verb|NAME| current address.
 
