@@ -58,18 +58,41 @@ However, there are some instructions that allow so called \textit{extended forma
         ('&VAR'  EQ  'L').B,     REMARK2                      x
         (T'&VAR  EQ  'U').C      REMARK3 
 \end{verbatim} 
-
-\begin{figure}[b]\centering
+\begin{figure}[h]\centering
 	\includegraphics[scale=0.4]{img/line}
-	\caption{Description of line columns.}
+	\caption{Description of line columns (source HLASM Language Reference https://www-01.ibm.com/servers/resourcelink/\-svc00100.nsf/\-pages/\-zOSV2R3sc264940/\-\$file/\-asmr1023.pdf).}
 	\label{fig01:line}
 \end{figure}
 
 
-\section{Semantics}
+\section{Assembling}
 
+Having briefly described syntax, this section prepares reader to better understand assembly process hidden behind HLASM. 
 
+We can divide this process into two interlinked steps, conditional assembly and ordinary assembly.
 
 \subsection{Conditional assembly}
+
+This part of assembly process can be compared to C++ text prepocessor. However, it is complicated process in HLASM and is commonly described as \textit{code generation}. It consists of \textbf{variable symbols}, \textbf{conditional assembly (CA) instructions} and \textbf{macros}. 
+
+
+\subsubsection{Variable symbols}
+
+These variables serves as points of substitution or information holders. 
+
+When they occur in a statement, they are substituted by their value to create a new statement. For example, in this manner user can write variable symbol in operation field of statement and generate any instruction that can be a result of substitution.
+
+Variable symbols have also notion of types. Symbol can be integer, boolean or string. CA instructions gather this information for different sorts of conditional branching.
+
+\subsubsection{CA instructions}
+
+The major difference to other instructions is that they are not assembled into object code, they rather choose which instructions will be. They are big contributors to \textit{code generation}.
+
+One subset of CA instructions operates on variable symbols. With them user can define variable symbols locally or globally, assign or update their value.
+
+Other subset is capable of conditional and unconditional branching. This is important in HLASM as you can alter flow of instructions that will be assembled into executable program.
+
+\subsubsection{Macros}
+Macro is structure consisting of name, input parameters and sequence of statements called body. When they are called in HLASM program, each statement in the body is performed. Nested or recursive call of macros is allowed. Macro body can even contain such sequence of instructions that it can generate another macro definition ready for later use. With help of variable symbols, HLASM macros have power to create custom task specific macros.
 
 \subsection{Ordinary assembly}
