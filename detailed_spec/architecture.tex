@@ -53,16 +53,47 @@ Analyser is able to process a single HLASM file. The processing includes:
  \item Provide highlighting and LSP information.
 \end{itemize}
 
+One HLASM file may have dependencies --- other files, that define helping macros or files brought in by COPY instruction. The dependencies are only discovered during processing of files, so the analyzer needs a way to invoke a method that would find a file with specified name, parse its contents and return it as list of parsed statements.
+
+To sum up, analyser has pretty simple API: it takes the contents of a source file by common string and a callback that can parse external files with specified name. It provides list of diagnostics connected with the file, highlighting and list of symbol definitions, etc.
+
+The analyser is further decomposed into 4 components.
 
 \subsubsection{Lexer}
+
+Lexer task is to read source string and break it into tokens --- small pieces of text with special meaning. The most important features of the lexer:
+\begin{itemize}
+	\item Check whether all characters ale valid in HLASM source
+	\item Each token has location in the source text
+	\item Ability to jump in the source file backward and forward is necessary for implementation of instructions like AGO and AIF.
+\end{itemize}
+
 \subsubsection{Parser}
+
+Parser component takes the stream of tokens the lexer produces and recognises HLASM statements according to syntax. To accomplish this, a parser generator tool Antlr 4 \footnote{https://www.antlr.org} is used.
+
+Antlr takes as input grammar (written in antlr-specific language) that specifies syntax of HLASM language and generates source code (in C++) for recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code.
+
+
+
 \subsubsection{Processing}
+
+Results of the parser component are further analysed in processing component. The most important features are:
+
+\begin{itemize}
+	\item CA instructions are interpreted here: that results in modifying lexer state (moving back and forth in the input file).
+	\item Substitution of variable symbols. After the substitution, the statement must be reparsed in the lexer and parser again.
+	\item Interpretation of assembler instructions to evaluate ordinary symbols.
+	\item MACRO and COPY expansion.
+\end{itemize}
+
 \subsubsection{Checking}
+After a statement is fully processed, all operands of each instruction are known, it needs to be checked. There are over 2000 machine instructions with variable number of operands and various restrictions on those operands --- some of them take only positive numbers, only numbers that are in specific range or take address only. Checking component takes an instruction and list of its operands and returns list of problems if form of LSP diagnostics.
 
 
 \subsection{Workspace manager}
 
-
+Workspace manager responsibility is to keep workspaces and files representation in parser library exactly the same as the user sees in the editor. 
 
 
 
