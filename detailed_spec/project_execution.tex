@@ -5,15 +5,15 @@ We analyze the problem difficulty, break it into tasks and estimate time require
 We further describe the team and work organization.
 
 \section{Tasks}
-We analyzed the problem and split it into several tasks. At the time of writing this document implementation is already in the 24. week of our schedule and we have working prototype. Therefore the presented tasks are specified. 
+We analyzed the problem and split it into several tasks. At the time of writing this document implementation is already in the 24. week of project schedule. By now there is a working prototype. Therefore, some of the presented tasks are specified. 
 
 Tasks were assigned to individual team members during stand ups. The tasks and their assignment (team member name initials in the parentheses following task name) is presented in the Gantt diagram(s)  (\ref{fig:gantt1}, \ref{fig:gantt2}, \ref{fig:gantt3}). 
-Project implementation is planned for nine months. 
+Project implementation is planned to be done within nine months. 
 
 \section{Collaboration}
-The team consists of five members. Collaboration within the team is essential for successful completion of the project. We use variety of means to achieve this. 
+The team consists of five members. Collaboration within the team is essential for successful completion of the project. We use a variety of means to achieve this. 
 
-Our team works with agile software development. To aid this we use visual process management system Kanban. The team meets every week together with our supervisor at stand ups. Team discusses current status of particular tasks with their owners, review progress and plan work for next week.
+Our team works with agile software development. To aid this we use visual process management system Kanban. The team meets every week together with our supervisor at stand ups. The team discusses the current status of particular tasks with their owners, review progress and plan work for next week.
 
 For communication between team members is used online tool Slack.
 
@@ -36,11 +36,11 @@ For communication between team members is used online tool Slack.
 		\ganttbar{Lexer (L \& P)}{5}{10}\\
 		\ganttbar{Parser (A \& Ma)}{5}{12}\\
 		
-		\ganttbar{Client semantic highlighting (M)}{9}{12}\\
+		\ganttbar{Client semantic highlighting (Ma)}{9}{12}\\
 		\ganttbar{Assembler checker (L)}{9}{12}\\
+		\ganttbar{Debugger POC (Mi)}{9}{12}\\
 		\ganttbar{Conditional assembly instructions (A)}{9}{12}\\
-		\ganttbar{Conditional assembly expressions (P)}{9}{12}\\
-		\ganttbar{Debugger POC (M)}{9}{12}
+		\ganttbar{Conditional assembly expressions (P) $\rightarrow$}{11}{12}\\
 		
 		
 		\end{ganttchart}
@@ -57,17 +57,22 @@ For communication between team members is used online tool Slack.
 			
 			\gantttitlelist{"4. month", "5. month", "6. month"}{4} \\
 			\gantttitlelist{13,...,24}{1} \\
-			\ganttbar{Conditional assembly LSP features (Ma)}{1}{4}\\
-			\ganttbar{Machine instruction checker (L)}{1}{12}\\
+			\ganttbar{$\rightarrow$ Conditional assembly expressions (P)}{1}{2}\\
 			\ganttbar{Macro expansion (A)}{1}{4}\\
+			\ganttbar{Conditional assembly LSP features (Ma)}{1}{4}\\
+			\ganttbar{Machine expressions (Mi)}{1}{4}\\
+			
+			\ganttmilestone{Demo presentation}{4}\\
+			
+			\ganttbar{Machine instruction checker (L)}{1}{12}\\
+			\ganttbar{DC instruction (Mi \& P)}{3}{12}\\
 			
 			\ganttbar{Copy instruction (A)}{5}{8}\\
-			\ganttbar{Machine expressions (Mi)}{5}{8}\\
 			\ganttbar{Client-server continuation handling (Ma)}{5}{8}\\
 			
-			\ganttbar{DC instruction (Mi \& P)  $\rightarrow$}{9}{12}\\
-			\ganttbar{Ordinary symbols (A \& P) $\rightarrow$}{9}{12}\\
-			\ganttbar{Diagnostics (L)}{9}{12}
+			\ganttbar{Diagnostics (L)}{9}{12} \\
+			\ganttbar{Ordinary LSP features (Ma)}{9}{12}\\
+			\ganttbar{Ordinary symbols (A \& P) $\rightarrow$}{9}{12}
 			
 			\ganttvrule[vrule offset=0.8]{today}{12}
 			
@@ -86,12 +91,11 @@ For communication between team members is used online tool Slack.
 			\gantttitlelist{25,...,36}{1} \\
 			
 			
-			\ganttbar{$\rightarrow$ DC instruction (Mi \& P)}{1}{4}\\
 			\ganttbar{$\rightarrow$ Ordinary symbols (A \& P)}{1}{4}\\
-			\ganttbar{Ordinary LSP features (Ma)}{1}{4}\\
+			\ganttbar{Multiplatform deployment (Mi)}{1}{4}\\
+			\ganttbar{Benchmarking (Ma)}{1}{4}\\
 			\ganttbar{Code coverage (L)}{1}{8}\\
 			
-			\ganttbar{Benchmarking (Ma)}{5}{8}\\
 			\ganttbar{Testing (all)}{5}{12}\\
 			
 			\ganttbar{Documentation (all)}{9}{12}\\
