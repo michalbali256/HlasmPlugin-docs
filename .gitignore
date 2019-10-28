@@ -12,3 +12,5 @@
 *.blg
 *.synctex.gz
 pdfa.xmpi
+*.pdf
+!detailed_spec/logo-en.pdf
