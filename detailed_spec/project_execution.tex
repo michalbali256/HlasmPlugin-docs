@@ -1,5 +1,116 @@
 \chapter{Project execution}
 
+In the following chapter is represented execution of the High Level Assembler Plugin software project. 
+We analyze the problem difficulty, break it into tasks and estimate time requirements of particular tasks.
+We further describe the team and work organization.
+
+\section{Tasks}
+We analyzed the problem and split it into several tasks. At the time of writing this document implementation is already in the 24. week of project schedule. By now there is a working prototype. Therefore, some of the presented tasks are specified. 
+
+Tasks were assigned to individual team members during stand ups. The tasks and their assignment (team member name initials in the parentheses following task name) is presented in the Gantt diagram(s)  (\ref{fig:gantt1}, \ref{fig:gantt2}, \ref{fig:gantt3}). 
+Project implementation is planned to be done within nine months. 
+
+\section{Collaboration}
+The team consists of five members. Collaboration within the team is essential for successful completion of the project. We use a variety of means to achieve this. 
+
+Our team works with agile software development. To aid this we use visual process management system Kanban. The team meets every week together with our supervisor at stand ups. The team discusses the current status of particular tasks with their owners, review progress and plan work for next week.
+
+For communication between team members is used online tool Slack.
+
+\newgeometry{a4paper,left=1in,right=1in,top=1in,bottom=1in,nohead}
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\begin{ganttchart}[vgrid={draw=none, dotted}, x unit = 1.2cm]{1}{12}
+		
+		\gantttitlelist{"1. month", "2. month", "3. month"}{4} \\
+		\gantttitlelist{1,...,12}{1} \\
+		
+		\ganttbar{HLASM language analysis (A \& Ma)}{1}{8} \\
+		\ganttbar{Parser libraries research (P)}{1}{4}\\
+		\ganttbar{IDEs research (L \& Mi)}{1}{4}\\
+		
+		\ganttbar{LSP POC (Mi)}{5}{8} \\
+		\ganttbar{VSCode client POC(Mi)}{5}{8}\\
+		\ganttbar{Lexer (L \& P)}{5}{10}\\
+		\ganttbar{Parser (A \& Ma)}{5}{12}\\
+		
+		\ganttbar{Client semantic highlighting (Ma)}{9}{12}\\
+		\ganttbar{Assembler checker (L)}{9}{12}\\
+		\ganttbar{Debugger POC (Mi)}{9}{12}\\
+		\ganttbar{Conditional assembly instructions (A)}{9}{12}\\
+		\ganttbar{Conditional assembly expressions (P) $\rightarrow$}{11}{12}\\
+		
+		
+		\end{ganttchart}
+    \caption{Tasks for months 1 -- 3}
+	\label{fig:gantt1}
+	\end{figure}
+\end{landscape}
+
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\begin{ganttchart}[vgrid={draw=none, dotted}, x unit = 1.2cm]{1}{12}
+			
+			\gantttitlelist{"4. month", "5. month", "6. month"}{4} \\
+			\gantttitlelist{13,...,24}{1} \\
+			\ganttbar{$\rightarrow$ Conditional assembly expressions (P)}{1}{2}\\
+			\ganttbar{Macro expansion (A)}{1}{4}\\
+			\ganttbar{Conditional assembly LSP features (Ma)}{1}{4}\\
+			\ganttbar{Machine expressions (Mi)}{1}{4}\\
+			
+			\ganttmilestone{Demo presentation}{4}\\
+			
+			\ganttbar{Machine instruction checker (L)}{1}{12}\\
+			\ganttbar{DC instruction (Mi \& P)}{3}{12}\\
+			
+			\ganttbar{Copy instruction (A)}{5}{8}\\
+			\ganttbar{Client-server continuation handling (Ma)}{5}{8}\\
+			
+			\ganttbar{Diagnostics (L)}{9}{12} \\
+			\ganttbar{Ordinary LSP features (Ma)}{9}{12}\\
+			\ganttbar{Ordinary symbols (A \& P) $\rightarrow$}{9}{12}
+			
+			\ganttvrule[vrule offset=0.8]{today}{12}
+			
+		\end{ganttchart}
+		\caption{Tasks for months 4 -- 6}
+		\label{fig:gantt2}
+	\end{figure}
+\end{landscape}
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\begin{ganttchart}[vgrid={draw=none, dotted}, x unit = 1.2cm]{1}{12}
+			
+			\gantttitlelist{"7. month", "8. month", "9. month"}{4} \\
+			\gantttitlelist{25,...,36}{1} \\
+			
+			
+			\ganttbar{$\rightarrow$ Ordinary symbols (A \& P)}{1}{4}\\
+			\ganttbar{Multiplatform deployment (Mi)}{1}{4}\\
+			\ganttbar{Benchmarking (Ma)}{1}{4}\\
+			\ganttbar{Code coverage (L)}{1}{8}\\
+			
+			\ganttbar{Testing (all)}{5}{12}\\
+			
+			\ganttbar{Documentation (all)}{9}{12}\\
+		
+			
+			\ganttvrule[vrule offset=0.2]{today}{1}
+			
+		\end{ganttchart}
+		\caption{Tasks for months 7 -- 9}
+		\label{fig:gantt3}
+	\end{figure}
+\end{landscape}
+
+\restoregeometry
+
 mirko:
 
 milestony
@@ -15,55 +126,3 @@ je fajn mit contingency plan, co delat kdyz se to dojebe nebo ltery ficury jsou 
 \todo{je fajn vsechno tohle podeprit tim ze mate prototyp, a jak se na nej bude navazovat. Rozhodne do specifikace uz nemuzete psat ze budete volit parser a ide, protoze to tady ma bejt specifikovany.}
 
 
-1. mesiac 
-	research jazyk 8t
-	research zvolit parser 4t
-	research zvolit ide 4t
-	
-	
-	
-2. mesiac
-	implementacia LSP POC
-		VSCode klient POC
-	lexer 6
-	parser 8t
-	cmake 1t
-	
-	
-	
-	
-3. mesiac
-	do klienta semanticky highlighting
-	assembler checker
-	conditional assembly 
-		instructions
-		expressions
-	debugger POC
-	
-	
-4. mesiac
-	CA LSP features
-	machine instruction checker 12t
-	macro expansion
-	
-5. 
-	copy 4t
-	machine expression 4t
-	client-server continuation handling
-	
-6.
-	DC
-	ordinary 8t
-	diagnostikz
-	
-	
-7.	
-	ORDINARY LSP features
-	code coverage 8t
-	
-8. 
-	benchmark
-	testing 8t	
-	
-9.
-	dokumentacia
