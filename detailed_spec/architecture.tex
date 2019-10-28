@@ -17,7 +17,7 @@ This chapter presents decomposition of the project into smaller components and d
 
 \section{Language server}
 
-The responsibility of the Language server component is to implement LSP. The features include: and pass all the calls to parser library. The issues that it addresses:
+The responsibility of the Language server component is to implement the LSP and pass all the  The issues that it addresses:
 
 \begin{itemize}
     \item To read LSP messages from standard input or TCP and write responses.
@@ -27,6 +27,17 @@ The responsibility of the Language server component is to implement LSP. The fea
 \end{itemize}
 
 \section{Parser library}
+
+Parser library is the core of the project --- it encapsulates all parsing capabilities. It keeps track of opened files in the editor and provides information about them. It has API based on LSP --- every relevant request and notification has corresponding method in parsing library. The API includes:
+
+\begin{itemize}
+	\item Implementation of text synchronization notifications (didOpen, didChange, didClose), which inform the library about files that are currently opened in the editor and their exact contents.
+	\item Implementation of workspace management notifications (DidChangeWorkspaceFolders): many editors have possibilities to open more workspaces in the same time, the parser library supports this too. Workspace is basically just a folder which contains related source codes. Workspaces help parser library find macro and copy files.
+	\item A method to consume DidChangeWatchedFiles notification which makes it possible to react to workspace changes that were not made by the user in editor, but still may affect the parsing. For example when user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
+	\item Implementation of diagnostics publishing (publishDiagnostics notification). A diagnostic is used to indicate a problem with source files, such as compiler error or warning. The parser library provides a callback to let language server know that diagnostics have changed.
+	
+\end{itemize}
+
 
 \subsection{Workspace manager}
 
