@@ -35,13 +35,24 @@ Parser library is the core of the project --- it encapsulates all parsing capabi
 	\item Implementation of workspace management notifications (DidChangeWorkspaceFolders): many editors have possibilities to open more workspaces in the same time, the parser library supports this too. Workspace is basically just a folder which contains related source codes. Workspaces help parser library find macro and copy files.
 	\item A method to consume DidChangeWatchedFiles notification which makes it possible to react to workspace changes that were not made by the user in editor, but still may affect the parsing. For example when user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
 	\item Implementation of diagnostics publishing (publishDiagnostics notification). A diagnostic is used to indicate a problem with source files, such as compiler error or warning. The parser library provides a callback to let language server know that diagnostics have changed.
+	\item Callback for highlighting information provision.
+	\item Implementation of language feature requests (definition, references, hover, completion), which provide information needed for proper reaction of the editor on user actions.
 	
 \end{itemize}
 
-
-\subsection{Workspace manager}
+The parser library is further decomposed into smaller components.
 
 \subsection{Analyser}
+
+Analyser is able to process a single HLASM file. The processing includes:
+\begin{itemize}
+ \item Recognition of statements and their parts (lexing and parsing).
+ \item Interpretation of instructions that should be executed in compile time.
+ \item Check whether the HLASM source code is well-formed.
+ \item Report problems with the source by producing LSP diagnostics.
+ \item Provide highlighting and LSP information.
+\end{itemize}
+
 
 \subsubsection{Lexer}
 \subsubsection{Parser}
@@ -49,11 +60,17 @@ Parser library is the core of the project --- it encapsulates all parsing capabi
 \subsubsection{Checking}
 
 
+\subsection{Workspace manager}
 
 
 
 
-\subsection{Debugger}
+
+
+
+
+
+\subsection{Macro tracer}
 
 
 
