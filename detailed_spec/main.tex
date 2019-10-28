@@ -2,37 +2,31 @@
 
 
 %% Settings for two-sided (duplex) printing
-\documentclass[12pt,a4paper,twoside,openright]{report}
+\documentclass[10pt,a4paper]{report}
 \let\openright=\cleardoublepage
 
 %% Character encoding: usually latin2, cp1250 or utf8:
 \usepackage[utf8]{inputenc}
 
+%% It's 2019
+\usepackage[default]{droidserif}
+\usepackage[T1]{fontenc}
 
 %% Further useful packages (included in most LaTeX distributions)
 \usepackage{amsmath}        % extensions for typesetting of math
 \usepackage{amsfonts}       % math fonts
-\usepackage{amsthm}         % theorems, definitions, etc.
-%\usepackage{bbding}         % various symbols (squares, asterisks, scissors, ...)
-%\usepackage{bm}             % boldface symbols (\bm)
 \usepackage{graphicx}       % embedding of pictures
-\usepackage{caption}       % embedding of pictures
-\usepackage{subcaption}       % embedding of pictures
-%\usepackage{fancyvrb}       % improved verbatim environment
-%\usepackage[square]{natbib}         % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
-%\usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
-			    % of figures/tables are included in the table
-			    % of contents
-%\usepackage{dcolumn}        % improved alignment of table columns
 \usepackage{tikz}
 %\usetikzlibrary{shapes,fit,positioning,snakes,mindmap,trees,decorations.text,arrows.meta}
-\usepackage{nomencl}
-\usepackage{epigraph}
-\makenomenclature
+%\makenomenclature
 \usepackage{algorithm,algpseudocode}
-\usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{mwe}
+\usepackage{pgfgantt}
+\usepackage{pdflscape}
+\usepackage{geometry}
+
+\usepackage{titlesec}
 
 \usepackage{listings}
 \lstset{basicstyle=\ttfamily,
@@ -43,35 +37,22 @@
 
 \usepackage{pdfpages}
 
-\usepackage[textsize=tiny]{todonotes}
-\newcommand{\XX}[1]{\textcolor{red}{#1}}
-\newcommand{\TT}[1]{\texttt{#1}}
-\newcommand{\X}[1]{\textsc{#1}}
-\usepackage[a-2u]{pdfx}
-\setitemize{itemsep=0pt}
-%\usepackage[usenames]{xcolor}  % typesetting in color
-\usepackage[textsize=tiny]{todonotes}
+\usepackage[textsize=tiny,backgroundcolor=yellow!50, linecolor=black!25]{todonotes}
 
-
-
-\setlength\epigraphwidth{9cm}
-\setlength\epigraphrule{0pt}
-
-%% The hyperref package for clickable links in PDF and also for storing
-%% metadata to PDF (including the table of contents).
-%\usepackage[pdftex,unicode]{hyperref}   % Must follow all other packages
-%\hypersetup{breaklinks=true}
-%\hypersetup{pdftitle={\ThesisTitle}}
-%\hypersetup{pdfauthor={\ThesisAuthor}}
-%\hypersetup{pdfkeywords=\Keywords}
-%\hypersetup{urlcolor=blue}
+% links shall be clickable
+\usepackage[unicode]{hyperref}   % Must follow all other packages
+\usepackage{cleveref} % Must follow all other packages including hyperref
 
 % Definitions of macros (see description inside)
 \include{macros}
 
+\title{\textcool{\bf High Level Assembler Plugin} \\ Project specification}
+\author{Michal Bali, Marcel Hruška, Peter Polák,\\ Adam Šmelko, Lucia Tódová}
+\date{Supervisor: Miroslav Kratochvíl}
+
 % Title page and various mandatory informational pages
 \begin{document}
-\include{title}
+\maketitle
 
 %%% A page with automatically generated table of contents of the bachelor thesis
 
@@ -84,13 +65,5 @@
 \include{architecture}
 \include{technologies}
 \include{project_execution}
-\include{epilog}
 
-%%% Abbreviations used in the thesis, if any, including their explanation
-%%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-%\chapwithtoc{List of Abbreviations}
-\renewcommand{\nomname}{List of Abbreviations}
-
-
-\openright
 \end{document}
