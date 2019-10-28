@@ -11,13 +11,13 @@
 
 In LSP the two parties who communicate are called \emph{client}  and \emph{language server}. The client runs as an extension of development tool. All language-specific user actions are transformed into standard LSP messages and sent to the language server, which analyses the source code and sends back response, which is then interpreted and presented to the user in editor-specific way. This architecture makes possible to have only one LSP client implementation for each code editor which may be reused by all programming languages. And vice versa, every language server may be easily used by any editor that has an implementation of LSP client.
 
-To add support for HLASM we have to implement LSP language server and write thin extension to an editor, which will use already existing implementation of LSP client. 
+To add support for HLASM we have to implement LSP language server and write thin extension to an editor, which will use already existing implementation of LSP client. Since LSP does not have support for server-side highlighting, a LSP notification is implemented to transfer information from language server to VS Code client, which is extended to highlight code in editor based on information from language server.
 
 This chapter presents decomposition of the project into smaller components and describes their relations. The overall architecture is pictured in Figure~\ref{fig03:arch}.
 
 \section{Language server}
 
-The responsibility of the Language server component is to implement the LSP and pass all the  The issues that it addresses:
+The responsibility of the Language server component is to implement the LSP and pass all the issues that it addresses:
 
 \begin{itemize}
     \item To read LSP messages from standard input or TCP and write responses.
@@ -93,23 +93,31 @@ After a statement is fully processed, all operands of each instruction are known
 
 \subsection{Workspace manager}
 
-Workspace manager responsibility is to keep workspaces and files representation in parser library exactly the same as the user sees in the editor. 
+Workspace manager responsibility is to keep workspaces and files representation in parser library exactly the same as the user sees in the editor. Further, it starts analyser when needed, manages workspace configuration and provides external macro and copy libraries to analyser.
+
+\section{VS code extension}
+
+The VS Code extension component ensures seamless integration with the editor. Its functions are:
+
+\begin{itemize}
+	\item It starts LSP client that comes with VS Code, HLASM language server and creates connection between them.
+	\item It implements server-side highlighting, which extends the LSP protocol.
+	\item It improves user experience regarding continuations and fixed length line source codes.
+\end{itemize}
+
+
+\section{Macro tracer}
+Macro tracer enables the user to trace the compilation of HLASM source code in a way similar to common debugging. That is the reason why we chose to implement Debug Adapter Protocol \footnote{https://microsoft.github.io/debug-adapter-protocol/} (DAP). It is very similar to LSP, so most of the code implementing LSP in the language server component may be reused for both protocols.
+
+The language server component communicates with macro tracer component in parser library. Its API mirrors the requests and events of DAP. The most important features to implement are:
+
+\begin{itemize}
+	\item Launch, continue, next, stepIn and disconnect requests allow user to control the flow of the compilation.
+	\item SetBreakpoints get information about breakpoints that the user has placed in the code.
+	\item Threads, StackTrace, Scopes and Variables requests to allow the DAP client to retrieve information about current processing stack (stack of nested macros and copy instructions), available variable symbols and their values.
+	\item Stopped, exited and terminated events to let the DAP client know about state of traced source code.
+\end{itemize}
 
 
 
-
-
-
-
-\subsection{Macro tracer}
-
-
-
-\section{VS code client}
-
-mirko:
-
-a je fajn rozepsat vsechny API a takovy veci co sou po ceste
-
---velky graf vsetkych komponent
---ku kazdemu odstavcek 
+Macro traces communicates with the workspace manager to retrieve contents of traced files. Further, it starts analysing the source file in a separate thread and get callbacks from the analyser before a statement is processed. In the callback, tracer puts the thread to sleep and wait for user interaction. During this time, it is possible retrieve all variable and stack information from the processing to show it to the user.
