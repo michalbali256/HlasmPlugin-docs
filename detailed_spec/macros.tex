@@ -39,3 +39,17 @@
 \titleformat{\subsection}{\cool\fontsize{14pt}{16pt}\bfseries}{\scriptsize\color{black!25}\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\cool\fontsize{12pt}{14pt}\bfseries}{\scriptsize\color{black!25}\thesubsubsection}{1em}{}
 
+% code floats
+\colorlet{shadecolor}{cyan!10}
+\makeatletter
+\newcommand\floatc@code[2]{{\@fs@cfont #1} #2\par}
+\newcommand\fs@code{\def\@fs@cfont{\bfseries}\let\@fs@capt\floatc@code
+\def\@fs@pre{}%
+\def\@fs@mid{\vspace{-.5ex}\begin{shaded}}%
+\def\@fs@post{\vspace{-1em}\end{shaded}}%
+\let\@fs@iftopcapt\iftrue}
+\makeatother
+
+\floatstyle{code}
+\newfloat{listing}{tbp}{lst}
+\floatname{listing}{Listing}
