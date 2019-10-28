@@ -1,5 +1,8 @@
 \chapter{Project execution}
 
+
+\todo{je fajn vsechno tohle podeprit tim ze mate prototyp, a jak se na nej bude navazovat. Rozhodne do specifikace uz nemuzete psat ze budete volit parser a ide, protoze to tady ma bejt specifikovany.}
+
 In the following chapter is represented execution of the High Level Assembler Plugin software project. 
 We analyze the problem difficulty, break it into tasks and estimate time requirements of particular tasks.
 We further describe the team and work organization.
@@ -12,10 +15,10 @@ Our team works with agile software development. To aid this we use visual proces
 For communication between team members is used online tool Slack.
 
 \section{Milestones and work packages}
-We analyzed the problem and split it into several milestones and work packages. At the time of writing this document milestone \hyperref[milestone_preview]{Preview}. By now there is a working prototype. Therefore, some of the presented work packages are specified. 
+We analyzed the problem and split it into several milestones and work packages. At the time of writing this document milestone \hyperref[milestone_preview]{Preview} was reached. By now there is a working prototype. Therefore, some of the presented work packages are specified. 
 
-Tasks were assigned to individual team members during stand ups. The tasks and their assignment \people{team member name initials in the parentheses following task name} is presented in the Gantt diagram(s)  \cref{fig:gantt1,fig:gantt2,fig:gantt3}. 
-Project implementation is planned to be done within nine months. 
+
+Project implementation is planned to be done within nine months. Work packages were assigned to individual team members during stand ups. The work packages, their deadline and assignment are in the following table and Gantt diagram \ref{fig:gantt-pokus}. 
 
 \bms
 	\itemm Research and analysis \deadline{2}
@@ -65,16 +68,12 @@ Project implementation is planned to be done within nine months.
 			\itemwp Ordinary symbols \people{Adam, Peter}
 		\eenum
 	
-	\itemm Feature integration \deadline{7}
-		\bwp
-			\itemwp Feature integration \people{all}
-		\eenum
-	
 	\itemm Feature testing \deadline{9}
 		\bwp
 			\itemwp Testing \people{all}
 			\itemwp Multiplatform deployment \people{Michal}
 			\itemwp Code coverage \people{Lucia}
+			\itemwp Benchmarking\people{Marcel}
 		\eenum
 	
 	\itemm Documentation \deadline{9}
@@ -88,7 +87,72 @@ Project implementation is planned to be done within nine months.
 		\eenum
 \eenum
 
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\tikzstyle{wp}=[anchor=east, font={\small\bf\cool}, inner sep=1mm]
+		\tikzstyle{swp}=[anchor=base west, font={\tiny\it}, inner sep=0mm]
+		\tikzstyle{month}=[anchor=west, rotate=90]
+		\newcommand{\ganttitem}[4]{\node[wp] (#1) at(#2) {#3}; \node[swp] at (#1.east|-#1.base) {#4};}
+		\begin{tikzpicture}
+		\foreach \wp in {1,...,29} {
+			\coordinate (wp\wp) at (0,\wp * -1.2em);
+		};
+		\foreach \tim in {1,...,9} {
+			\coordinate (t\tim) at (\tim * 2cm,0);
+			\node[month] at (t\tim) {Month \tim};
+			\draw[dotted, thin, draw=black!25] (t\tim) to (t\tim |- wp29); %sync with previous
+		};
+		
+		\ganttitem{ider}{t1|-wp1}{IDEs research}{Lucia, Michal};
+		\ganttitem{pare}{t1|-wp2}{Parser libraries research}{Peter};
+		
+		\ganttitem{hlasmla}{t2|-wp3}{HLASM language analysis}{Adam, Marcel};
+		\ganttitem{lsppoc}{t2|-wp4}{LSP POC}{Michal}
+		\ganttitem{vspoc}{t2|-wp5}{VSCode client POC}{Michal}
+		
+		\ganttitem{lex}{t3|-wp6}{Lexer}{Lucia, Peter};
+		\ganttitem{lex}{t3|-wp7}{Parser}{Adam, Marcel};
+		\ganttitem{vspoc}{t3|-wp8}{Client semantic highlighting}{Marcel}
+		\ganttitem{lex}{t3|-wp9}{Assembler checker}{Lucia};
+		\ganttitem{vspoc}{t3|-wp10}{Debugger POC}{Michal}
+		\ganttitem{lex}{t3|-wp11}{Conditional assembly instructions}{Adam};
+		
+		
+		\ganttitem{lex}{t4|-wp12}{Conditional assembly expressions}{Peter};
+		\ganttitem{lex}{t4|-wp13}{Macro expansion}{Adam};
+		\ganttitem{lex}{t4|-wp14}{Conditional assembly LSP features}{Marcel};
+		\ganttitem{lex}{t4|-wp15}{Machine expressions}{Michal};
+		
+		
+		\ganttitem{lex}{t5|-wp16}{Copy instruction}{Adam};
+		\ganttitem{lex}{t5|-wp17}{Client-server continuation handling}{Marcel};
+		
+		
+		\ganttitem{lex}{t6|-wp18}{Machine instruction checker}{Lucia};
+		\ganttitem{lex}{t6|-wp19}{DC instruction}{Michal, Peter};
+		\ganttitem{lex}{t6|-wp20}{Diagnostics}{Lucia};
+		\ganttitem{lex}{t6|-wp21}{Ordinary LSP features}{Marcel};
+		
+		
+		\ganttitem{lex}{t7|-wp22}{Ordinary symbols}{Adam, Peter};
+		\ganttitem{lex}{t7|-wp23}{Multiplatform deployment}{Michal};
+		\ganttitem{lex}{t7|-wp24}{Benchmarking}{Marcel};
+		
+		
+		\ganttitem{lex}{t8|-wp25}{Code coverage}{Lucia};
+		
+		\ganttitem{lex}{t9|-wp26}{Testing}{all};
+		\ganttitem{lex}{t9|-wp27}{Documnetation}{all};
+		\ganttitem{lex}{t9|-wp28}{Final presenation}{all};
+		
+		\end{tikzpicture}
+		\caption{Work packages overview}
+		\label{fig:gantt-pokus}
+	\end{figure}
+\end{landscape}
 
+\iffalse
 \newgeometry{a4paper,left=1in,right=1in,top=1in,bottom=1in,nohead}
 
 \begin{landscape}
@@ -183,18 +247,7 @@ Project implementation is planned to be done within nine months.
 
 \restoregeometry
 
-mirko:
+\fi
 
-milestony
-
-gantt
-
-prirazeni lidi k projektum
-
-udelejte si cas na psani dokumentace
-
-je fajn mit contingency plan, co delat kdyz se to dojebe nebo ltery ficury jsou jak prioritni
-
-\todo{je fajn vsechno tohle podeprit tim ze mate prototyp, a jak se na nej bude navazovat. Rozhodne do specifikace uz nemuzete psat ze budete volit parser a ide, protoze to tady ma bejt specifikovany.}
 
 
