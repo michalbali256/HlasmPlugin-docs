@@ -1,11 +1,13 @@
 \chapter{Architecture}
 
+\todo{Nedohodli sme sa na americkej anglictine?}
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{img/language-server-sequence}
-	\caption{LSP session example}
+	\caption{LSP session example }
 	\label{fig04:LSP}
-\end{figure}
+\end{figure}\todo{nechyba zdroj (Adam to daval, tak aby sme boli konzistentni) \ref{fig04:LSP}?}
 
 \begin{figure}
 	\centering
@@ -19,6 +21,7 @@
 The architecture is based on the way modern code editors and IDEs are extended to support additional languages. We chose to implement Language Server Protocol \footnote{https://microsoft.github.io/language-server-protocol/} (LSP), which is supported by majority of contemporary editors.
 
 In LSP the two parties who communicate are called \emph{client} and \emph{language server}. A simple example is displayed in Figure~\cref{fig04:LSP} The client runs as a part of an editor. Language server may be standalone application, that is connected to the client by a pipe or TCP. All language-specific user actions are transformed into standard LSP messages and sent to the language server, which analyses the source code and sends back response, which is then interpreted and presented to the user in editor-specific way. This architecture makes possible to have only one LSP client implementation for each code editor which may be reused by all programming languages. And vice versa, every language server may be easily used by any editor that has an implementation of LSP client.
+\todo{mozno pridat editory: Eclipse, Vim, IntelliJ... }
 
 To add support for HLASM we have to implement LSP language server and write thin extension to an editor, which will use already existing implementation of LSP client. To implement source code highlighting, we have to extend the protocol with a new notification to transfer information from language server to VS Code client, which is extended to highlight code in editor based on the incoming custom notifications.
 
@@ -40,7 +43,7 @@ Parser library is the core of the project --- it encapsulates all parsing capabi
 
 \begin{itemize}
 	\item Implementation of text synchronization notifications (didOpen, didChange, didClose), which inform the library about files that are currently opened in the editor and their exact contents.
-	\item Implementation of workspace management notifications (DidChangeWorkspaceFolders): many editors have possibilities to open more workspaces in the same time, the parser library supports this too. Workspace is basically just a folder which contains related source codes. Workspaces help parser library find macro and copy files.
+	\item Implementation of workspace management notifications (DidChangeWorkspaceFolders): many editors have \todo[inline]{capability mozno lepsie} possibilities to open more workspaces in the same time, the parser library supports this too. Workspace is basically just a folder which contains related source codes. Workspaces help parser library find macro and copy files.
 	\item A method to consume DidChangeWatchedFiles notification which makes it possible to react to workspace changes that were not made by the user in editor, but still may affect the parsing. For example when user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
 	\item Implementation of diagnostics publishing (publishDiagnostics notification). A diagnostic is used to indicate a problem with source files, such as compiler error or warning. The parser library provides a callback to let language server know that diagnostics have changed.
 	\item Callback for highlighting information provision.
@@ -75,6 +78,8 @@ Lexer task is to read source string and break it into tokens --- small pieces of
 	\item Each token has location in the source text
 	\item Ability to jump in the source file backward and forward is necessary for implementation of instructions like AGO and AIF.
 \end{itemize}
+
+\todo{Because of the complexity and specificity of HLASM language we implement our own lexer from scratch even though there are many tools for lexical analysis.}
 
 \subsubsection{Parser}
 
