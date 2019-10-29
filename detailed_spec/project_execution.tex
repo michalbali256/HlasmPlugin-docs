@@ -73,7 +73,7 @@ Project implementation is planned to be done within nine months. Work packages w
 			\itemwp Testing \people{all}
 			\itemwp Multiplatform deployment \people{Michal}
 			\itemwp Code coverage \people{Lucia}
-			\itemwp Benchmarking\people{Marcel}
+			\itemwp Benchmarking \people{Marcel}
 		\eenum
 	
 	\itemm Documentation \deadline{9}
@@ -95,7 +95,7 @@ Project implementation is planned to be done within nine months. Work packages w
 		\tikzstyle{month}=[anchor=west, rotate=90]
 		\newcommand{\ganttitem}[4]{\node[wp] (#1) at(#2) {#3}; \node[swp] at (#1.east|-#1.base) {#4};}
 		\begin{tikzpicture}
-		\foreach \wp in {1,...,29} {
+		\foreach \wp in {1,...,30} {
 			\coordinate (wp\wp) at (0,\wp * -1.2em);
 		};
 		\foreach \tim in {1,...,9} {
@@ -103,6 +103,10 @@ Project implementation is planned to be done within nine months. Work packages w
 			\node[month] at (t\tim) {Month \tim};
 			\draw[dotted, thin, draw=black!25] (t\tim) to (t\tim |- wp29); %sync with previous
 		};
+		
+		
+		\draw[draw=black!25] (t6) to (t6 |- wp26); %sync with previous
+		\node[month] at (t6|-wp29) {today};
 		
 		\ganttitem{ider}{t1|-wp1}{IDEs research}{Lucia, Michal};
 		\ganttitem{pare}{t1|-wp2}{Parser libraries research}{Peter};
@@ -133,18 +137,20 @@ Project implementation is planned to be done within nine months. Work packages w
 		\ganttitem{lex}{t6|-wp19}{DC instruction}{Michal, Peter};
 		\ganttitem{lex}{t6|-wp20}{Diagnostics}{Lucia};
 		\ganttitem{lex}{t6|-wp21}{Ordinary LSP features}{Marcel};
+		\ganttitem{lex}{t6|-wp22}{Detailed specification}{all};
 		
 		
-		\ganttitem{lex}{t7|-wp22}{Ordinary symbols}{Adam, Peter};
-		\ganttitem{lex}{t7|-wp23}{Multiplatform deployment}{Michal};
-		\ganttitem{lex}{t7|-wp24}{Benchmarking}{Marcel};
+		\ganttitem{lex}{t7|-wp23}{Ordinary symbols}{Adam, Peter};
+		\ganttitem{lex}{t7|-wp24}{Multiplatform deployment}{Michal};
+		\ganttitem{lex}{t7|-wp25}{Benchmarking}{Marcel};
 		
 		
-		\ganttitem{lex}{t8|-wp25}{Code coverage}{Lucia};
+		\ganttitem{lex}{t8|-wp26}{Code coverage}{Lucia};
 		
-		\ganttitem{lex}{t9|-wp26}{Testing}{all};
-		\ganttitem{lex}{t9|-wp27}{Documnetation}{all};
-		\ganttitem{lex}{t9|-wp28}{Final presenation}{all};
+		\ganttitem{lex}{t9|-wp27}{Testing}{all};
+		\ganttitem{lex}{t9|-wp28}{Documnetation}{all};
+		\ganttitem{lex}{t9|-wp29}{Final presenation}{all};
+		
 		
 		\end{tikzpicture}
 		\caption{Work packages overview}
