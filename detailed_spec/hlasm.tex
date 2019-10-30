@@ -1,6 +1,6 @@
 \chapter{HLASM overview}
 
-Assembly languages consist of solely ordinary machine instructions. High-level assemblers generally extend them with features commonly found in high-level programming languages, such as control statements similar to \textit{if, while, for} as well as custom callable macros.
+Assembly languages consist of solely ordinary machine instructions. High-level assemblers generally extend them with features commonly found in high-level programming languages, such as control statements similar to \emph{if, while, for} as well as custom callable macros.
 
 IBM High Level Assembler (HLASM) satisfies this definition and adds other features which will be described in this chapter.
 
@@ -10,7 +10,7 @@ Due to historical reasons, HLASM syntax differs greatly to the syntax of modern 
 
 \subsection{Statement}
 
-HLASM program is represented by a sequence of \textit{statements}. A statement consists of four fields. These are:
+HLASM program is represented by a sequence of \emph{statements}. A statement consists of four fields. These are:
 \begin{itemize}
 	\item \textbf{Name field} --- Serves as a place for named constants that are to be used in code. This field is optional, but, when present, it must start at the begin column of a line.
 	
@@ -22,7 +22,7 @@ HLASM program is represented by a sequence of \textit{statements}. A statement c
 \end{itemize}
 
 
-\Cref{lst:example} shows an example of a basic statement containing all fields.
+\Cref{lst:small_example} shows an example of a basic statement containing all fields.
 \begin{listing}
 
 \begin{verbatim}
@@ -30,12 +30,12 @@ HLASM program is represented by a sequence of \textit{statements}. A statement c
 .NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
 \end{verbatim}
 \caption{An example statement with fields.}
-\label{lst:example}
+\label{lst:small_example}
 \end{listing}
 
 \subsection{Continuation}
 
-Individual statements sometimes contain more than 80 characters, which contradicts to line length limitations. Therefore, a special handling called \emph{continuation} is introduced.\todo{Prosim nepouzivejte bold uprostred odstavce nebo v textu, na emphasis a definice je \textbackslash\emph{emph}. Pokud je neco potreba zvyraznit, je to potreba udelat systematictejc, idealne obrazkem.}.
+Individual statements sometimes contain more than 80 characters, which contradicts to line length limitations. Therefore, a special handling called \emph{continuation} is introduced.
 
 Firstly, let us elaborate more on the topic of line columns. There are four special columns:
 \begin{itemize}
@@ -49,29 +49,29 @@ Firstly, let us elaborate more on the topic of line columns. There are four spec
 \end{itemize}
 They all serve a different purpose.
 
-\textit{Begin column} defines either the start of a statement, or the beginning of the name field.
+\emph{Begin column} defines either the start of a statement, or the beginning of the name field.
 
-\textit{End column} determines the end of the statement. Anything written to its right does not count as content of the statement, and is rather used as a place for the line sequence number (see \ref{fig01:line}). 
+\emph{End column} determines the end of the statement. Anything written to its right does not count as content of the statement, and is rather used as a place for the line sequence number (see \cref{fig01:line}). 
 
-\textit{Continuation column} is used to indicate that the statement continues on the next line. For proper indication, an arbitrary character other than space must be written in this column. The remainder of the statement must then start on the \textit{continue column}.
+\emph{Continuation column} is used to indicate that the statement continues on the next line. For proper indication, an arbitrary character other than space must be written in this column. The remainder of the statement must then start on the \emph{continue column}.
 
 An example of an instruction where its last operand exceeded 72.~column of the line can be seen in \cref{lst:overflow}.
 \begin{listing}
 	\begin{verbatim}
-	OP1                    REG12,REG07,REG04,REG00,REG01,REG11,Rx
-	EG02
+             OP1                   REG12,REG07,REG04,REG00,REG01,REG11,Rx
+                EG02
 	\end{verbatim}
 	\caption{Example program that uses continuation for overflowing the line.}
 	\label{lst:overflow}
 \end{listing}
 
-There also exist instructions that support a so called \textit{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column.
+There also exist instructions that support a so called \emph{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
 
 \begin{listing}
 \begin{verbatim}
-  AIF   ('&VAR' FIND '~').A,     REMARK1                      x
-        ('&VAR'  EQ  'L').B,     REMARK2                      x
-        (T'&VAR  EQ  'U').C      REMARK3 
+          AIF   ('&VAR' FIND '~').A,     REMARK1                        x
+                ('&VAR'  EQ  'L').B,     REMARK2                        x
+                (T'&VAR  EQ  'U').C      REMARK3 
 \end{verbatim}
 \caption{Extended instruction format.}
 \label{lst:extended}
@@ -79,7 +79,7 @@ There also exist instructions that support a so called \textit{extended format} 
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
-	\caption{Description of line columns (source: HLASM Language Reference https://www-01.ibm.com/servers/resourcelink/\-svc00100.nsf/\-pages/\-zOSV2R3sc264940/\-\$file/\-asmr1023.pdf).}
+	\caption{Description of line columns (source: \href{https://www-01.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R3sc264940/$file/asmr1023.pdf}{HLASM Language Reference} ).}
 	\label{fig01:line}
 \end{figure}
 
@@ -92,7 +92,7 @@ We can divide assembling into two interlinked steps --- \emph{conditional assemb
 
 \subsection{Conditional assembly}
 
-The \emph{conditional assembly} process can be compared to a C++ text preprocessor. However, in HLASM, the preprocessing is more complex, so it has obtained the term \textit{code generation}. It works with \emph{variable symbols}, \emph{conditional assembly (CA) instructions} and \emph{macros}. 
+The \emph{conditional assembly} process can be compared to a C++ text preprocessor. However, in HLASM, the preprocessing is more complex, so it has obtained the term \emph{code generation}. It works with \emph{variable symbols}, \emph{conditional assembly (CA) instructions} and \emph{macros}. 
 
 \subsubsection{Variable symbols}
 
@@ -132,9 +132,9 @@ A few specific instructions exist that alter assembler's behavior. Let us name a
 	
 	\item \textbf{DC} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc. ).
 	
-	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \textit{conditional assembly}, hence alter it in custom manner.
+	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \emph{conditional assembly}, hence alter it in custom manner.
 	
-	\item \textbf{COPY} --- Copies a whole file found in \textit{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
+	\item \textbf{COPY} --- Copies a whole file found in \emph{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
 	
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
