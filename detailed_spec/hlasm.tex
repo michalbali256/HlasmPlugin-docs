@@ -88,11 +88,21 @@ There also exist instructions that support a so called \emph{extended format} of
 
 Having briefly described its syntax, this section prepares the reader to better understand the assembly process hidden behind HLASM. 
 
-We can divide assembling into two interlinked steps --- \emph{conditional assembly} and \emph{ordinary assembly}.
+HLASM program consists of sequence of statements. Those statements are mainly ordinary \emph{machine instructions} that are processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers.
+
+In addition to machine instruction statements, HLASM assembler provides the \emph{assembler instructions} (in other systems commonly termed as \emph{directives}). They order the assembler to take a specific actions rather than assembling instructions. For example, they generate run-time data constants, create named symbols containing relative addresses or constant values, modify addresses of code generation or affect how the assembler operates.
+
+On top of this, the HLASM assembler offers \emph{conditional assembly (CA) processing}. The user may think of it as a macro-language built above traditional assembler. Employing special statements, user is capable of branching around and printing machine instruction statements. Even more, the user is able to define custom macros that can be called defined with parameters. Note, that CA processing is T-complete and it is whole processed during compile-time.
+
+The last think to note is that CA processing, although it may act like a text preprocessing, is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing.
+
+\vspace{5mm}
+
+Now, let us talk more about above described kinds of processing.
 
 \subsection{Conditional assembly}
 
-The \emph{conditional assembly} process can be compared to a C++ text preprocessor. However, in HLASM, the preprocessing is more complex, so it has obtained the term \emph{code generation}. It works with \emph{variable symbols}, \emph{conditional assembly (CA) instructions} and \emph{macros}. 
+Conditional assembly processing can be divided into \emph{variable symbols}, \emph{conditional assembly instructions} and \emph{macros}. 
 
 \subsubsection{Variable symbols}
 
@@ -112,21 +122,12 @@ Other subset is capable of conditional and unconditional branching. HLASM provid
 
 \subsubsection{Macros}
 
-A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can even contain a sequence of instructions generating another macro definition.
+A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can contain CA instructions or even a sequence of instructions generating another macro definition.
 
 With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
 
-\subsection{Ordinary assembly}
-
-Ordinary assembly is a term for assembly other that conditional. It includes assembly of both machine and assembler instructions. 
-
-\emph{Machine instructions} and their operands are translated to a sequence of bytes and written to the executable program. In contrast to basic assemblers, HLASM allows expressions to be passed as operands of these instructions. These expressions are capable of address arithmetics, and can also contain defined constants.
-
-\emph{Assembler instructions}, on the other hand, are used to alter the behavior of the assembler. Therefore, they are not assembled into the executable program.
-
-\subsubsection{Assembler instructions}
-
-A few specific instructions exist that alter assembler's behavior. Let us name a few of them:
+\subsection{Assembler instructions}
+Here, let us enumerate a few of the assembler instructions:
 \begin{itemize}
 	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
 	
@@ -138,6 +139,11 @@ A few specific instructions exist that alter assembler's behavior. Let us name a
 	
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
+
+\subsection{Machine instructions}
+\emph{Machine instructions} and their operands are translated to a sequence of bytes and written to the executable program. In contrast to basic assemblers, HLASM allows expressions to be passed as operands of these instructions. These expressions are capable of address arithmetics, and can also contain defined constants.
+
+\vspace{5mm}
 
 An example of simple HLASM program with the description of its statements is shown in \cref{lst:example}.
 \begin{listing}
@@ -164,7 +170,7 @@ An example of simple HLASM program with the description of its statements is sho
 [18]     .END        ANOP
 [19]                 END
 \end{verbatim} 
-\caption{An example definition of a macro.}
+\caption{An example of HLASM program.}
 \label{lst:example}
 \end{listing}
 
@@ -183,5 +189,3 @@ In line \verb|15|, the constant \verb|LEN| is assigned the difference of two add
 Instruction \verb|DC| in line \verb|17| creates value of type double and assigns its address to constant \verb|DOUBLE|. This constant also holds information about length, type and other attributes of the data.  
 
 \verb|ANOP| is an empty assembler action and line \verb|19| ends the assembling of the program. 
-
-\vspace{5mm}
