@@ -1,14 +1,14 @@
 \chapter{Background and goals}
 
 
-The IBM High Level Assembler Language is still actively used commercially, even though it is a relatively old language. 
+The IBM High Level Assembler Language (HLASM) is still actively used commercially, even though it is a relatively old language. Its roots go back to seventies, when IBM began to ship their first mainframes. Since then, IBM assembler was revised several times --- the last version came out in 1992 and is called HLASM. Although it is hard to believe, much of the software written in the language over the years is still used and maintained mainly because conservatism of companies and IBM's vendor lock-in.
 
-Today's HLASM developers are forced to code in the archaic terminals directly on the mainframe. Therefore, they spend too much time navigating the code. For developers, it would be extremely useful to have an IDE plugin that could analyze the HLASM program, check its validity and make the code clearer by highlighting it. 
+Today's HLASM developers are forced to code in archaic terminals directly on the mainframe. Therefore, they spend too much time navigating the code and the environment. For example, it takes approximately 20 seconds just to make a change in a file and recompile, just because the user has to navigate through plenty of terminal screens. For developers, it would be extremely useful to have an IDE plugin that would minimise contact with the terminal. could analyze the HLASM program, check its validity and make the code clearer by highlighting it. 
 
-The aim of this project is to elevate programming in HLASM language to be compared with coding in modern programming languages.
+The aim of this project is to elevate HLASM programming experience to be compared to coding in modern programming languages by providing instant code validity checks, advanced highlighting, code analysis and all the functionality today's programmer takes for granted when writing code.
 
-\section{Related Work}
+\section{Related HLASM software}
 \todo{misto `related work' je tady vhodny mit spis `related HLASM users'}
-Naturally, there exists a HLASM compiler, specifically the one from IBM. Our team will be granted access to this compiler. During the implementation of language features we will use this compiler to recognize all the details of assembling behavior. 
+Naturally, there exists a HLASM compiler, specifically the one from IBM. Our team will be granted access to this compiler. During the implementation of language features we will use this compiler as a reference and will try to mimic its error recognition capabilities.
 
-Visual Studio Code Marketplace already has a plugin for HLASM language. However it provides only syntax highlighting. The team will analyze this plugin while developing the project.
+Visual Studio Code Marketplace already has a plugin for HLASM language. However it provides only basic syntax highlighting implemented as textmate grammar, which has its limitations. We aim for writing a parser that would understand every aspect of the language.
