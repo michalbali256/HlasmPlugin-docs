@@ -40,7 +40,7 @@ and assembler instructions for code layout determination:
 
 \item All instructions (including machine instructions) are being semantically and syntactically checked for correct operand format usage. However, the run-time register and memory values are not being analyzed as there is no machine instruction interpretation.
 
-\item Due to the possibility of using external files, a dependency search must be implemented. To do so, two configuration files are necessary to provide locations of depending files. They look as shown in \cref{lst:pgm} and \cref{lst:grps}. 
+\item Due to the possibility of using external files, a dependency search must be implemented. To do so, two configuration files are necessary to provide locations of depending files. They look as shown in \cref{lst:grps} and \cref{lst:pgm}. 
 
 The \texttt{proc\_grps} file contains names of \texttt{processor groups} with the relative paths to the external files. The \texttt{pgm\_conf} matches the processor groups to the source code files. This configuration procedure is similar to the one used on real mainframes. We provide a built-in pre-configuration option for these files.
 
