@@ -23,6 +23,15 @@
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\Z}{\mathbb{Z}}
 
+\newcommand{\bms}{\begin{enumerate}[label=\bf (M\arabic*)]}
+\newcommand{\bwp}{\begin{enumerate}[label=\bf \normalsize  (WP\arabic*), resume=del]}
+\newcommand{\eenum}{\end{enumerate}}
+\newcommand{\itemm}{\large \item }
+\newcommand{\itemwp}{ \normalsize \item }
+\newcommand{\deadline}[1]{\textit{\small (month #1)}}
+\newcommand{\people}[1]{\textit{\small (#1)}}
+
+
 % move the headings out of gutenberg era
 \setcounter{secnumdepth}{4}
 \titleformat{\chapter}{\cool\fontsize{24pt}{24pt}\bfseries}{\color{black!25}\thechapter.}{1em}{}
@@ -30,3 +39,17 @@
 \titleformat{\subsection}{\cool\fontsize{14pt}{16pt}\bfseries}{\scriptsize\color{black!25}\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\cool\fontsize{12pt}{14pt}\bfseries}{\scriptsize\color{black!25}\thesubsubsection}{1em}{}
 
+% code floats
+\colorlet{shadecolor}{cyan!10}
+\makeatletter
+\newcommand\floatc@code[2]{{\@fs@cfont #1} #2\par}
+\newcommand\fs@code{\def\@fs@cfont{\bfseries}\let\@fs@capt\floatc@code
+\def\@fs@pre{}%
+\def\@fs@mid{\vspace{-.5ex}\begin{shaded}}%
+\def\@fs@post{\vspace{-1em}\end{shaded}}%
+\let\@fs@iftopcapt\iftrue}
+\makeatother
+
+\floatstyle{code}
+\newfloat{listing}{tbp}{lst}
+\floatname{listing}{Listing}

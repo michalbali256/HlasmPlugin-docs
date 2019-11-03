@@ -1,5 +1,13 @@
 \chapter{Background and goals}
 
-\section{Related Work}
-\todo{misto `related work' je tady vhodny mit spis `related HLASM users'}
 
+The IBM High Level Assembler Language (HLASM) is still actively used commercially, even though it is a relatively old language. Its roots go back to the 1970s, when IBM began to ship their first mainframes. Since then, the IBM assembler has been revised several times --- the last version came out in 1992 and is called HLASM. Although it is hard to believe, a lot of the software that has been written in the language over the years is still used and maintained, mainly because of the conservatism of companies and IBM's vendor lock-in.
+
+Today's HLASM developers are forced to code in archaic terminals directly on the mainframe. Therefore, they spend too much time navigating around the code and the environment. For example, it takes approximately 20 seconds just to make a change in a file and recompile, solely due to the fact that the user needs to navigate through plenty of terminal screens. For developers, it would be extremely useful to have an IDE plugin, which would minimize contact with the terminal, could analyze the HLASM program, check its validity and make the code clearer by highlighting it. 
+
+The aim of this project is to elevate HLASM programming experience, so it could be compared to coding in modern programming languages by providing instant code validity checks, advanced highlighting, code analysis and all the functionality today's programmer takes for granted when writing code.
+
+\section{Related HLASM software}
+Naturally, there exists a HLASM compiler, specifically the one from IBM. Our team will be granted access to this compiler. During the implementation of language features, we will use this compiler as a reference and will try to mimic its error recognition capabilities.
+
+Visual Studio Code Marketplace already has a plugin for HLASM language. However, it provides only basic syntax highlighting implemented as textmate grammar, which has its limitations. We aim for writing a parser that would understand every aspect of the language.

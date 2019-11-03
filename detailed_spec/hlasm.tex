@@ -1,126 +1,152 @@
 \chapter{HLASM overview}
 
-In general, high-level assemblers provide for their assembly languages features that are commonly found in high-level programming languages. Hence, in addition to ordinary machine instructions they also contain control statements similar to \textit{if, while, for} as well as custom callable macros.
+Assembly languages consist of solely ordinary machine instructions. High-level assemblers generally extend them with features commonly found in high-level programming languages, such as control statements similar to \emph{if, while, for} as well as custom callable macros.
 
-IBM High Level Assembler (HLASM) comforts this definition and adds other features which will be described in this chapter.
+IBM High Level Assembler (HLASM) satisfies this definition and adds other features which will be described in this chapter.
 
 \section{Syntax}
 
-Because of historical reasons HLASM syntax is fairly complicated. Its line length is limited to 80 characters as it was in times when punch cards were used. 
-
-Besides this HLASM uses syntax common to regular assemblers.
+Due to historical reasons, HLASM syntax differs greatly to the syntax of modern programming languages. It mostly uses syntax common to regular assemblers, which has limitations, like line-length limited to 80 characters (as that was the length of a punched card line).
 
 \subsection{Statement}
 
-HLASM program is sequence of \textit{statements}. Statement consists of four fields. Those are:
+HLASM program is represented by a sequence of \emph{statements}. A statement consists of four fields. These are:
 \begin{itemize}
-	\item \textbf{Name field} --- Serves as a place for named constants that are to be used in code. The field is optional but when present it must start in the begin column of a line.
+	\item \textbf{Name field} --- Serves as a place for named constants that are to be used in code. This field is optional, but, when present, it must start at the begin column of a line.
 	
-	\item \textbf{Operation field} --- Instruction that is executed. The only field that is mandatory. Must not begin in the first column as it would be interpreted as a name field.
+	\item \textbf{Operation field} --- The only mandatory field representing the instruction that is executed. Must not begin in the first column, as it would be interpreted as a name field.
 	
-	\item \textbf{Operands field} --- Field for instruction operands separated by comma located immediately after operation field. According to instruction used it can be any sequence of characters, apostrophe separated string or blank. 
+	\item \textbf{Operands field} --- Field for instruction operands, located immediately after operation field. Individual operands must be separated by a comma, and, depending on the specific instruction, can be either blank, in a form of an apostrophe separated string, or represented by a sequence of characters.
 	
-	\item \textbf{Remark field} --- Serves as inline commentary. Optionally located after operands field or operation field when operands are blank.
+	\item \textbf{Remark field} --- Optional, serves as inline commentary. Located either after the operands field, or, in case the operands are omitted, the operation field. 
 \end{itemize}
 
-This is an example of basic statement using all field.
+
+\Cref{lst:small_example} shows an example of a basic statement containing all fields.
+\begin{listing}
+
 \begin{verbatim}
  label   instruction     operands             remarks
 .NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
 \end{verbatim}
+\caption{An example statement with fields.}
+\label{lst:small_example}
+\end{listing}
 
 \subsection{Continuation}
 
-One line in HLASM source code can contain only up to 80 characters. However, sometimes statement is too long to be written in one line. Therefore, special handling is introduced called \textbf{continuation}\todo{Prosim nepouzivejte bold uprostred odstavce nebo v textu, na emphasis a definice je \textbackslash\emph{emph}. Pokud je neco potreba zvyraznit, je to potreba udelat systematictejc, idealne obrazkem.}.
+Individual statements sometimes contain more than 80 characters, which contradicts to line length limitations. Therefore, a special handling called \emph{continuation} is introduced.
 
-Firstly, let us elaborate more on the topic of line column. There are four special columns:
+Firstly, let us elaborate more on the topic of line columns. There are four special columns:
 \begin{itemize}
-	\item \textbf{Begin column (default 1)}
+	\item \emph{Begin column (default value: 1)}
 	
-	\item \textbf{End column (default 71)}
+	\item \emph{End column (default value: 71)}
 	
-	\item \textbf{Continuation column (default 72)}
+	\item \emph{Continuation column (default value: 72)}
 	
-	\item \textbf{Continue column (default 16)}
+	\item \emph{Continue column (default value: 16)}
 \end{itemize}
-They all serve different purpose. \textit{Begin column} states start of the statement or where name field should be written. Anything after \textit{end column} does not count as the content of a statement, rather it is used as a place for the line sequence number (see \ref{fig01:line}). 
+They all serve a different purpose.
 
-\textit{Continuation column} is used for indication that statement continues on the next line (to correctly indicate we write there arbitrary character other than space). Then the remainder of the statement must start on \textit{continue column} to finally create a well formed statement.
+\emph{Begin column} defines either the start of a statement, or the beginning of the name field.
 
-Here is an example of an instruction where its last operand exceeded 72.~column of the line.
+\emph{End column} determines the end of the statement. Anything written to its right does not count as content of the statement, and is rather used as a place for the line sequence number (see \cref{fig01:line}). 
+
+\emph{Continuation column} is used to indicate that the statement continues on the next line. For proper indication, an arbitrary character other than space must be written in this column. The remainder of the statement must then start on the \emph{continue column}.
+
+An example of an instruction where its last operand exceeded 72.~column of the line can be seen in \cref{lst:overflow}.
+\begin{listing}
+	\begin{verbatim}
+             OP1                   REG12,REG07,REG04,REG00,REG01,REG11,Rx
+                EG02
+	\end{verbatim}
+	\caption{Example program that uses continuation for overflowing the line.}
+	\label{lst:overflow}
+\end{listing}
+
+There also exist instructions that support a so called \emph{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
+
+\begin{listing}
 \begin{verbatim}
-  OP1                    REG12,REG07,REG04,REG00,REG01,REG11,Rx
-        EG02
-\end{verbatim} 
-However, there are some instructions that allow so called \textit{extended format} of~operands allowing continuation even when the contents of a line have not reached  the continuation column. \todo{reference the figure, do not use [h].}
-\begin{verbatim}
-  AIF   ('&VAR' FIND '~').A,     REMARK1                      x
-        ('&VAR'  EQ  'L').B,     REMARK2                      x
-        (T'&VAR  EQ  'U').C      REMARK3 
-\end{verbatim} 
+          AIF   ('&VAR' FIND '~').A,     REMARK1                        x
+                ('&VAR'  EQ  'L').B,     REMARK2                        x
+                (T'&VAR  EQ  'U').C      REMARK3 
+\end{verbatim}
+\caption{Extended instruction format.}
+\label{lst:extended}
+\end{listing}
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
-	\caption{Description of line columns (source HLASM Language Reference https://www-01.ibm.com/servers/resourcelink/\-svc00100.nsf/\-pages/\-zOSV2R3sc264940/\-\$file/\-asmr1023.pdf).}
+	\caption{Description of line columns (source: \href{https://www-01.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R3sc264940/$file/asmr1023.pdf}{HLASM Language Reference} ).}
 	\label{fig01:line}
 \end{figure}
 
 
 \section{Assembling}
 
-Having briefly described syntax, this section prepares reader to better understand assembly process hidden behind HLASM. 
+Having briefly described its syntax, this section prepares the reader to better understand the assembly process hidden behind HLASM. 
 
-We can divide assembling into two interlinked steps, \textbf{conditional assembly} and \textbf{ordinary assembly}.
+HLASM program consists of sequence of statements. Those statements are mainly ordinary \emph{machine instructions} that are processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers.
+
+In addition to machine instruction statements, HLASM assembler provides the \emph{assembler instructions} (in other systems commonly termed as \emph{directives}). They order the assembler to take a specific actions rather than assembling instructions. For example, they generate run-time data constants, create named symbols containing relative addresses or constant values, modify addresses of code generation or affect how the assembler operates.
+
+On top of this, the HLASM assembler offers \emph{conditional assembly (CA) processing}. The user may think of it as a macro-language built above traditional assembler. Employing special statements, user is capable of branching around and printing machine instruction statements. Even more, the user is able to define custom macros that can be called defined with parameters. Note, that CA processing is T-complete and it is whole processed during compile-time.
+
+The last think to note is that CA processing, although it may act like a text preprocessing, is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing.
+
+\vspace{5mm}
+
+Now, let us talk more about above described kinds of processing.
 
 \subsection{Conditional assembly}
 
-This part of assembly process can be compared to C++ text prepocessor. In HLASM it is more complicated process so it has obtained the term \textit{code generation}. It consists of \textbf{variable symbols}, \textbf{conditional assembly (CA) instructions} and \textbf{macros}. 
-
+Conditional assembly processing can be divided into \emph{variable symbols}, \emph{conditional assembly instructions} and \emph{macros}. 
 
 \subsubsection{Variable symbols}
 
-These symbols serve as points of substitution or information holders. 
+Variable symbols serve as points of substitution or information holders. 
 
-When they occur in a statement, they are substituted by their value to create a new statement. For example, in this manner user can write variable symbol in operation field of statement and generate any instruction that can be a result of substitution.
+When they occur in a statement, they are substituted by their value to create a new statement. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
 
-Variable symbols have also notion of types. Symbol can be integer, boolean or string. CA instructions gather this information for different sorts of conditional branching.
+Variable symbols also have notion of their type --- they can be defined either as an integer, a boolean or a string. CA instructions gather this information for different sorts of conditional branching.
 
 \subsubsection{CA instructions}
 
-The major difference to other instructions is that they are not assembled into object code, they rather select which instructions will be processed by assembler next.
+The major difference to other instructions is that they are not assembled into object code. Rather, they select which instructions will be processed by assembler next.
 
-One subset of CA instructions operates on variable symbols. With them user can define variable symbols locally or globally, assign or update their value.
+One subset of CA instructions operates on variable symbols. With them, the user can define variable symbols locally or globally, assign or update their values.
 
-Other subset is capable of conditional and unconditional branching. HL\-ASM provides big variety of built in binary or unary operations on variable symbols which can create complex conditional expressions. This is important in HLASM as you can alter flow of instructions that will be assembled into executable program.
+Other subset is capable of conditional and unconditional branching. HLASM provides a variety of built-in binary or unary operations on variable symbols, which can create complex conditional expressions. This is important in HLASM, as the user can alter flow of instructions that will be assembled into executable program.
 
 \subsubsection{Macros}
-Macro is structure consisting of name, input parameters and sequence of statements called body. When they are called in HLASM program, each statement in the body is performed. Nested or recursive call of macros is allowed. Macro body can even contain such sequence of instructions that it can generate another macro definition ready for later use. With help of variable symbols, HLASM macros have power to create custom task specific macros.
 
-\subsection{Ordinary assembly}
+A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can contain CA instructions or even a sequence of instructions generating another macro definition.
 
-Ordinary assembly is a term for assembly other that conditional. 
+With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
 
-Assembly of \textit{machine instructions} belong here. They and their operands are translated to sequence of bytes and written to executable program. HL\-ASM differs from basic assemblers as it allows expressions as operands of those instructions. This expressions can contain constanst as well as are capable of address arithmetics.
-
-Assembly of \textit{assembler instructions} also belong here. However, they are neither assembled nor completely ignored. They alter behavior of assembler.
-
-\subsubsection{Assembler instructions}
-The behavior of assembler is altered by this instructions in different ways. Let us enumerate some of them.
- 
+\subsection{Assembler instructions}
+Here, let us enumerate a few of the assembler instructions:
 \begin{itemize}
-	\item \textbf{ICTL} --- Changes previously described line columns (i.e. \textit{begin column} at column 2 etc. ).
+	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
 	
 	\item \textbf{DC} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc. ).
 	
-	\item \textbf{EQU} --- Defines named constant with integer value or relative address value. This constants can be accessed by \textit{conditional assembly}, hence alter it in custom manner.
+	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \emph{conditional assembly}, hence alter it in custom manner.
 	
-	\item \textbf{COPY} --- Copies whole file found in \textit{copy member library}\footnote{Path to library is passed to assembler before the start of assembly.} and pastes it in place of the instruction.
+	\item \textbf{COPY} --- Copies a whole file found in \emph{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
 	
-	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and start of relative addressing.
+	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
 
-Here is example of simple HLASM program with the description of its statements.
+\subsection{Machine instructions}
+\emph{Machine instructions} and their operands are translated to a sequence of bytes and written to the executable program. In contrast to basic assemblers, HLASM allows expressions to be passed as operands of these instructions. These expressions are capable of address arithmetics, and can also contain defined constants.
 
+\vspace{5mm}
+
+An example of simple HLASM program with the description of its statements is shown in \cref{lst:example}.
+\begin{listing}
 \begin{verbatim}
          name        operation   operands
          
@@ -144,23 +170,22 @@ Here is example of simple HLASM program with the description of its statements.
 [18]     .END        ANOP
 [19]                 END
 \end{verbatim} 
+\caption{An example of HLASM program.}
+\label{lst:example}
+\end{listing}
 
-In lines \verb|01-04| the reader can see \textit{macro definition}. It is defined with a name \verb|GEN_LABEL|, variable \verb|NAME| and has one instruction in body that assigns to label in \verb|NAME| current address.
+In lines \verb|01-04|, we see a \emph{macro definition}. It is defined with a name \verb|GEN_LABEL|, variable \verb|NAME| and contains one instruction in its body, which assigns the current address to the label in \verb|NAME|.
 
-In line \verb|06| there is use of \textit{copy instruction} where it includes contents of \verb|REGS| file.
+In line \verb|06|, the \emph{copy instruction} is used, which includes the contents of the \verb|REGS| file.
 
-Line \verb|08| establishes start of executable section called \verb|TEST|. 
+Line \verb|08| establishes a start of an executable section \verb|TEST|. 
 
-In line \verb|09| integer value is assigned to variable symbol \verb|VAR|. The value is the length attribute of non previously defined constant \verb|DOUBLE|. The assembler looks for definition of the constant to properly evaluate conditional assembly expression. In the next line there is CA branching instruction \verb|AIF|. If value of \verb|VAR| equals 4, next lines are skipped and assembling continues on line \verb|18| where branching symbol \verb|END| is located.  
+In line \verb|09|, an integer value is assigned to a variable symbol \verb|VAR|. The value is the length attribute of previously non-defined constant \verb|DOUBLE|. The assembler looks for the definition of the constant to properly evaluate the conditional assembly expression. In the next line, there is CA branching instruction \verb|AIF|. If value of \verb|VAR| equals to 4, next lines are skipped and assembling continues on line \verb|18|, where branching symbol \verb|END| is located.  
 
-Lines \verb|12-13| shows example of machine instructions which are directly assembled into object code. Lines \verb|11,14| are examples of macro call.
+Lines \verb|12-13| show examples of machine instructions that are directly assembled into object code. Lines \verb|11,14| contain examples of macro call.
 
-In line \verb|15| to constant \verb|LEN| is equated difference of two addresses. This value is next used to generate character data.
+In line \verb|15|, the constant \verb|LEN| is assigned the difference of two addresses. This value is next used to generate character data.
 
 Instruction \verb|DC| in line \verb|17| creates value of type double and assigns its address to constant \verb|DOUBLE|. This constant also holds information about length, type and other attributes of the data.  
 
-\verb|ANOP| is empty assembler action and line \verb|19| ends the program assembling. 
-
-\vspace{5mm}
-As the reader may see, HLASM is heavily extended assembler with complex assembling phases. 
-However, the result of that is programming language with large expressive power. 
+\verb|ANOP| is an empty assembler action and line \verb|19| ends the assembling of the program. 
