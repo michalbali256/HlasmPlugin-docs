@@ -1,13 +1,13 @@
 \chapter{Project scope}
 
-This chapter reviews specific goals of our project.
+This chapter reviews the specific goals of our project.
 All the features below have been discussed with professional HLASM developers and have been agreed on by the company.
 
 This project aims to produce a VS Code extension, downloadable from the Market Place. The extension contains all executables/libraries that are needed for the project to work correctly on the most popular platforms. No other prerequisites should be needed.
 
 Modularity of the software is another important requirement. 
 
-The parsing library provides 2 kinds of API: complex one that mirrors the LSP specification and a simple one that accepts a text along with a dependency-resolver object and returns diagnostics. 
+The parsing library provides 2 kinds of API: a complex one that mirrors the LSP specification and a simple one that accepts a text along with a dependency-resolver object and returns diagnostics. 
 
 The language server implements the LSP standard, hence it can be easily reintegrated within other IDEs such as Eclipse Che.
 
@@ -17,7 +17,7 @@ This part provides a brief overview of the parts of HLASM that should be include
 \begin{itemize}
 \item The parsing library recognizes the syntax of HLASM and parses it into predefined structures. 
 
-\item It is able to interpret high-level parts of the assembler. There are conditional assembly instructions for the code generation and the macro expansion:
+\item It is able to interpret high-level parts of the assembler. Following are the conditional assembly instructions for code generation and macro expansion:
 \begin{itemize}
     \item AIF
     \item AGO
@@ -39,15 +39,15 @@ and assembler instructions for code layout determination:
     \item LOCTR
 \end{itemize}
 
-\item The back-end library also semantically and syntactically checks all instructions (including machine instructions) for correct operand format usage. However, it does not analyze the run-time register and memory values as there is no machine instruction interpretation.
+\item The back-end library also semantically and syntactically checks all instructions (including machine instructions) for correct operand format usage. However, it does not analyze the run-time register and memory values, as there is no machine instruction interpretation.
 
-\item Usage of external files in HLASM is highly common phenomenon. On mainframes, HLASM programs are built according to its JCL\footnote{Job Control Language, instructs the system how to run a specific task.} file which contains a list of libraries. When the compiler encounters an undefined instruction or \texttt{COPY} instruction, it does a top-down search through the whole list. Both ways of invoking a dependency search are demonstrated in \cref{lst:search}. As a large portion of the programs use the same libraries, defining these JCL files gets repetitive. Therefore, the build and source management system Endevor creates an abstraction above the libraries and groups them into \texttt{processor groups}. As a result, JCL offers an option to identify the libraries to be included by their processor group's ID instead of listing them all manually.
+\item Usage of external files in HLASM is a highly common phenomenon. On mainframes, HLASM programs are built according to its JCL\footnote{Job Control Language, instructs the system how to run a specific task} file, which contains a list of libraries. When the compiler encounters an undefined instruction or a \texttt{COPY} instruction, it does a top-down search through the whole list. Both ways of invoking a dependency search are demonstrated in \cref{lst:search}. As a large portion of the programs use the same libraries, defining these JCL files gets repetitive. Therefore, the build and source management system Endevor creates an abstraction above the libraries and groups them into \texttt{processor groups}. As a result, JCL offers an option to identify the libraries to be included by their processor group's ID instead of listing them all manually.
 
-We adapt this system to our needs and define 2 configuration files. First one mirrors the behavior of Endevor and defines the processor groups. Second one matches the source codes to these processor groups.
+We adapt this system to our needs and define 2 configuration files. The first one mirrors the behavior of Endevor and defines the processor groups. The second one matches the source codes to these processor groups.
 
-\item Another aspect of HLASM which has to be considered and handled are fixed-sized lines. This makes the parsing more difficult as the continuation character can be placed in different cases differently. We also add a continuation handling option to the IDE which mostly consists of non-movable continuation characters, i.e. if the user types something in front of the continuation character, it stays on place.
+\item Another aspect of HLASM that needs to be considered and handled are fixed-sized lines. This makes the parsing more difficult, as the position of the continuation character may vary. We also add a continuation handling option to the IDE, which mostly consists of non-movable continuation characters, i.e. if the user types something in front of the continuation character, it stays on place.
 
-\item On top of that, \texttt{macro tracer} is implemented using \texttt{Debug Adapter Protocol}. Following standard debugging procedure, the user can step through the code generation while watching the contents of variables and the call stack. This tool is extremely useful as tracing the macro expansions manually gets tedious quickly.
+\item On top of that, we implement the \texttt{macro tracer} using the \texttt{Debug Adapter Protocol}. Following the standard debugging procedure, the user can step through the code generation while watching the contents of variables and the call stack. This tool is extremely useful as tracing the macro expansions manually gets tedious quickly.
 \end{itemize}
 
 \pagebreak
@@ -96,14 +96,14 @@ framexleftmargin=15pt,
 backgroundcolor = \color{lightgray}
 }
 \begin{itemize}
-    \item The language server recognizes operand formats of different instructions. The most simple example is the \texttt{SAM31} instruction which does not have any operands while \texttt{LR} instructions takes two. So the identifier right after \texttt{SAM31} is colored blue as remark. 
+    \item The language server recognizes operand formats of different instructions. The most simple example is the \texttt{SAM31} instruction, which does not have any operands, while the \texttt{LR} instruction takes two. So the identifier right after \texttt{SAM31} is colored blue as a remark. 
     
 \begin{lstlisting}
     SAM31 REMARK
     LR    1,1   REMARK
 \end{lstlisting}
 
-\item The code skipped by the conditional assembly is not colored, stays white.
+\item The code skipped by the conditional assembly is not colored and stays white.
 \begin{lstlisting}
     AGO .HERE
     J   SYMBOL
