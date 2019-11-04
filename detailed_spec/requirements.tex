@@ -1,20 +1,21 @@
-\chapter{Requirements}
+\chapter{Project scope}
 
-This chapters outlines the main features that the project should implement to be a working product. All the features below have been discussed with professional HLASM developers and have been agreed on by the company.
+This chapter reviews specific goals of our project.
+All the features below have been discussed with professional HLASM developers and have been agreed on by the company.
 
-The final product is a VS Code extension, downloadable from the Market Place. The extension contains all executables/libraries that are needed for the project to work correctly on the most popular platforms. No other prerequisites should be needed.
+This project aims to produce a VS Code extension, downloadable from the Market Place. The extension contains all executables/libraries that are needed for the project to work correctly on the most popular platforms. No other prerequisites should be needed.
 
-Modularity of the project is another important requirement. 
+Modularity of the software is another important requirement. 
 
 The parsing library provides 2 kinds of API: complex one that mirrors the LSP specification and a simple one that accepts a text along with a dependency-resolver object and returns diagnostics. 
 
 The language server implements the LSP standard, hence it can be easily reintegrated within other IDEs such as Eclipse Che.
 
-\section{Language features}
-This part provides a brief overview of the parts of HLASM that are included in the working product.
+\section{Supported language features}
+This part provides a brief overview of the parts of HLASM that should be included in the final software.
 
 \begin{itemize}
-\item The project recognizes the syntax of HLASM and parses it into predefined structures. 
+\item The parsing library recognizes the syntax of HLASM and parses it into predefined structures. 
 
 \item It is able to interpret high-level parts of the assembler. There are conditional assembly instructions for the code generation and the macro expansion:
 \begin{itemize}
@@ -38,61 +39,76 @@ and assembler instructions for code layout determination:
     \item LOCTR
 \end{itemize}
 
-\item All instructions (including machine instructions) are being semantically and syntactically checked for correct operand format usage. However, the run-time register and memory values are not being analyzed as there is no machine instruction interpretation.
+\item The back-end library also semantically and syntactically checks all instructions (including machine instructions) for correct operand format usage. However, it does not analyze the run-time register and memory values as there is no machine instruction interpretation.
 
-\item Due to the possibility of using external files, a dependency search must be implemented. To do so, two configuration files are necessary to provide locations of depending files. They look as shown in \cref{lst:grps} and \cref{lst:pgm}. 
+\item Usage of external files in HLASM is highly common phenomenon. On mainframes, HLASM programs are built according to its JCL\footnote{Job Control Language, instructs the system how to run a specific task.} file which contains a list of libraries. When the compiler encounters an undefined instruction or \texttt{COPY} instruction, it does a top-down search through the whole list. Both ways of invoking a dependency search are demonstrated in \cref{lst:search}. As a large portion of the programs use the same libraries, defining these JCL files gets repetitive. Therefore, the build and source management system Endevor creates an abstraction above the libraries and groups them into \texttt{processor groups}. As a result, JCL offers an option to identify the libraries to be included by their processor group's ID instead of listing them all manually.
 
-The \texttt{proc\_grps} file contains names of \texttt{processor groups} with the relative paths to the external files. The \texttt{pgm\_conf} matches the processor groups to the source code files. This configuration procedure is similar to the one used on real mainframes. We provide a built-in pre-configuration option for these files.
+We adapt this system to our needs and define 2 configuration files. First one mirrors the behavior of Endevor and defines the processor groups. Second one matches the source codes to these processor groups.
 
 \item Another aspect of HLASM which has to be considered and handled are fixed-sized lines. This makes the parsing more difficult as the continuation character can be placed in different cases differently. We also add a continuation handling option to the IDE which mostly consists of non-movable continuation characters, i.e. if the user types something in front of the continuation character, it stays on place.
 
-\item On top of that, \texttt{macro tracer} is implemented using \texttt{Debugging Adapter Protocol}. Following standard debugging procedure, the user can step through the code generation while watching the conditional assembly variables and the call stack. This tool is extremely useful as tracing the macro expansions manually gets tedious quickly.
+\item On top of that, \texttt{macro tracer} is implemented using \texttt{Debug Adapter Protocol}. Following standard debugging procedure, the user can step through the code generation while watching the contents of variables and the call stack. This tool is extremely useful as tracing the macro expansions manually gets tedious quickly.
 \end{itemize}
 
 \pagebreak
 \begin{listing}
 \begin{verbatim}
-{
-  "pgroups": [
-    {
-      "name": "P1",
-      "libs": [
-        "copies",
-        "libs"
-      ]
-    }
-  ]
-}
-\end{verbatim}
-\caption{proc\_grps.json}
-\label{lst:grps}
+        MAC1       1,1                   
+        COPY       COPY1
+\end{verbatim} 
+\caption{An example of both ways the HLASM program may invoke dependency search.}
+\label{lst:search}
 \end{listing}
 
-\begin{listing}
-\begin{verbatim}
-{
-  "pgms": [
-    {
-      "program": "source_code",
-      "pgroup": "P1"
-    }
-  ]
-}
-\end{verbatim}
-\caption{pgm\_conf.json}
-\label{lst:pgm}
-\end{listing}
-
-\section{LSP features}
+\section{Supported LSP features}
 This section demonstrates the possible uses of the extension on the client side. LSP provides a list of well-defined features. The project implements the following:
 
 \begin{itemize}
-	\item Go to definition for all symbols, macro definitions and copy members
-	\item Find all references for all symbols, macro definitions and copy members
+	\item \texttt{Go to definition} command for all symbols, macro definitions and copy members\footnote{Copy, along with macro expansion, is a mean to include another external file, invoked by \texttt{COPY} instruction. Comparing to macro, copy does not neither need to start nor end with any specific instruction and the invoking \texttt{COPY} instruction is simply replaced by the COPY file's contents.}
+	\item \texttt{Find all references} command for all symbols, macro definitions and copy members
 	\item Completion for instructions, defined symbols and macros
 	\item Hover for symbol attributes, their locations, contents and other useful information depending on the symbol type
 	\item Diagnostics for syntax and semantic errors and warnings
-	\item (Extra to LSP) Server-side Highlighting for all symbols  
+	\item (Custom LSP extension) Server-side Highlighting for all symbols  
 \end{itemize}
 
-The highlighting is not a standard part of the LSP, nonetheless it is a needed addition. Due to the complexity of HLASM, a typical syntax highlighting is not sufficient.
+The highlighting is not a standard part of the LSP, nonetheless it is a needed addition. Due to the complexity of HLASM, a typical syntax highlighting is not sufficient. Consider following examples:
+
+\lstdefinelanguage{HLASM}{
+    keywords = [1]{REMARK},
+    keywords = [2]{SAM31,LR,AGO,AIF,ICTL},
+    keywords = [3]{J,SYMBOL},
+     keywords = [4]{IGNORED},
+     keywords = [5]{X},
+    keywordstyle = [1]\color{blue},
+    keywordstyle = [2]\color{red},
+    keywordstyle = [3]\color{white},
+    keywordstyle = [4]\color{magenta},
+    keywordstyle = [5]\color{cyan}
+}
+\lstset{
+numbers=left, 
+numberstyle=\small, 
+numbersep=8pt, 
+frame = single, 
+language=HLASM, 
+framexleftmargin=15pt,
+backgroundcolor = \color{lightgray}
+}
+\begin{itemize}
+    \item The language server recognizes operand formats of different instructions. The most simple example is the \texttt{SAM31} instruction which does not have any operands while \texttt{LR} instructions takes two. So the identifier right after \texttt{SAM31} is colored blue as remark. 
+    
+\begin{lstlisting}
+    SAM31 REMARK
+    LR    1,1   REMARK
+\end{lstlisting}
+
+\item The code skipped by the conditional assembly is not colored, stays white.
+\begin{lstlisting}
+    AGO .HERE
+    J   SYMBOL
+.HERE AIF
+\end{lstlisting}
+
+\end{itemize}
+
