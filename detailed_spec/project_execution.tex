@@ -1,20 +1,31 @@
 \chapter{Project execution}
 
-In the following chapter, we review the execution of the High Level Assembler Plugin software project. 
-We analyze the problem difficulty, break it into tasks and estimate time requirements of particular tasks.
-We further describe the team and work organization.
+\section{Team}
+Our team consists of five members:
+
+\begin{itemize}
+	\item Michal Bali,
+	\item Marcel Hruška,
+	\item Peter Polák,
+	\item Adam Šmelko,
+	\item Lucia Tódová.
+\end{itemize}
+
+Each team member is responsible of delivering work packages assigned to him or her. 
 
 \section{Collaboration}
-The team consists of five members. As the collaboration within the team is essential for successful completion of the project, we use a variety of means and methods to achieve this. 
+As the collaboration within the team is essential for successful completion of the project, we use a variety of means and methods to achieve this. 
 
 Our team works with agile software development. To aid this, we use a visual process management system called Kanban. Our team meets every week with our supervisor at stand-ups and discusses the current status of particular tasks with their owners, reviews progress and plans work for the next week.
 
 For communication between team members, we use an online tool --- Slack.
 
-\section{Milestones and work packages}
-We analyzed the problem and split it into several milestones and work packages. At the time of writing this document,  the milestone \hyperref[milestone_preview]{Preview} has been reached. Therefore, there is currently a working prototype, and some of the presented work packages are already specified. 
+\section{Project timeline}
+The project is split into several milestones and work packages. At the time of writing this document,  the milestone \hyperref[milestone_preview]{Preview} has been reached. Therefore, there is currently a working prototype, and some of the presented work packages are already specified. 
 
 The implementation of the project is planned to be done within nine months. Work packages have been assigned to individual team members during stand-ups. The work packages, their deadlines and assignments are in the following table and Gantt diagram \ref{fig:gantt-pokus}. 
+
+\newpage
 
 \bms
 	\itemm Research and analysis \deadline{2}
@@ -41,6 +52,7 @@ The implementation of the project is planned to be done within nine months. Work
 		\bwp
 			\itemwp Client semantic highlighting \people{Marcel}
 			\itemwp Assembler checker \people{Lucia}
+					\tiny validation of instruction operands in parsed statements
 			\itemwp Conditional assembly instructions \people{Adam}
 			\itemwp Conditional assembly expressions \people{Peter}
 			\itemwp Macro expansion \people{Adam}
@@ -56,12 +68,17 @@ The implementation of the project is planned to be done within nine months. Work
 	\itemm Final version skeleton \deadline{7}
 		\bwp
 			\itemwp Machine instruction checker \people{Lucia}
+					\tiny validation of instruction operands in parsed statements
 			\itemwp DC instruction \people{Michal, Peter}
+					\tiny space reservation in object code for data (i.e. arrays)
 			\itemwp Copy instruction \people{Adam}
+					\tiny member library include
 			\itemwp Client-server continuation handling \people{Marcel}
 			\itemwp Diagnostics \people{Lucia}
+					\tiny errors and warnings reporting
 			\itemwp Ordinary LSP features \people{Marcel}
 			\itemwp Ordinary symbols \people{Adam, Peter}
+					\tiny space reservation for ordinary symbols
 		\eenum
 	
 	\itemm Feature testing \deadline{9}
