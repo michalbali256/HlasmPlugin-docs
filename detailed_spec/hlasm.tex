@@ -82,7 +82,7 @@ There also exist instructions that support a so called \emph{extended format} of
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
 	\caption{Description of line columns (source: \href{https://www-01.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R3sc264940/$file/asmr1023.pdf}{HLASM Language Reference} ).}
-	\label{fig01:line}
+	\label{fig01:line$}
 \end{figure}
 
 
@@ -97,10 +97,18 @@ Ordinary processing consist of \emph{machine instructions} and \emph{assembler i
 
 The main purpose of CA processing (see \cref{CA_proc}) is to generate statements for ordinary assembly.
 
+\subsection{Ordinary symbols}
+
+In HLASM, an \emph{ordinary symbol} is a named constant that can represent either a simple integer or an address. It can be defined by writing its name into the name field of a statement. Each symbol can only be defined once, and its value is constant. There are two kinds of ordinary symbols:
+\begin{itemize}
+	\item An \emph{absolute symbol} that simply has an integral value.
+	\item A \emph{relocatable symbol} that represents an address in the resulting object code.
+\end{itemize}
+
 \subsection{Machine instructions}
 \label{mach_instr}
 
-HLASM statements are mainly ordinary \emph{machine instructions} that are, with their operands, processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers. In contrast to them, HLASM allows expressions to be passed as operands of these instructions. These expressions are capable of address arithmetics, and can also contain defined constants.
+HLASM statements are mainly ordinary \emph{machine instructions} that are, with their operands, processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers. In contrast to them, HLASM allows expressions to be passed as operands of these instructions. These expressions may use ordinary symbols and are capable of integer and address arithmetics.
 
 \subsection{Assembler instructions}
 \label{asm_instrs}
@@ -111,7 +119,7 @@ Here, let us enumerate a few of the assembler instructions:
 \begin{itemize}
 	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
 	
-	\item \textbf{DC} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc. ).
+	\item \textbf{DC}, \textbf{DS} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.).
 	
 	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \emph{conditional assembly}, hence alter it in custom manner.
 	
@@ -120,6 +128,28 @@ Here, let us enumerate a few of the assembler instructions:
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
 
+\subsection{Ordinary assembly}
+
+All the assembler instructions and ordinary symbols must be resolved before the assembler writes the final object file. The HLASM language supports forward declaration of ordinary symbols, so the assembly may be quite complicated. Consider an example in \cref{lst:ordinary_assembly}. When the instruction in line 1 is seen for the first time, it is impossible to determine its length, because the symbol \verb|LEN| is not defined yet \footnote{Character L with an expression in parentheses in DS operand of type C specifies how many bytes should be reserved in the program.}. The same applies to the length of the instruction in the second line. Furthermore, it is also impossible to determine the exact value of relocatable symbols \verb|ADDR| and \verb|HERE|, because of the unknown length of the preceding instructions.
+
+In the next step, \verb|LEN| is defined, but it cannot be evaluated, because the subtraction of addresses \verb|ADDR| and \verb|HERE| is dependant on the unknown length of instruction on second line and therefore on the symbol \verb|SIZE|. The whole program is resolved only when the assembly reaches the last line, which defines the length of instruction \verb|02|. Afterwards, it is possible to resolve \verb|LEN| and finally the length of instruction \verb|01|.
+
+The dependency graph created by these principles can be arbitrarily deep and complicated, however it must not contain cycles (it must be a tree).
+
+\begin{listing}[p]
+	\begin{verbatim}
+	
+[01]              DS    CL(LEN)
+[02]   ADDR       DS    CL(SIZE)
+[03]
+[04]   HERE       DS    0H
+[05]   LEN        EQU   HERE-ADDR
+[06]   SIZE       EQU   1
+	
+	\end{verbatim}
+	\caption{Example program that uses continuation for overflowing the line.}
+	\label{lst:ordinary_assembly}
+\end{listing}
 
 \subsection{Conditional assembly}
 \label{CA_proc}
@@ -150,15 +180,6 @@ A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameter
 With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
 
 \vspace{5mm}
-
-To sum up, CA processing is T-complete and it is whole processed during compile-time.
-CA instructions have the same syntax as machine or assembler instructions to create an appearance of consistency in the HLASM program. Moreover, during ordinary assembly, names of these instructions can be aliased.
-
-Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. Also, CA is able to lookup constants that are not yet defined prior to the currently processed statement. 
-
-
-\vspace{5mm}
-
 
 An example of simple HLASM program with the description of its statements is shown in \cref{lst:example}.
 \begin{listing}
@@ -204,3 +225,10 @@ In line \verb|15|, the constant \verb|LEN| is assigned the difference of two add
 Instruction \verb|DC| in line \verb|17| creates value of type double and assigns its address to constant \verb|DOUBLE|. This constant also holds information about length, type and other attributes of the data.  
 
 \verb|ANOP| is an empty assembler action and line \verb|19| ends the assembling of the program. 
+
+\vspace{5mm}
+
+Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
+
+To sum up, CA processing has variables to store state of compilation and CA instructions for conditional branching. Hence, it is Turing-complete while still evaluated during compile-time.
+

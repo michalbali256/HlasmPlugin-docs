@@ -1,7 +1,7 @@
 \chapter{Project execution}
 
 \section{Team}
-Our team consists of five members:
+This team consists of five members:
 
 \begin{itemize}
 	\item Michal Bali,
@@ -11,7 +11,7 @@ Our team consists of five members:
 	\item Lucia Tódová.
 \end{itemize}
 
-Each team member is responsible of delivering work packages assigned to him or her. 
+Each team member is responsible for delivering work packages assigned to him or her. 
 
 \section{Collaboration}
 As the collaboration within the team is essential for successful completion of the project, we use a variety of means and methods to achieve this. 
@@ -52,12 +52,14 @@ The implementation of the project is planned to be done within nine months. Work
 		\bwp
 			\itemwp Client semantic highlighting \people{Marcel}
 			\itemwp Assembler checker \people{Lucia}
-					\tiny validation of instruction operands in parsed statements
+					\tiny validation of assembler instruction operands
 			\itemwp Conditional assembly instructions \people{Adam}
 			\itemwp Conditional assembly expressions \people{Peter}
 			\itemwp Macro expansion \people{Adam}
 			\itemwp Conditional assembly LSP features \people{Marcel}
+					\tiny Hover, Go to definition and Find all references for variable symbols
 			\itemwp Machine expressions \people{Michal}
+					\tiny Expressions that are used in assembler and machine instructions
 		\eenum
 	
 	\itemm Detailed specification \deadline{6}
@@ -68,17 +70,17 @@ The implementation of the project is planned to be done within nine months. Work
 	\itemm Final version skeleton \deadline{7}
 		\bwp
 			\itemwp Machine instruction checker \people{Lucia}
-					\tiny validation of instruction operands in parsed statements
+					\tiny validation of machine instruction operands
 			\itemwp DC instruction \people{Michal, Peter}
-					\tiny space reservation in object code for data (i.e. arrays)
+					\tiny parsing, validation and length of data definition operand
 			\itemwp Copy instruction \people{Adam}
-					\tiny member library include
+					\tiny external files include
 			\itemwp Client-server continuation handling \people{Marcel}
 			\itemwp Diagnostics \people{Lucia}
-					\tiny errors and warnings reporting
+					\tiny errors and warnings reporting polishing
 			\itemwp Ordinary LSP features \people{Marcel}
 			\itemwp Ordinary symbols \people{Adam, Peter}
-					\tiny space reservation for ordinary symbols
+					\tiny ordinary assembly implementation
 		\eenum
 	
 	\itemm Feature testing \deadline{9}
