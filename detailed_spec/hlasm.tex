@@ -6,11 +6,11 @@ IBM High Level Assembler (HLASM) satisfies this definition and adds other featur
 
 \section{Syntax}
 
-Due to historical reasons, HLASM syntax differs greatly to the syntax of modern programming languages. It mostly uses syntax common to regular assemblers, which has limitations, like line-length limited to 80 characters (as that was the length of a punched card line).
+Due to historical reasons, HLASM syntax differs greatly from the syntax of current programming languages. It mostly uses syntax common to regular assemblers, which has limitations, like line-length limited to 80 characters (as that was the length of a punched card line).
 
 \subsection{Statement}
 
-HLASM program is represented by a sequence of \emph{statements}. A statement consists of four fields. These are:
+HLASM program consists of a sequence of \emph{statements}. A statement consists of four fields that can be split into more lines using continuation (see \cref{Continuation}). They are used to produce both compile-time code and run-time code (see \cref{Assembling}). The fields are:
 \begin{itemize}
 	\item \textbf{Name field} --- Serves as a place for named constants that are to be used in code. This field is optional, but, when present, it must start at the begin column of a line.
 	
@@ -23,8 +23,8 @@ HLASM program is represented by a sequence of \emph{statements}. A statement con
 
 
 \Cref{lst:small_example} shows an example of a basic statement containing all fields.
-\begin{listing}
 
+\begin{listing}[p]
 \begin{verbatim}
  label   instruction     operands             remarks
 .NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
@@ -34,18 +34,19 @@ HLASM program is represented by a sequence of \emph{statements}. A statement con
 \end{listing}
 
 \subsection{Continuation}
+\label{Continuation}
 
-Individual statements sometimes contain more than 80 characters, which contradicts to line length limitations. Therefore, a special handling called \emph{continuation} is introduced.
+Individual statements sometimes contain more than 80 characters, which is in contrary to the line length limitations. Therefore, a special feature called \emph{continuation} is introduced.
 
 Firstly, let us elaborate more on the topic of line columns. There are four special columns:
 \begin{itemize}
-	\item \emph{Begin column (default value: 1)}
+	\item \emph{Begin column} (default value: 1)
 	
-	\item \emph{End column (default value: 71)}
+	\item \emph{End column} (default value: 71)
 	
-	\item \emph{Continuation column (default value: 72)}
+	\item \emph{Continuation column} (default value: 72)
 	
-	\item \emph{Continue column (default value: 16)}
+	\item \emph{Continue column} (default value: 16)
 \end{itemize}
 They all serve a different purpose.
 
@@ -56,7 +57,8 @@ They all serve a different purpose.
 \emph{Continuation column} is used to indicate that the statement continues on the next line. For proper indication, an arbitrary character other than space must be written in this column. The remainder of the statement must then start on the \emph{continue column}.
 
 An example of an instruction where its last operand exceeded 72.~column of the line can be seen in \cref{lst:overflow}.
-\begin{listing}
+
+\begin{listing}[p]
 	\begin{verbatim}
              OP1                   REG12,REG07,REG04,REG00,REG01,REG11,Rx
                 EG02
@@ -67,7 +69,7 @@ An example of an instruction where its last operand exceeded 72.~column of the l
 
 There also exist instructions that support a so called \emph{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
 
-\begin{listing}
+\begin{listing}[p]
 \begin{verbatim}
           AIF   ('&VAR' FIND '~').A,     REMARK1                        x
                 ('&VAR'  EQ  'L').B,     REMARK2                        x
@@ -85,24 +87,45 @@ There also exist instructions that support a so called \emph{extended format} of
 
 
 \section{Assembling}
+\label{Assembling}
 
-Having briefly described its syntax, this section prepares the reader to better understand the assembly process hidden behind HLASM. 
+Having briefly described its syntax, now we describe the assembly process hidden behind HLASM. 
 
-HLASM program consists of sequence of statements. Those statements are mainly ordinary \emph{machine instructions} that are processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers.
+We distinguish two types of processing, \emph{Conditional Assembly (CA) processing} and \emph{Ordinary processing}.
+
+Ordinary processing consist of \emph{machine instructions} and \emph{assembler instructions} (see \cref{mach_instr} , \cref{asm_instrs}). The assembler processes them and generate an opcode or performs an action.
+
+The main purpose of CA processing (see \cref{CA_proc}) is to generate statements for ordinary assembly.
+
+\subsection{Machine instructions}
+\label{mach_instr}
+
+HLASM statements are mainly ordinary \emph{machine instructions} that are, with their operands, processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers. In contrast to them, HLASM allows expressions to be passed as operands of these instructions. These expressions are capable of address arithmetics, and can also contain defined constants.
+
+\subsection{Assembler instructions}
+\label{asm_instrs}
 
 In addition to machine instruction statements, HLASM assembler provides the \emph{assembler instructions} (in other systems commonly termed as \emph{directives}). They order the assembler to take a specific actions rather than assembling instructions. For example, they generate run-time data constants, create named symbols containing relative addresses or constant values, modify addresses of code generation or affect how the assembler operates.
 
-On top of this, the HLASM assembler offers \emph{conditional assembly (CA) processing}. The user may think of it as a macro-language built above traditional assembler. Employing special statements, user is capable of branching around and printing machine instruction statements. Even more, the user is able to define custom macros that can be called defined with parameters. Note, that CA processing is T-complete and it is whole processed during compile-time.
+Here, let us enumerate a few of the assembler instructions:
+\begin{itemize}
+	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
+	
+	\item \textbf{DC} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc. ).
+	
+	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \emph{conditional assembly}, hence alter it in custom manner.
+	
+	\item \textbf{COPY} --- Copies a whole file found in \emph{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
+	
+	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
+\end{itemize}
 
-The last think to note is that CA processing, although it may act like a text preprocessing, is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing.
-
-\vspace{5mm}
-
-Now, let us talk more about above described kinds of processing.
 
 \subsection{Conditional assembly}
+\label{CA_proc}
 
-Conditional assembly processing can be divided into \emph{variable symbols}, \emph{conditional assembly instructions} and \emph{macros}. 
+On top of machine and assembler instructions, the HLASM assembler offers \emph{conditional assembly (CA) processing}. The user may think of it as a macro-language built above traditional assembler.
+The processing can be divided into \emph{variable symbols}, \emph{conditional assembly instructions} and \emph{macros}. 
 
 \subsubsection{Variable symbols}
 
@@ -126,24 +149,16 @@ A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameter
 
 With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
 
-\subsection{Assembler instructions}
-Here, let us enumerate a few of the assembler instructions:
-\begin{itemize}
-	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
-	
-	\item \textbf{DC} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc. ).
-	
-	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \emph{conditional assembly}, hence alter it in custom manner.
-	
-	\item \textbf{COPY} --- Copies a whole file found in \emph{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
-	
-	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
-\end{itemize}
+\vspace{5mm}
 
-\subsection{Machine instructions}
-\emph{Machine instructions} and their operands are translated to a sequence of bytes and written to the executable program. In contrast to basic assemblers, HLASM allows expressions to be passed as operands of these instructions. These expressions are capable of address arithmetics, and can also contain defined constants.
+To sum up, CA processing is T-complete and it is whole processed during compile-time.
+CA instructions have the same syntax as machine or assembler instructions to create an appearance of consistency in the HLASM program. Moreover, during ordinary assembly, names of these instructions can be aliased.
+
+Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. Also, CA is able to lookup constants that are not yet defined prior to the currently processed statement. 
+
 
 \vspace{5mm}
+
 
 An example of simple HLASM program with the description of its statements is shown in \cref{lst:example}.
 \begin{listing}
@@ -170,7 +185,7 @@ An example of simple HLASM program with the description of its statements is sho
 [18]     .END        ANOP
 [19]                 END
 \end{verbatim} 
-\caption{An example of HLASM program.}
+\caption{An example of an artificial HLASM program.}
 \label{lst:example}
 \end{listing}
 
