@@ -45,7 +45,7 @@ and assembler instructions for code layout determination:
 
 We adapt this system to our needs and define 2 configuration files. The first one mirrors the behavior of Endevor and defines the processor groups. The second one matches the source codes to these processor groups.
 
-\item Another aspect of HLASM that needs to be considered and handled are fixed-sized lines. This makes the parsing more difficult, as the position of the continuation character may vary. We also add a continuation handling option to the IDE, which mostly consists of non-movable continuation characters, i.e. if the user types something in front of the continuation character, it stays on place.
+\item Another aspect of HLASM that needs to be considered and handled are fixed-sized lines. This makes the parsing more difficult, as the position of the continuation character may vary. We also add a continuation handling option to the IDE, which mostly consists of non-movable continuation characters, i.e. if the user types something in front of the continuation character, it stays in place.
 
 \item On top of that, we implement the \texttt{macro tracer} using the \texttt{Debug Adapter Protocol}. Following the standard debugging procedure, the user can step through the code generation while watching the contents of variables and the call stack. This tool is extremely useful as tracing the macro expansions manually gets tedious quickly.
 \end{itemize}
