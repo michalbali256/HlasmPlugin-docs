@@ -6,15 +6,15 @@ IBM High Level Assembler (HLASM) satisfies this definition and adds other featur
 
 \section{Syntax}
 
-Due to historical reasons, HLASM syntax differs greatly from the syntax of current programming languages. It mostly uses syntax common to regular assemblers, which has limitations, like line-length limited to 80 characters (as that was the length of a punched card line).
+HLASM syntax is similar to a common assembler, but due to historical reasons it has limitations, like line length limited to 80 characters (as that was the length of a punched card line).
 
 \subsection{Statement}
 
-HLASM program consists of a sequence of \emph{statements}. A statement consists of four fields that can be split into more lines using continuation (see \cref{Continuation}). They are used to produce both compile-time code and run-time code (see \cref{Assembling}). The fields are:
+HLASM program consists of a sequence of \emph{statements}. A statement consists of four fields separated by spaces that can be split into more lines using continuation (see \cref{Continuation}). They are used to produce both compile-time code and run-time code (see \cref{Assembling}). The fields are:
 \begin{itemize}
 	\item \textbf{Name field} --- Serves as a place for named constants that are to be used in code. This field is optional, but, when present, it must start at the begin column of a line.
 	
-	\item \textbf{Operation field} --- The only mandatory field representing the instruction that is executed. Must not begin in the first column, as it would be interpreted as a name field.
+	\item \textbf{Instruction field} --- The only mandatory field representing the instruction that is executed. Must not begin in the first column, as it would be interpreted as a name field.
 	
 	\item \textbf{Operands field} --- Field for instruction operands, located immediately after operation field. Individual operands must be separated by a comma, and, depending on the specific instruction, can be either blank, in a form of an apostrophe separated string, or represented by a sequence of characters.
 	
@@ -26,10 +26,10 @@ HLASM program consists of a sequence of \emph{statements}. A statement consists 
 
 \begin{listing}[p]
 \begin{verbatim}
- label   instruction     operands             remarks
+ name    instruction     operands             remark
 .NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
 \end{verbatim}
-\caption{An example statement with fields.}
+\caption{An example statement.}
 \label{lst:small_example}
 \end{listing}
 
@@ -50,11 +50,11 @@ Firstly, let us elaborate more on the topic of line columns. There are four spec
 \end{itemize}
 They all serve a different purpose.
 
-\emph{Begin column} defines either the start of a statement, or the beginning of the name field.
+The begin column defines the start of a statement.
 
-\emph{End column} determines the end of the statement. Anything written to its right does not count as content of the statement, and is rather used as a place for the line sequence number (see \cref{fig01:line}). 
+The end column determines the end of the line. Anything written to its right does not count as content of the statement, and is rather used as a place for the line sequence number (see \cref{fig01:line}).
 
-\emph{Continuation column} is used to indicate that the statement continues on the next line. For proper indication, an arbitrary character other than space must be written in this column. The remainder of the statement must then start on the \emph{continue column}.
+The continuation column is used to indicate that the statement continues on the next line. For proper indication, an arbitrary character other than space must be written in this column. The remainder of the statement must then start on the continue column.
 
 An example of an instruction where its last operand exceeded 72.~column of the line can be seen in \cref{lst:overflow}.
 
@@ -63,11 +63,11 @@ An example of an instruction where its last operand exceeded 72.~column of the l
              OP1                   REG12,REG07,REG04,REG00,REG01,REG11,Rx
                 EG02
 	\end{verbatim}
-	\caption{Example program that uses continuation for overflowing the line.}
+	\caption{Example program that uses the continuation for overflowing the line.}
 	\label{lst:overflow}
 \end{listing}
 
-There also exist instructions that support a so called \emph{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
+There are also instructions that support a so called \emph{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
 
 \begin{listing}[p]
 \begin{verbatim}
@@ -82,7 +82,7 @@ There also exist instructions that support a so called \emph{extended format} of
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
 	\caption{Description of line columns (source: \href{https://www-01.ibm.com/servers/resourcelink/svc00100.nsf/pages/zOSV2R3sc264940/$file/asmr1023.pdf}{HLASM Language Reference} ).}
-	\label{fig01:line$}
+	\label{fig01:line}
 \end{figure}
 
 
@@ -93,27 +93,25 @@ Having briefly described its syntax, now we describe the assembly process hidden
 
 We distinguish two types of processing, \emph{Conditional Assembly (CA) processing} and \emph{Ordinary processing}.
 
-Ordinary processing consist of \emph{machine instructions} and \emph{assembler instructions} (see \cref{mach_instr} , \cref{asm_instrs}). The assembler processes them and generate an opcode or performs an action.
-
-The main purpose of CA processing (see \cref{CA_proc}) is to generate statements for ordinary assembly.
+The ordinary processing works with \emph{machine instructions} and \emph{assembler instructions} (see \cref{mach_instr}, \cref{asm_instrs}). The main purpose of CA processing (see \cref{CA_proc}) is to generate statements for ordinary assembly.
 
 \subsection{Ordinary symbols}
 
-In HLASM, an \emph{ordinary symbol} is a named constant that can represent either a simple integer or an address. It can be defined by writing its name into the name field of a statement. Each symbol can only be defined once, and its value is constant. There are two kinds of ordinary symbols:
+In HLASM, an \emph{ordinary symbol} is a named constant that can represent either a simple integer or an address. It can be defined by writing its name into the name field of a statement. Each ordinary symbol can only be defined once, and its value is constant. There are two kinds of ordinary symbols:
 \begin{itemize}
-	\item An \emph{absolute symbol} that simply has an integral value.
-	\item A \emph{relocatable symbol} that represents an address in the resulting object code.
+	\item An \emph{absolute symbol} that simply has an integral value. It can be defined using a special assembler instruction.
+	\item A \emph{relocatable symbol} that represents an address in the resulting object code. It can be defined by writing the ordinary symbol name into the name field of a statement with a machine instruction and denotes the address of the instruction.
 \end{itemize}
 
 \subsection{Machine instructions}
 \label{mach_instr}
 
-HLASM statements are mainly ordinary \emph{machine instructions} that are, with their operands, processed and tranlated into corresponding opcodes. This does not differ from traditional assemblers. In contrast to them, HLASM allows expressions to be passed as operands of these instructions. These expressions may use ordinary symbols and are capable of integer and address arithmetics.
+\emph{Machine instructions} represent the actual processor instructions executed during run-time. The assembler translates them into corresponding opcodes and processes their operands. That does not differ from traditional assemblers. In contrast to them, HLASM allows expressions to be passed as operands of the instructions. These expressions may use ordinary symbols and are capable of integer and address arithmetics.
 
 \subsection{Assembler instructions}
 \label{asm_instrs}
 
-In addition to machine instruction statements, HLASM assembler provides the \emph{assembler instructions} (in other systems commonly termed as \emph{directives}). They order the assembler to take a specific actions rather than assembling instructions. For example, they generate run-time data constants, create named symbols containing relative addresses or constant values, modify addresses of code generation or affect how the assembler operates.
+In addition to machine instructions, the HLASM assembler provides the \emph{assembler instructions} (in other systems commonly termed as \emph{directives}). They order the assembler to take specific actions rather than to assemble instructions. For example, they generate run-time data constants, create ordinary symbols, organize the resulting object code and generally affect how the assembler operates.
 
 Here, let us enumerate a few of the assembler instructions:
 \begin{itemize}
@@ -121,7 +119,7 @@ Here, let us enumerate a few of the assembler instructions:
 	
 	\item \textbf{DC}, \textbf{DS} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.).
 	
-	\item \textbf{EQU} --- Defines named constant with an integer or a relative address value. These constants can be accessed by \emph{conditional assembly}, hence alter it in custom manner.
+	\item \textbf{EQU} --- Defines ordinary symbols.
 	
 	\item \textbf{COPY} --- Copies a whole file found in \emph{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
 	
@@ -134,7 +132,7 @@ All the assembler instructions and ordinary symbols must be resolved before the 
 
 In the next step, \verb|LEN| is defined, but it cannot be evaluated, because the subtraction of addresses \verb|ADDR| and \verb|HERE| is dependant on the unknown length of instruction on second line and therefore on the symbol \verb|SIZE|. The whole program is resolved only when the assembly reaches the last line, which defines the length of instruction \verb|02|. Afterwards, it is possible to resolve \verb|LEN| and finally the length of instruction \verb|01|.
 
-The dependency graph created by these principles can be arbitrarily deep and complicated, however it must not contain cycles (it must be a tree).
+The dependency graph created by these principles can be arbitrarily deep and complicated, however it must not contain cycles (a symbol must not be dependant on itself).
 
 \begin{listing}[p]
 	\begin{verbatim}
@@ -147,21 +145,20 @@ The dependency graph created by these principles can be arbitrarily deep and com
 [06]   SIZE       EQU   1
 	
 	\end{verbatim}
-	\caption{Example program that uses continuation for overflowing the line.}
+	\caption{A sample program that shows that symbols can be used prior to their definition.}
 	\label{lst:ordinary_assembly}
 \end{listing}
 
 \subsection{Conditional assembly}
 \label{CA_proc}
 
-On top of machine and assembler instructions, the HLASM assembler offers \emph{conditional assembly (CA) processing}. The user may think of it as a macro-language built above traditional assembler.
-The processing can be divided into \emph{variable symbols}, \emph{conditional assembly instructions} and \emph{macros}. 
+On top of machine and assembler instructions, the HLASM assembler offers the conditional assembly instructions. The user may think of it as a macro-language built above traditional assembler. Conditional assembly instructions may define \emph{variable symbols} which can be used in any statement to alter its meaning. Moreover, it is possible to define \emph{macros} --- reusable pieces of code with parameters.
 
 \subsubsection{Variable symbols}
 
 Variable symbols serve as points of substitution or information holders. 
 
-When they occur in a statement, they are substituted by their value to create a new statement. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
+When they occur in a statement, they are substituted by their value to create a statement processable by ordinary assembly. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
 
 Variable symbols also have notion of their type --- they can be defined either as an integer, a boolean or a string. CA instructions gather this information for different sorts of conditional branching.
 
@@ -175,9 +172,7 @@ Other subset is capable of conditional and unconditional branching. HLASM provid
 
 \subsubsection{Macros}
 
-A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can contain CA instructions or even a sequence of instructions generating another macro definition.
-
-With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
+A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can contain CA instructions or even a sequence of instructions generating another macro definition. With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
 
 \vspace{5mm}
 
@@ -202,7 +197,7 @@ An example of simple HLASM program with the description of its statements is sho
 [14]     LBL2        GEN_LABEL
 [15]     LEN         EQU         LBL2-LBL1
 [16]                 DC          (LEN)C'HELLO'
-[17]     DOUBLE      DC          D'-3.729'
+[17]     DOUBLE      DC          H'-3.729'
 [18]     .END        ANOP
 [19]                 END
 \end{verbatim} 
@@ -216,19 +211,19 @@ In line \verb|06|, the \emph{copy instruction} is used, which includes the conte
 
 Line \verb|08| establishes a start of an executable section \verb|TEST|. 
 
-In line \verb|09|, an integer value is assigned to a variable symbol \verb|VAR|. The value is the length attribute of previously non-defined constant \verb|DOUBLE|. The assembler looks for the definition of the constant to properly evaluate the conditional assembly expression. In the next line, there is CA branching instruction \verb|AIF|. If value of \verb|VAR| equals to 4, next lines are skipped and assembling continues on line \verb|18|, where branching symbol \verb|END| is located.  
+In line \verb|09|, an integer value is assigned to a variable symbol \verb|VAR|. The value is the length attribute of previously non-defined constant \verb|DOUBLE|. The assembler looks for the definition of the constant to properly evaluate the conditional assembly expression. In the next line, there is CA branching instruction \verb|AIF|. If value of \verb|VAR| equals to 4, next lines are skipped and assembling continues on line \verb|18|, where branching symbol \verb|.END| is located. In that case, all the text between the \verb|AIF| and \verb|.END| is completely skipped --- it does not even have to be valid HLASM code.
 
-Lines \verb|12-13| show examples of machine instructions that are directly assembled into object code. Lines \verb|11,14| contain examples of macro call.
+Lines \verb|12-13| show examples of machine instructions that are directly assembled into object code. Lines \verb|11| and \verb|14| contain examples of macro call.
 
-In line \verb|15|, the constant \verb|LEN| is assigned the difference of two addresses. This value is next used to generate character data.
+In line \verb|15|, the constant \verb|LEN| is assigned the difference of two addresses, which results in absolute ordinary symbol. This value is next used to generate character data.
 
-Instruction \verb|DC| in line \verb|17| creates value of type double and assigns its address to constant \verb|DOUBLE|. This constant also holds information about length, type and other attributes of the data.  
+Instruction \verb|DC| in line \verb|17| creates value of type double and assigns its address to ordinary symbol \verb|DOUBLE|. This constant also holds information about length, type and other attributes of the data.  
 
-\verb|ANOP| is an empty assembler action and line \verb|19| ends the assembling of the program. 
+\verb|ANOP| is an empty assembler action which defines the \verb|.END| symbol and line \verb|19| ends the assembling of the program. 
 
 \vspace{5mm}
 
-Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA have mechanics that allow user to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
+Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA has mechanics that allows the assembler to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
 
 To sum up, CA processing has variables to store state of compilation and CA instructions for conditional branching. Hence, it is Turing-complete while still evaluated during compile-time.
 
