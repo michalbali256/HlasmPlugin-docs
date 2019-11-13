@@ -24,14 +24,7 @@ HLASM program consists of a sequence of \emph{statements}. A statement consists 
 
 \Cref{lst:small_example} shows an example of a basic statement containing all fields.
 
-\begin{listing}[p]
-\begin{verbatim}
- name    instruction     operands             remark
-.NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
-\end{verbatim}
-\caption{An example statement.}
-\label{lst:small_example}
-\end{listing}
+
 
 \subsection{Continuation}
 \label{Continuation}
@@ -58,26 +51,10 @@ The continuation column is used to indicate that the statement continues on the 
 
 An example of an instruction where its last operand exceeded 72.~column of the line can be seen in \cref{lst:overflow}.
 
-\begin{listing}[p]
-	\begin{verbatim}
-             OP1                   REG12,REG07,REG04,REG00,REG01,REG11,Rx
-                EG02
-	\end{verbatim}
-	\caption{Example program that uses the continuation for overflowing the line.}
-	\label{lst:overflow}
-\end{listing}
 
 There are also instructions that support a so called \emph{extended format} of the operands. It allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
 
-\begin{listing}[p]
-\begin{verbatim}
-          AIF   ('&VAR' FIND '~').A,     REMARK1                        x
-                ('&VAR'  EQ  'L').B,     REMARK2                        x
-                (T'&VAR  EQ  'U').C      REMARK3 
-\end{verbatim}
-\caption{Extended instruction format.}
-\label{lst:extended}
-\end{listing}
+
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
@@ -95,7 +72,11 @@ We distinguish two types of processing, \emph{Conditional Assembly (CA) processi
 
 The ordinary processing works with \emph{machine instructions} and \emph{assembler instructions} (see \cref{mach_instr}, \cref{asm_instrs}). The main purpose of CA processing (see \cref{CA_proc}) is to generate statements for ordinary assembly.
 
-\subsection{Ordinary symbols}
+\subsection{Ordinary assembly}
+
+With help of machine and assembler instructions, this type of processing is responsible for runtime behaviour of the program. Let us elaborate more about both of this instruction sets and their common information holders called \emph{ordinary symbols}.
+
+\subsubsection{Ordinary symbols}
 
 In HLASM, an \emph{ordinary symbol} is a named constant that can represent either a simple integer or an address. It can be defined by writing its name into the name field of a statement. Each ordinary symbol can only be defined once, and its value is constant. There are two kinds of ordinary symbols:
 \begin{itemize}
@@ -103,12 +84,12 @@ In HLASM, an \emph{ordinary symbol} is a named constant that can represent eithe
 	\item A \emph{relocatable symbol} that represents an address in the resulting object code. It can be defined by writing the ordinary symbol name into the name field of a statement with a machine instruction and denotes the address of the instruction.
 \end{itemize}
 
-\subsection{Machine instructions}
+\subsubsection{Machine instructions}
 \label{mach_instr}
 
 \emph{Machine instructions} represent the actual processor instructions executed during run-time. The assembler translates them into corresponding opcodes and processes their operands. That does not differ from traditional assemblers. In contrast to them, HLASM allows expressions to be passed as operands of the instructions. These expressions may use ordinary symbols and are capable of integer and address arithmetic.
 
-\subsection{Assembler instructions}
+\subsubsection{Assembler instructions}
 \label{asm_instrs}
 
 In addition to machine instructions, the HLASM assembler provides the \emph{assembler instructions} (in other systems commonly termed as \emph{directives}). They order the assembler to take specific actions rather than to assemble instructions. For example, they generate run-time data constants, create ordinary symbols, organize the resulting object code and generally affect how the assembler operates.
@@ -126,41 +107,20 @@ Here, let us enumerate a few of the assembler instructions:
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
 
-\subsection{Ordinary assembly}
+\vspace{5mm}
 
 All the assembler instructions and ordinary symbols must be resolved before the assembler writes the final object file. The HLASM language supports forward declaration of ordinary symbols, so the assembly may be quite complicated. Consider an example in \cref{lst:ordinary_assembly}. When the instruction in line 1 is seen for the first time, it is impossible to determine its length, because the symbol \verb|LEN| is not defined yet \footnote{Character L with an expression in parentheses in DS operand of type C specifies how many bytes should be reserved in the program.}. The same applies to the length of the instruction in the second line. Furthermore, it is also impossible to determine the exact value of relocatable symbols \verb|ADDR| and \verb|HERE|, because of the unknown length of the preceding instructions.
 
 In the next step, \verb|LEN| is defined, but it cannot be evaluated, because the subtraction of addresses \verb|ADDR| and \verb|HERE| is dependent on the unknown length of instruction on second line and therefore on the symbol \verb|SIZE|. The whole program is resolved only when the assembly reaches the last line, which defines the length of instruction \verb|02|. Afterwards, it is possible to resolve \verb|LEN| and finally the length of instruction \verb|01|.
 
-The dependency graph created by these principles can be arbitrarily deep and complicated, however it must not contain cycles (a symbol must not be dependent on itself).
+The dependency graph created by these principles can be arbitrarily deep and complicated, however it must not contain cycles (a symbol must not be transitively dependent on itself).
 
-\begin{listing}[p]
-	\begin{verbatim}
-	
-[01]              DS    CL(LEN)
-[02]   ADDR       DS    CL(SIZE)
-[03]
-[04]   HERE       DS    0H
-[05]   LEN        EQU   HERE-ADDR
-[06]   SIZE       EQU   1
-	
-	\end{verbatim}
-	\caption{A sample program that shows that symbols can be used prior to their definition.}
-	\label{lst:ordinary_assembly}
-\end{listing}
+
 
 \subsection{Conditional assembly}
 \label{CA_proc}
 
 On top of machine and assembler instructions, the HLASM assembler offers the conditional assembly instructions. The user may think of it as a macro-language built above traditional assembler. Conditional assembly instructions may define \emph{variable symbols} which can be used in any statement to alter its meaning. Moreover, it is possible to define \emph{macros} --- reusable pieces of code with parameters.
-
-\subsubsection{Variable symbols}
-
-Variable symbols serve as points of substitution or information holders. 
-
-When they occur in a statement, they are substituted by their value to create a statement processable by ordinary assembly. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
-
-Variable symbols also have notion of their type --- they can be defined either as an integer, a boolean or a string. CA instructions gather this information for different sorts of conditional branching.
 
 \subsubsection{CA instructions}
 
@@ -170,6 +130,14 @@ One subset of CA instructions operates on variable symbols. With them, the user 
 
 Other subset is capable of conditional and unconditional branching. HLASM provides a variety of built-in binary or unary operations on variable symbols, which can create complex conditional expressions. This is important in HLASM, as the user can alter flow of instructions that will be assembled into executable program.
 
+\subsubsection{Variable symbols}
+
+Variable symbols serve as points of substitution or information holders. 
+
+When they occur in a statement, they are substituted by their value to create a statement processable by ordinary assembly. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
+
+Variable symbols also have notion of their type --- they can be defined either as an integer, a boolean or a string. CA instructions gather this information for different sorts of conditional branching.
+
 \subsubsection{Macros}
 
 A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can contain CA instructions or even a sequence of instructions generating another macro definition. With the help of variable symbols, HLASM macros have the power to create custom, task specific macros.
@@ -177,33 +145,7 @@ A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameter
 \vspace{5mm}
 
 An example of simple HLASM program with the description of its statements is shown in \cref{lst:example}.
-\begin{listing}
-\begin{verbatim}
-         name        operation   operands
-         
-[01]                 MACRO                   
-[02]     &NAME       GEN_LABEL
-[03]     &NAME       EQU         *
-[04]                 MEND
-[05]             
-[06]                 COPY        REGS
-[07]             
-[08]     TEST        CSECT
-[09]     &VAR        SETA        L'DOUBLE
-[10]                 AIF         (&VAR EQ 4).END
-[11]     LBL1        GEN_LABEL
-[12]                 LR          3,2
-[13]                 L           8
-[14]     LBL2        GEN_LABEL
-[15]     LEN         EQU         LBL2-LBL1
-[16]                 DC          (LEN)C'HELLO'
-[17]     DOUBLE      DC          H'-3.729'
-[18]     .END        ANOP
-[19]                 END
-\end{verbatim} 
-\caption{An example of an artificial HLASM program.}
-\label{lst:example}
-\end{listing}
+
 
 In lines \verb|01-04|, we see a \emph{macro definition}. It is defined with a name \verb|GEN_LABEL|, variable \verb|NAME| and contains one instruction in its body, which assigns the current address to the label in \verb|NAME|.
 
@@ -226,4 +168,75 @@ Instruction \verb|DC| in line \verb|17| creates value of type double and assigns
 Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA has mechanics that allows the assembler to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
 
 To sum up, CA processing has variables to store state of compilation and CA instructions for conditional branching. Hence, it is Turing-complete while still evaluated during compile-time.
+
+\begin{listing}[p]
+	\begin{verbatim}
+	name    instruction     operands             remark
+	.NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
+	\end{verbatim}
+	\caption{An example statement.}
+	\label{lst:small_example}
+\end{listing}
+
+\begin{listing}[p]
+	\begin{verbatim}
+	OP1                   REG12,REG07,REG04,REG00,REG01,REG11,Rx
+	EG02
+	\end{verbatim}
+	\caption{Example program that uses the continuation for overflowing the line.}
+	\label{lst:overflow}
+\end{listing}
+
+\begin{listing}[p]
+	\begin{verbatim}
+	AIF   ('&VAR' FIND '~').A,     REMARK1                        x
+	('&VAR'  EQ  'L').B,     REMARK2                        x
+	(T'&VAR  EQ  'U').C      REMARK3 
+	\end{verbatim}
+	\caption{Extended instruction format.}
+	\label{lst:extended}
+\end{listing}
+
+\begin{listing}[p]
+	\begin{verbatim}
+	
+	[01]              DS    CL(LEN)
+	[02]   ADDR       DS    CL(SIZE)
+	[03]
+	[04]   HERE       DS    0H
+	[05]   LEN        EQU   HERE-ADDR
+	[06]   SIZE       EQU   1
+	
+	\end{verbatim}
+	\caption{A sample program that shows that symbols can be used prior to their definition.}
+	\label{lst:ordinary_assembly}
+\end{listing}
+
+\begin{listing}
+	\begin{verbatim}
+	name        operation   operands
+	
+	[01]                 MACRO                   
+	[02]     &NAME       GEN_LABEL
+	[03]     &NAME       EQU         *
+	[04]                 MEND
+	[05]             
+	[06]                 COPY        REGS
+	[07]             
+	[08]     TEST        CSECT
+	[09]     &VAR        SETA        L'DOUBLE
+	[10]                 AIF         (&VAR EQ 4).END
+	[11]     LBL1        GEN_LABEL
+	[12]                 LR          3,2
+	[13]                 L           8
+	[14]     LBL2        GEN_LABEL
+	[15]     LEN         EQU         LBL2-LBL1
+	[16]                 DC          (LEN)C'HELLO'
+	[17]     DOUBLE      DC          H'-3.729'
+	[18]     .END        ANOP
+	[19]                 END
+	\end{verbatim} 
+	\caption{An example of an artificial HLASM program.}
+	\label{lst:example}
+\end{listing}
 
