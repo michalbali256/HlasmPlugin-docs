@@ -1,4 +1,5 @@
 \chapter{Architecture}
+\label{arch}
 
 \begin{figure}
 	\centering
@@ -97,6 +98,7 @@ After a statement is fully processed and all operands of each instruction are kn
 The API of the validation component is simple: it takes an instruction and list of its operands and returns a list of warnings and errors in the form of LSP diagnostics.
 
 \section{Client-side VS Code extension}
+\label{arch:client}
 
 The VS Code extension component ensures seamless integration with the editor. Its functions are:
 
@@ -108,6 +110,7 @@ The VS Code extension component ensures seamless integration with the editor. It
 
 
 \section{Macro tracer}
+\label{arch:macro}
 The macro tracer enables the user to trace the compilation of HLASM source code in a way similar to common debugging. This is the reason why we chose to implement the Debug Adapter Protocol \footnote{\url{https://microsoft.github.io/debug-adapter-protocol/}} (DAP). It is very similar to LSP, so most of the code implementing LSP in the language server component may be reused for both protocols.
 
 The language server component communicates with the macro tracer component in the parser library. Its API mirrors the requests and events of DAP. The most important features to implement are:

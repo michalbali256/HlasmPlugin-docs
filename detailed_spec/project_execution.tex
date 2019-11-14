@@ -21,82 +21,153 @@ Our team works with agile software development. To aid this, we use a visual pro
 For communication between team members, we use an online tool --- Slack.
 
 \section{Project timeline}
-The project is split into several milestones and work packages. At the time of writing this document,  the milestone \hyperref[milestone_preview]{Preview} has been reached. Therefore, there is currently a working prototype, and some of the presented work packages are already specified. 
+The project is split into several milestones and work packages. At the time of writing this document, the milestone \hyperref[milestone_preview]{Preview} has been reached. Therefore, there is currently a working prototype, and some of the presented work packages are already specified. 
 
-The implementation of the project is planned to be done within nine months. Work packages have been assigned to individual team members during stand-ups. The work packages, their deadlines and assignments are in the following table and Gantt diagram \ref{fig:gantt-pokus}. 
+The implementation of the project is planned to be done within nine months. We do not expect any technical issues as this project is in quite developed stage and is supported by company. Therefore, we are very confident that the project will be completed as it is planned. 
+
+Work packages have been assigned to individual team members during stand-ups. The work packages, their deadlines and assignments are in the following table and Gantt diagram \ref{fig:gantt-pokus}. 
+
+
 
 \newpage
 
 \bms
-	\itemm Research and analysis \deadline{2}
+	\itemm Research and analysis \deadline{2}{2}
+	
+		\small The output of this milestone should be deeper knowledge and understanding of HLASM language, selection of parser library and target IDE.
+		HLASM is complicated language, hence the choice of right parser library is vital for further development. Also important is to choose IDE in witch would be the language support integrated.
+	
 		\bwp
 			\itemwp HLASM language analysis \people{Adam, Marcel}
+					\tiny study and analysis of HLASM documentation, available code and discussion with HLASM users
+					
 			\itemwp Parser libraries research \people{Peter}
+					\tiny research and comparison of contemporary lexical and parser libraries (Bison, ANTLR, ...) 
+					
 			\itemwp IDEs research \people{Michal, Lucia}
+					\tiny research of available IDEs to which would be the HLASM language support integrated
 		\eenum
 	
-	\itemm Parser prototype \deadline{3}
+	
+	\itemm Parser prototype \deadline{3}{2}
+	
+		\small With knowledge and selected tools from previous milestone, this milestone should output fist prototype of parser.
+	
 		\bwp
 			\itemwp Lexer \people{Lucia, Peter}
 			\itemwp Parser \people{Adam, Marcel}
 		\eenum
 	
-	\itemm IDE integration prototype \deadline{3}
+	
+	\itemm IDE integration prototype \deadline{3}{1}
+	
+		\small In this milestone should be accomplished integration of the parser to the selected IDE.
+	
 		\bwp
 			\itemwp LSP POC \people{Michal}
-			\itemwp VSCode client POC \people{Michal}
+					\tiny proof of concept of the Language Server Protocol (LSP) implementation (see chapter \hyperref[arch]{Architecture})
+					
+			\itemwp VS Code client POC \people{Michal}
+					\tiny proof of concept of the \hyperref[arch:client]{VS Code client}
+					
 			\itemwp Debugger POC \people{Michal}
+					\tiny proof of concept of the Debug Adapter Protocol (see \ref{arch:macro})
 		\eenum
 	
-	\itemm \label{milestone_preview} Preview \deadline{4}
+	
+	\itemm \label{milestone_preview} Preview \deadline{4}{2}
+	
+		\small Output of this milestone is working demo and its presentation in Broadcom. To accomplish this, several essential WPs must be done.
+		
 		\bwp
 			\itemwp Client semantic highlighting \people{Marcel}
+					\tiny implementation of semantic highlighting in the IDE
+					
 			\itemwp Assembler checker \people{Lucia}
 					\tiny validation of assembler instruction operands
+					
 			\itemwp Conditional assembly instructions \people{Adam}
+					\tiny processing of conditional assembly instructions inside the Analyzer
+					
 			\itemwp Conditional assembly expressions \people{Peter}
+					\tiny evaluation of conditional assembly expression 
+					
 			\itemwp Macro expansion \people{Adam}
+					\tiny processing of macros (expansion)
+					
 			\itemwp Conditional assembly LSP features \people{Marcel}
 					\tiny Hover, Go to definition and Find all references for variable symbols
+					
 			\itemwp Machine expressions \people{Michal}
-					\tiny Expressions that are used in assembler and machine instructions
+					\tiny expressions that are used in assembler and machine instructions
 		\eenum
 	
-	\itemm Detailed specification \deadline{6}
+	
+	\itemm Detailed specification \deadline{6}{1}
 		\bwp
 			\itemwp Detailed specification \people{all}
 		\eenum
 	
-	\itemm Final version skeleton \deadline{7}
+	
+	\itemm Features \deadline{7}{4}
+	
+		\small Addition of other important features.
+		
 		\bwp
 			\itemwp Machine instruction checker \people{Lucia}
 					\tiny validation of machine instruction operands
+					
 			\itemwp DC instruction \people{Michal, Peter}
 					\tiny parsing, validation and length of data definition operand
+					
 			\itemwp Copy instruction \people{Adam}
 					\tiny external files include
+					
 			\itemwp Client-server continuation handling \people{Marcel}
+					\tiny implementation of support for continuation (see \cref{Continuation})
+			
 			\itemwp Diagnostics \people{Lucia}
 					\tiny errors and warnings reporting polishing
+					
 			\itemwp Ordinary LSP features \people{Marcel}
+					\tiny implementation of support for ordinary symbols
+					
 			\itemwp Ordinary symbols \people{Adam, Peter}
 					\tiny ordinary assembly implementation
 		\eenum
+		
+	\itemm Finalization \deadline{8}{1}
 	
-	\itemm Feature testing \deadline{9}
+		\small After this milestone should be all components finalized. 
+		
+		\bwp
+			\itemwp Finalization \people{all}
+		\eenum
+	
+	\itemm Feature testing \deadline{9}{2}
+	
+		\small Goal of this milestone is to test, polish and benchmark all code from previous milestones.
+		
 		\bwp
 			\itemwp Testing \people{all}
+			
 			\itemwp Multiplatform deployment \people{Michal}
+					\tiny deployment on platforms Windows, Linux and Mac OS
+					
 			\itemwp Code coverage \people{Lucia}
+			
 			\itemwp Benchmarking \people{Marcel}
 		\eenum
 	
-	\itemm Documentation \deadline{9}
+	\itemm Documentation \deadline{9}{1}
+	
+		\small Goal is to assembly a complete documentation for whole work.
+		
 		\bwp
 			\itemwp Documentation \people{all}
 		\eenum
 	
-	\itemm Final presentation \deadline{9}
+	\itemm Final presentation \deadline{9}{0}
 		\bwp
 			\itemwp Final presentation \people{all}
 		\eenum
@@ -116,12 +187,12 @@ The implementation of the project is planned to be done within nine months. Work
 		\foreach \tim in {1,...,9} {
 			\coordinate (t\tim) at (\tim * 2cm,0);
 			\node[month] at (t\tim) {Month \tim};
-			\draw[dotted, thin, draw=black!25] (t\tim) to (t\tim |- wp29); %sync with previous
+			\draw[dotted, thin, draw=black!25] (t\tim) to (t\tim |- wp30); %sync with previous
 		};
 		
 		
-		\draw[draw=black!25] (t6) to (t6 |- wp26); %sync with previous
-		\node[month] at (t6|-wp29) {today};
+		\draw[draw=black!25] (t6) to (t6 |- wp27); %sync with previous
+		\node[month] at (t6|-wp30) {today};
 		
 		\ganttitem{ider}{t1|-wp1}{IDEs research}{Lucia, Michal};
 		\ganttitem{pare}{t1|-wp2}{Parser libraries research}{Peter};
@@ -161,10 +232,11 @@ The implementation of the project is planned to be done within nine months. Work
 		
 		
 		\ganttitem{lex}{t8|-wp26}{Code coverage}{Lucia};
+		\ganttitem{lex}{t8|-wp27}{Finalization}{all};
 		
-		\ganttitem{lex}{t9|-wp27}{Testing}{all};
-		\ganttitem{lex}{t9|-wp28}{Documentation}{all};
-		\ganttitem{lex}{t9|-wp29}{Final presentation}{all};
+		\ganttitem{lex}{t9|-wp28}{Testing}{all};
+		\ganttitem{lex}{t9|-wp29}{Documentation}{all};
+		\ganttitem{lex}{t9|-wp30}{Final presentation}{all};
 		
 		
 		\end{tikzpicture}
@@ -267,7 +339,6 @@ The implementation of the project is planned to be done within nine months. Work
 \end{landscape}
 
 \restoregeometry
-
 \fi
 
 
