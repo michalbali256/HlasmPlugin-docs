@@ -102,12 +102,12 @@ Here, let us enumerate a few of the assembler instructions:
 	
 	\item \textbf{EQU} --- Defines ordinary symbols.
 	
-	\item \textbf{COPY} --- Copies a whole file found in \emph{copy member library}\footnote{Path to library is passed to assembler before the start of assembly} and pastes it in place of the instruction.
+	\item \textbf{COPY} --- Copies text of a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
 	
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
 
-\vspace{5mm}
+\subsubsection{Ordinary symbols resolution}
 
 All the assembler instructions and ordinary symbols must be resolved before the assembler writes the final object file. The HLASM language supports forward declaration of ordinary symbols, so the assembly may be quite complicated. Consider an example in \cref{lst:ordinary_assembly}. When the instruction in line 1 is seen for the first time, it is impossible to determine its length, because the symbol \verb|LEN| is not defined yet \footnote{Character L with an expression in parentheses in DS operand of type C specifies how many bytes should be reserved in the program.}. The same applies to the length of the instruction in the second line. Furthermore, it is also impossible to determine the exact value of relocatable symbols \verb|ADDR| and \verb|HERE|, because of the unknown length of the preceding instructions.
 
@@ -120,15 +120,7 @@ The dependency graph created by these principles can be arbitrarily deep and com
 \subsection{Conditional assembly}
 \label{CA_proc}
 
-On top of machine and assembler instructions, the HLASM assembler offers the conditional assembly instructions. The user may think of it as a macro-language built above traditional assembler. Conditional assembly instructions may define \emph{variable symbols} which can be used in any statement to alter its meaning. Moreover, it is possible to define \emph{macros} --- reusable pieces of code with parameters.
-
-\subsubsection{CA instructions}
-
-The major difference to other instructions is that they are not assembled into object code. Rather, they select which instructions will be processed by assembler next.
-
-One subset of CA instructions operates on variable symbols. With them, the user can define variable symbols locally or globally, assign or update their values.
-
-Other subset is capable of conditional and unconditional branching. HLASM provides a variety of built-in binary or unary operations on variable symbols, which can create complex conditional expressions. This is important in HLASM, as the user can alter flow of instructions that will be assembled into executable program.
+On top of machine and assembler instructions, the HLASM assembler offers the conditional assembly. The user may think of it as a macro-language built above traditional assembler. It alters textual representation of the source code and selects which lines will be processed next. Conditional assembly instructions may define \emph{variable symbols} which can be used in any statement to alter its meaning. Moreover, it is possible to define \emph{macros} --- reusable pieces of code with parameters.
 
 \subsubsection{Variable symbols}
 
@@ -137,6 +129,14 @@ Variable symbols serve as points of substitution or information holders.
 When they occur in a statement, they are substituted by their value to create a statement processable by ordinary assembly. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
 
 Variable symbols also have notion of their type --- they can be defined either as an integer, a boolean or a string. CA instructions gather this information for different sorts of conditional branching.
+
+\subsubsection{CA instructions}
+
+CA instructions are not assembled into object code. Rather, they select which instructions will be processed by assembler next.
+
+There are instructions capable of conditional and unconditional branching. HLASM provides a variety of built-in binary or unary operations on variable symbols, which can create complex conditional expressions. This is important in HLASM, as the user can alter flow of instructions that will be assembled into executable program.
+
+Another subset of CA instructions operates on variable symbols. With them, the user can define variable symbols locally or globally, assign or update their values.
 
 \subsubsection{Macros}
 
