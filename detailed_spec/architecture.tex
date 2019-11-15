@@ -39,14 +39,14 @@ Parser library is the core of the project --- it encapsulates the analyzer, whic
 \subsection{Parser library API}
 The parser library API is based on LSP --- every relevant request and notification has a corresponding method in the parsing library.
 
-Firstly, the API has to implement the LSP notifications that ensure the editor state synchronization. Apart from working with individual files, the LSP also supports workspaces. A workspace is basically just a folder which contains related source codes. The LSP also supports working with multiple workspaces at the same time. We use the workspace abstraction when searching for dependencies of HLASM source codes (macros, and copy files).
+Firstly, the API has to implement the LSP notifications that ensure the editor state synchronization. Apart from working with individual files, the LSP also supports workspaces. A workspace is basically just a folder which contains related source codes. The LSP also supports working with multiple workspaces at the same time. We use it when searching for dependencies of HLASM source codes (macros, and copy files).
 
-The parser library needs to have the exact contents of all files in opened workspaces. To achieve that, there is a file watcher running in the LSP client that notifies the server when any of the relevant files is changed outside of editor. For example, when a user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
+The parser library needs to have the exact contents of all files in opened workspaces. To achieve that, there is a file watcher running in the LSP client that notifies the server when any of the HLASM source files is changed outside of editor. For example, when a user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
 
-The list of necessary editor state synchronization notification follows:
+The list of necessary editor state synchronization notifications follows:
 \begin{itemize}
-	\item Text synchronization notifications (didOpen, didChange, didClose), which inform the library about files that are currently open in the editor and their exact contents.
-	\item DidChangeWorkspaceFolders notification, which informs the library when a workspace has been opened or closed.
+	\item Text synchronization notifications (didOpen, didChange, didClose) which inform the library about files that are currently open in the editor and their exact contents.
+	\item DidChangeWorkspaceFolders notification which informs the library when a workspace has been opened or closed.
 	\item DidChangeWatchedFiles notification
 \end{itemize}
 
@@ -54,9 +54,9 @@ The list of necessary editor state synchronization notification follows:
 
 Secondly, the API has to implement the requests and notifications that provide the parsing results:
 \begin{itemize}
-	\item Implementation of diagnostics publishing (publishDiagnostics notification). A diagnostic is used to indicate a problem with source files, such as a compiler error or a warning. The parser library provides a callback to let the language server know that diagnostics have changed.
+	\item publishDiagnostics notification. A diagnostic is used to indicate a problem with source files, such as a compiler error or a warning. The parser library provides a callback to let the language server know that diagnostics have changed.
 	\item Callback for highlighting information provision.
-	\item Implementation of language feature requests (definition, references, hover, completion), which provide information needed for proper reaction of the editor on user actions.
+	\item Language feature requests (definition, references, hover, completion), which provide information needed for proper reaction of the editor on user actions.
 \end{itemize}
 
 \subsection{Analyzer}
