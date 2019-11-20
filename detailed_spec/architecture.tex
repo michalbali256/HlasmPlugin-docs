@@ -1,4 +1,5 @@
 \chapter{Architecture}
+\label{arch}
 
 \begin{figure}
 	\centering
@@ -37,15 +38,26 @@ The responsibility of the language server component is to maintain the LSP sessi
 Parser library is the core of the project --- it encapsulates the analyzer, which provides all parsing capabilities, and workspace manager, which keeps track of open files in the editor and manages their dependencies. It has to keep the representation of workspaces and files in the parser library exactly the same as the user sees in the editor. It also starts the analyzer when needed, manages workspace configuration and provides external macro and copy libraries to analyzer.
 
 \subsection{Parser library API}
-The parser library API is based on LSP --- every relevant request and notification has a corresponding method in the parsing library. The API includes:
+The parser library API is based on LSP --- every relevant request and notification has a corresponding method in the parsing library.
 
+Firstly, the API has to implement the LSP notifications that ensure the editor state synchronization. Apart from working with individual files, the LSP also supports workspaces. A workspace is basically just a folder which contains related source codes. The LSP also supports working with multiple workspaces at the same time. We use it when searching for dependencies of HLASM source codes (macros, and copy files).
+
+The parser library needs to have the exact contents of all files in opened workspaces. To achieve that, there is a file watcher running in the LSP client that notifies the server when any of the HLASM source files is changed outside of editor. For example, when a user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
+
+The list of necessary editor state synchronization notifications follows:
 \begin{itemize}
-	\item Implementation of text synchronization notifications (didOpen, didChange, didClose), which inform the library about files that are currently open in the editor and their exact contents.
-	\item Implementation of workspace management notifications (DidChangeWorkspaceFolders): many editors have capabilities to open more workspaces at the same time, and the parser library supports this too. Workspace is basically just a folder which contains related source codes. Workspaces help parser library find macro and copy files.
-	\item A method to consume DidChangeWatchedFiles notification. This method makes it possible to react to workspace changes that were not made by the user in editor, but may still affect the parsing. For example, when a user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
-	\item Implementation of diagnostics publishing (publishDiagnostics notification). A diagnostic is used to indicate a problem with source files, such as a compiler error or a warning. The parser library provides a callback to let the language server know that diagnostics have changed.
+	\item Text synchronization notifications (didOpen, didChange, didClose) which inform the library about files that are currently open in the editor and their exact contents.
+	\item DidChangeWorkspaceFolders notification which informs the library when a workspace has been opened or closed.
+	\item DidChangeWatchedFiles notification
+\end{itemize}
+
+
+
+Secondly, the API has to implement the requests and notifications that provide the parsing results:
+\begin{itemize}
+	\item publishDiagnostics notification. A diagnostic is used to indicate a problem with source files, such as a compiler error or a warning. The parser library provides a callback to let the language server know that diagnostics have changed.
 	\item Callback for highlighting information provision.
-	\item Implementation of language feature requests (definition, references, hover, completion), which provide information needed for proper reaction of the editor on user actions.
+	\item Language feature requests (definition, references, hover, completion), which provide information needed for proper reaction of the editor on user actions.
 \end{itemize}
 
 \subsection{Analyzer}
@@ -97,6 +109,7 @@ After a statement is fully processed and all operands of each instruction are kn
 The API of the validation component is simple: it takes an instruction and list of its operands and returns a list of warnings and errors in the form of LSP diagnostics.
 
 \section{Client-side VS Code extension}
+\label{arch:client}
 
 The VS Code extension component ensures seamless integration with the editor. Its functions are:
 
@@ -108,6 +121,7 @@ The VS Code extension component ensures seamless integration with the editor. It
 
 
 \section{Macro tracer}
+\label{arch:macro}
 The macro tracer enables the user to trace the compilation of HLASM source code in a way similar to common debugging. This is the reason why we chose to implement the Debug Adapter Protocol \footnote{\url{https://microsoft.github.io/debug-adapter-protocol/}} (DAP). It is very similar to LSP, so most of the code implementing LSP in the language server component may be reused for both protocols.
 
 The language server component communicates with the macro tracer component in the parser library. Its API mirrors the requests and events of DAP. The most important features to implement are:
