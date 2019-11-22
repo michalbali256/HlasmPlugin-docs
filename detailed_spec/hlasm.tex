@@ -119,7 +119,7 @@ The assembler instructions include the following examples:
 \end{itemize}
 
 \subsubsection{Ordinary symbols resolution}
-
+\label{ordinary_resolution}
 All the assembler instructions and ordinary symbols must be resolved before the assembler writes the final object file. The HLASM language supports forward declaration of ordinary symbols, so the assembly may be quite complicated. Consider an example in \cref{lst:ordinary_assembly}. When the instruction in line 1 is seen for the first time, it is impossible to determine its length, because the symbol \verb|LEN| is not defined yet \footnote{Character L with an expression in parentheses in DS operand of type C specifies how many bytes should be reserved in the program.}. The same applies to the length of the instruction in the second line. Furthermore, it is also impossible to determine the exact value of relocatable symbols \verb|ADDR| and \verb|HERE|, because of the unknown length of the preceding instructions.
 
 In the next step, \verb|LEN| is defined, but it cannot be evaluated, because the subtraction of addresses \verb|ADDR| and \verb|HERE| is dependent on the unknown length of instruction on second line and therefore on the symbol \verb|SIZE|. The whole program is resolved only when the assembly reaches the last line, which defines the length of instruction \verb|02|. Afterwards, it is possible to resolve \verb|LEN| and finally the length of instruction \verb|01|.
