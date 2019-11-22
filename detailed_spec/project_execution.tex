@@ -40,12 +40,12 @@ The work packages have been assigned to individual team members based on long-te
 
 \Mdef{1}{Research and analysis}{}
 	\WPdef{1}{HLASM language analysis}
-	{analyse and study HLASM specification, available code and discussion with HLASM users}
+	{Analysis of HLASM specification, available code and discussion with HLASM users.}
 	\WPdef{2}{Parser libraries research}
-	{research and comparison of contemporary lexical and parser libraries (Bison, ANTLR, ...) }
-	\WPdef{3}{IDEs research}{research of available IDEs to which would be the HLASM language support integrated }
+	{Research and comparison of contemporary lexical and parser libraries (Bison, ANTLR, ...).}
+	\WPdef{3}{IDEs research}{Research of available IDEs to which would be the HLASM language support integrated.}
 
-\Mdef{2}{Hlasm syntax support}{At the second milestone, the plugin is able to parse HLASM syntax, which is shown to the user with server-side highlighting. There is a working implementation of LSP on the server side, which communicates to the VS Code LSP client. The LSP is extended to transfer server-side highlighting information.}
+\Mdef{2}{HLASM syntax support}{At the second milestone, the plugin is able to parse HLASM syntax, which is shown to the user with server-side highlighting. There is a working implementation of LSP on the server side, which communicates to the VS Code LSP client. The LSP is extended to transfer server-side highlighting information.}
 
 	\WPdefe{4}{Lexer}
 	\WPdefe{5}{Parser}
@@ -55,7 +55,7 @@ The work packages have been assigned to individual team members based on long-te
 \Mdefe{3}{Detailed specification}{}
 	\WPdefe{8}{Detailed specification}{}
 
-\Mdef{4}{Preview}{Output of this milestone is a working demo and its presentation in Broadcom. The parser is able to interpret conditional assembly instructions and expand macros defined within the same source file. It is able to present problems with HLASM source code via LSP diagnostics, and LSP features like Hover or Go to definitions are working with variable symbols.}
+\Mdef{4}{Preview}{The output of this milestone is a working demo and its presentation in Broadcom. The parser is able to interpret conditional assembly instructions and expand macros defined within the same source file. It is able to present problems with HLASM source code via LSP diagnostics, and LSP features like Hover or Go to definitions are working with variable symbols.}
 	\WPdef{9}{Macro tracer POC}{Proof of concept of the macro tracer by implementation of the Debug Adapter Protocol (see \cref{arch:macro}).}
 	\WPdefe{10}{Validation of assembler instructions operands}
 	\WPdef{11}{CA instructions}{Interpretation and validation of the conditional assembly instructions.}
@@ -83,7 +83,7 @@ The work packages have been assigned to individual team members based on long-te
 
 \Mdef{8}{Feature testing}{After the M8 milestone, the software should be well tested, stable and able to run seamlessly on any major platform.}
 	\WPdefe{24}{Testing}
-	\WPdef{25}{Multi-platform deployment}{Deployment on Windows, Linux and Mac OS}
+	\WPdef{25}{Multi-platform deployment}{Deployment on Windows, Linux and MacOS}
 	\WPdefe{26}{Code coverage}
 	\WPdef{27}{Benchmark}{Creation of a performance measuring tool that measures how much time the parser needs to analyze a file. It also measures number of processed lines.}
 	
@@ -93,7 +93,7 @@ The work packages have been assigned to individual team members based on long-te
 \Mdefe{10}{Final presentation}
 	\WPdefe{29}{Final presentation}
 
-\newcommand{\M}[2]{\multirow{#1}{0.6cm}{\centering M#2}}
+\newcommand{\M}[2]{\multirow{#1}{0.8cm}{\centering M#2}}
 \newcommand{\Md}[2]{\multirow{#1}{7cm}{\csname M#2 \endcsname}}
 \newcommand{\WP}[2]{\multirow{#1}{1cm}{\centering WP#2}}
 \newcommand{\WPd}[2]{\multirow{#1}{7cm}{\csname WP#2 \endcsname}}
@@ -444,7 +444,7 @@ HLASM is complicated language, hence the choice of right parser library is vital
 
 \itemwp Code coverage \people{Lucia}
 
-\itemwp Benchmarking \people{Marcel}
+\itemwp Benchmark \people{Marcel}
 \eenum
 
 \itemm Documentation \deadline{9}{1}
@@ -540,7 +540,7 @@ HLASM is complicated language, hence the choice of right parser library is vital
 			
 			\ganttbar{$\rightarrow$ Ordinary symbols (A \& P)}{1}{4}\\
 			\ganttbar{Multiplatform deployment (Mi)}{1}{4}\\
-			\ganttbar{Benchmarking (Ma)}{1}{4}\\
+			\ganttbar{Benchmark (Ma)}{1}{4}\\
 			\ganttbar{Code coverage (L)}{1}{8}\\
 			
 			\ganttbar{Testing (all)}{5}{12}\\
