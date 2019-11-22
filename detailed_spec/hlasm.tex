@@ -23,8 +23,8 @@ HLASM program consists of a sequence of \emph{statements}. A statement consists 
 
 \begin{listing}[t]
 	\begin{verbatim}
-	name    instruction     operands             remark
-	.NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
+name    instruction     operands             remark
+.NOMOV       AGO     (&WH).L1,.L2,.L3     SEQUENTIAL BRANCH
 	\end{verbatim}
 	\caption{An example statement.}
 	\label{lst:small_example}
@@ -58,14 +58,24 @@ An example of an instruction where its last operand exceeded column 72 of the li
 
 \begin{listing}[t]
 	\begin{verbatim}
-[1]    OP1                            REG12,REG07,REG04,REG00,REG01,REG11,Rx
-[2]               EG02
+    OP1                            REG12,REG07,REG04,REG00,REG01,REG11,Rx
+                EG02
 	\end{verbatim}
 	\caption{Example program that uses the continuation for overflowing the line.}
 	\label{lst:overflow}
 \end{listing}
 
 Some instructions also support the \emph{extended format} of the operands. That allows the presence of a continuation character even when the contents of a line have not reached the continuation column (see \cref{lst:extended}).
+
+\begin{listing}[t]
+	\begin{verbatim}
+          AIF   ('&VAR' FIND '~').A,     REMARK1                        x
+                ('&VAR'  EQ  'L').B,     REMARK2                        x
+                (T'&VAR  EQ  'U').C      REMARK3 
+	\end{verbatim}
+	\caption{Extended instruction format.}
+	\label{lst:extended}
+\end{listing}
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{img/line}
@@ -85,7 +95,7 @@ The ordinary processing works with \emph{machine instructions} and \emph{assembl
 
 \subsection{Ordinary assembly}
 
-With help of machine and assembler instructions, the ordinary assembly processing is responsible for runtime behaviour of the program. Ordinary assembly allows to procduce code from traditional machine instructions, special-purpose assembler instructions and save values in \emph{ordinary symbols}.
+With help of machine and assembler instructions, the ordinary assembly processing is responsible for runtime behaviour of the program. Ordinary assembly allows to produce code from traditional machine instructions, special-purpose assembler instructions and save values in \emph{ordinary symbols}.
 
 \subsubsection{Ordinary symbols}
 
@@ -121,6 +131,22 @@ The assembler instructions include the following examples:
 \subsubsection{Ordinary symbols resolution}
 \label{ordinary_resolution}
 All the assembler instructions and ordinary symbols must be resolved before the assembler writes the final object file. The HLASM language supports forward declaration of ordinary symbols, so the assembly may be quite complicated. Consider an example in \cref{lst:ordinary_assembly}. When the instruction in line 1 is seen for the first time, it is impossible to determine its length, because the symbol \verb|LEN| is not defined yet \footnote{Character L with an expression in parentheses in DS operand of type C specifies how many bytes should be reserved in the program.}. The same applies to the length of the instruction in the second line. Furthermore, it is also impossible to determine the exact value of relocatable symbols \verb|ADDR| and \verb|HERE|, because of the unknown length of the preceding instructions.
+
+\begin{listing}[t]
+	\begin{verbatim}
+	
+	[01]              DS    CL(LEN)
+	[02]   ADDR       DS    CL(SIZE)
+	[03]
+	[04]   HERE       DS    0H
+	[05]   LEN        EQU   HERE-ADDR
+	[06]   SIZE       EQU   1
+	
+	\end{verbatim}
+	\caption{A sample program that shows that symbols can be used prior to their definition.}
+	\label{lst:ordinary_assembly}
+\end{listing}
+
 
 In the next step, \verb|LEN| is defined, but it cannot be evaluated, because the subtraction of addresses \verb|ADDR| and \verb|HERE| is dependent on the unknown length of instruction on second line and therefore on the symbol \verb|SIZE|. The whole program is resolved only when the assembly reaches the last line, which defines the length of instruction \verb|02|. Afterwards, it is possible to resolve \verb|LEN| and finally the length of instruction \verb|01|.
 
@@ -171,39 +197,7 @@ Instruction \verb|DC| in line \verb|17| creates value of type double and assigns
 
 \verb|ANOP| is an empty assembler action which defines the \verb|.END| symbol and line \verb|19| ends the assembling of the program. 
 
-\vspace{5mm}
-
-Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA has mechanics that allows the assembler to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
-
-To sum up, CA processing has variables to store state of compilation and CA instructions for conditional branching. Hence, it is Turing-complete while still evaluated during compile-time.
-
-
-\begin{listing}[p]
-	\begin{verbatim}
-	AIF   ('&VAR' FIND '~').A,     REMARK1                        x
-	('&VAR'  EQ  'L').B,     REMARK2                        x
-	(T'&VAR  EQ  'U').C      REMARK3 
-	\end{verbatim}
-	\caption{Extended instruction format.}
-	\label{lst:extended}
-\end{listing}
-
-\begin{listing}[p]
-	\begin{verbatim}
-	
-	[01]              DS    CL(LEN)
-	[02]   ADDR       DS    CL(SIZE)
-	[03]
-	[04]   HERE       DS    0H
-	[05]   LEN        EQU   HERE-ADDR
-	[06]   SIZE       EQU   1
-	
-	\end{verbatim}
-	\caption{A sample program that shows that symbols can be used prior to their definition.}
-	\label{lst:ordinary_assembly}
-\end{listing}
-
-\begin{listing}[p]
+\begin{listing}[t]
 	\begin{verbatim}
 	name        operation   operands
 	
@@ -230,3 +224,11 @@ To sum up, CA processing has variables to store state of compilation and CA inst
 	\caption{An example of an artificial HLASM program.}
 	\label{lst:example}
 \end{listing}
+
+\vspace{5mm}
+
+Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA has mechanics that allows the assembler to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
+
+To sum up, CA processing has variables to store state of compilation and CA instructions for conditional branching. Hence, it is Turing-complete while still evaluated during compile-time.
+
+
