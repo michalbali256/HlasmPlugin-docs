@@ -244,10 +244,11 @@ The work packages have been assigned to individual team members based on long-te
 			\node[month] at (t\tim) {Month \tim};
 			\draw[dotted, thin, draw=black!25] (t\tim) to (t\tim |- wp30); %sync with previous
 		};
+		\coordinate (t36) at (3.6 * 2cm,0);
 		
 		
-		\draw[draw=black!25] (t3) to (t3 |- wp27); %sync with previous
-		\node[month] at (t3|-wp30) {today};
+		\draw[draw=black!25] (t36) to (t36 |- wp27); %sync with previous
+		\node[month] at (t36|-wp30) {today};
 		
 		\ganttitem{ider}{t1|-wp3}{IDEs research}{Lucia, Michal};
 		\ganttitem{pare}{t1|-wp2}{Parser libraries research}{Peter};
