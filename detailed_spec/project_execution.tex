@@ -21,11 +21,13 @@ Slack is used for dynamic communication between team members.
 
 \section{Project timeline}
 \label{timeline}
-The project was split into several milestones and work packages. Presently, the milestone \hyperref[milestone_preview]{Preview} has already been reached. Therefore, there is currently a working prototype, and some of the presented work packages are already finished. 
+The project was split into several milestones and work packages, specified closer in~\cref{table}. The implementation of the whole project was planned to be accomplished within nine months.
 
-The implementation of the whole project was planned to be accomplished within nine months. The project has been already worked on for four months which has already resulted in completion of milestone M4 Preview. Since most of the architecture, design and planning questions have been answered during the development of the prototype, we do not expect any additional technical or architectural issues at this point. Additionally, the company support from Broadcom Inc. prevents financing and motivation issues. Currently, it seems that it is very probable that the project will be completed as planned. 
+The project has been already worked on for four months, which has resulted in completion of the initial milestones up to a large portion of \hyperref[milestone_preview]{Preview}. Therefore, there is now a working prototype of the HLASM plugin, and some of the presented work packages are already finished.
 
-The work packages have been assigned to individual team members based on long-term planning. The work packages, their deadlines and assignments are summarized in the \cref{table} and in the overview diagram \ref{fig:gantt-pokus}. 
+Since most of the architecture, design and planning questions have already been answered during the development of the prototype, we do not expect any serious technical or architectural issues to surface at this point. Additionally, the company support from Broadcom Inc.~prevents financing and motivation issues. We therefore assume that it is very probable that the project will be completed as planned.
+
+The work packages have been assigned to individual team members based on long-term planning. The assignments and corresponding deadlines are listed in \cref{table}, and summarized in the overview diagram \ref{fig:gantt-pokus}.
 
 
 \newcommand{\WPdef}[3]{\expandafter\def\csname WP#1 \endcsname{\textbf{#2}
@@ -244,11 +246,10 @@ The work packages have been assigned to individual team members based on long-te
 			\node[month] at (t\tim) {Month \tim};
 			\draw[dotted, thin, draw=black!25] (t\tim) to (t\tim |- wp30); %sync with previous
 		};
-		\coordinate (t36) at (3.6 * 2cm,0);
+		\coordinate (today) at ([xshift=-5mm] t4);
 		
-		
-		\draw[draw=black!25] (t36) to (t36 |- wp27); %sync with previous
-		\node[month] at (t36|-wp30) {today};
+		\draw[draw=black!25, dashed] (today|- wp1) to (today |- wp27); %sync with previous
+		\node[month] at (today|-wp30) {today};
 		
 		\ganttitem{ider}{t1|-wp3}{IDEs research}{Lucia, Michal};
 		\ganttitem{pare}{t1|-wp2}{Parser libraries research}{Peter};
