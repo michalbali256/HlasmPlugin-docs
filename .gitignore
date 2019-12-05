@@ -11,5 +11,10 @@
 *.bbl
 *.blg
 *.synctex.gz
+*.vrb
+*.nav
+*.snm
 pdfa.xmpi
 *.pdf
+
+!**/img/*

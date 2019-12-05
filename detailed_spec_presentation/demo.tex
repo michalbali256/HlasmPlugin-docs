@@ -1,0 +1,118 @@
+\documentclass[10pt]{beamer}
+
+
+\usepackage[utf8]{inputenc}
+\usetheme{metropolis}
+\usepackage{appendixnumberbeamer}
+\usepackage{pgfgantt}
+
+
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+
+\title{High Level Assembler Plugin}
+\subtitle{}
+\date{Supervisor: Miroslav Kratochvíl}
+\author{Michal Bali, Marcel Hruška, Peter Polák, Adam Šmelko, Lucia Tódová}
+% \institute{Center for modern beamer themes}
+% \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Table of contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}[fragile]{Metropolis}
+
+    Maybe:
+    
+    Motivation:
+    
+    \includegraphics[width=10cm]{img/maxresdefault}
+    
+  
+\end{frame}
+
+\begin{frame}[fragile]{The HLASM language}
+
+There are 3 types of instructions:
+\begin{enumerate}
+	\item Machine instructions
+	\item Assembler instructions
+	\item Conditional assembly instructions
+\end{enumerate}
+
+
+*Short slide just to introduce instructions*
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Ordinary assembly example}
+  
+	\begin{verbatim}
+	[00]              LR    1,2
+	[01]              DS    CL(LEN)
+	[02]   ADDR       DS    CL(SIZE)
+	[03]
+	[04]   HERE       DS    0H
+	[05]   LEN        EQU   HERE-ADDR
+	[06]   SIZE       EQU   1
+	\end{verbatim}
+	
+	*Drawing of resulting object*
+	
+	*Explain the example* 
+\end{frame}
+
+\begin{frame}[fragile]{Conditional assembly example}
+
+
+\begin{verbatim}
+[01]     *CA example*
+
+\end{verbatim}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Architecture}
+\centering
+\includegraphics[width=10cm]{img/hlasm_architecture}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Preview version}
+
+*Screen z preview verzie
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Project timeline}
+
+
+
+\end{frame}
+
+
+\begin{frame}[standout]
+  Questions?
+\end{frame}
+
+\end{document}
