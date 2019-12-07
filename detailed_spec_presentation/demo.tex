@@ -16,6 +16,8 @@
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
 
+\usepackage{array}
+
 
 \title{High Level Assembler Plugin}
 \subtitle{}
@@ -68,23 +70,34 @@ There are 3 types of instructions:
 	[00]              LR    1,2
 	[01]              DS    CL(LEN)
 	[02]   ADDR       DS    CL(SIZE)
-	[03]
-	[04]   HERE       DS    0H
+	[03]   HERE       DS    CL5
+	[04]
 	[05]   LEN        EQU   HERE-ADDR
 	[06]   SIZE       EQU   1
 	\end{verbatim}
 	
-	*Drawing of resulting object*
+	\begin{table}[]
+		\begin{tabular}{llll}
+			\hline
+			\multicolumn{1}{|p{1cm}|}{\texttt{2}\hspace{5cm}} & \multicolumn{1}{p{1cm}|}{\texttt{LEN}} & \multicolumn{1}{p{1cm}|}{\texttt{SIZE}} & \multicolumn{1}{p{1cm}|}{\texttt{5}}  \\ \hline
+			 &   & \multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{ADDR->} }}  & \multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{HERE->}}}                       
+		\end{tabular}
+	\end{table}
 	
-	*Explain the example* 
 \end{frame}
 
 \begin{frame}[fragile]{Conditional assembly example}
 
 
 \begin{verbatim}
-[01]     *CA example*
-
+	[00]   &VAR       SETA    1
+	[01]   .LOOP      ANOP         
+	[02]   SYM        DC      (&VAR)C'A'
+	[03]              AIF     (L'SYM GE 10).END
+	[04]              MAC     &VAR
+	[06]   &VAR       SETA    &VAR+1
+	[07]              AIF     (&VAR LE 5).LOOP
+	[08]   .END       END     
 \end{verbatim}
 
 
