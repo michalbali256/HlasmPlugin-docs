@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usetheme{metropolis}
 \usepackage{appendixnumberbeamer}
+\usepackage[defaultsans]{droidsans}
 
 
 \usepackage{booktabs}
@@ -16,7 +17,7 @@
 
 
 \title{High Level Assembler Plugin}
-\subtitle{}
+%\subtitle{Software project}
 \date{Supervisor: Miroslav Kratochvíl}
 \author{Michal Bali, Marcel Hruška, Peter Polák, Adam Šmelko, Lucia Tódová}
 % \institute{Center for modern beamer themes}
@@ -27,39 +28,46 @@
 \maketitle
 
 
-\begin{frame}[fragile]{Motivation}
+\begin{frame}[standout]{Motivation}
 \centering
 \hspace*{-1cm}
 \includegraphics[width=12.6cm]{img/maxresdefault}
+\pause
+\footnotesize Your Account Balance May Still Rely On Such Code!
 
 \end{frame}
 
-\begin{frame}[fragile]{Introduction}
-
+\begin{frame}{Project goals}
     \begin{itemize}
-    	\item provide HLASM support for contemporary source code editors using Language Server Protocol
+    	\item HLASM support for contemporary source code editors using the Language Server Protocol
     	\item Code validation
-    	\item Code navigation (Go to definition, Find all references)
-    	\item Tooltips when hovering over symbols
+    	\item Code navigation (Go to definition, Find all references, \dots)
+    	\item Tooltips, autocompletion, \dots
+    \end{itemize}
+
+    In the long term:
+    \begin{itemize}
+        \item Simplify orientation in legacy code
+        \item Allow transitioning to some modern language % COBOL
     \end{itemize}
 \end{frame}
 
 
-
-\begin{frame}[fragile]{The HLASM language}
+\begin{frame}{The HLASM language}
 
 There are 3 types of instructions:
 \begin{enumerate}
 	\item Machine instructions
-	\item Assembler instructions
-	\item Conditional assembly instructions
+	\item Assembler instructions \\\quad{\small (`compile'-time variables, modifications of assembler program state)}
+	\item Conditional Assembly instructions \\\quad{\small (basically a Turing-complete macro system)}
 \end{enumerate}
 
+\textbf{Main problem:} Code interpretation heavily depends on 2.~and 3.
 
 \end{frame}
 
 
-\begin{frame}[fragile]{Ordinary assembly example}
+\begin{frame}[fragile]{Example --- assembler instructions}
   
 	\begin{verbatim}
 	[00]              LR    1,2
@@ -83,7 +91,7 @@ There are 3 types of instructions:
 	
 \end{frame}
 
-\begin{frame}[fragile]{Conditional assembly example}
+\begin{frame}[fragile]{Example --- Conditional Assembly}
 
 
 \begin{verbatim}
@@ -97,29 +105,24 @@ There are 3 types of instructions:
 	[08]   .END       END     
 \end{verbatim}
 
-
 \end{frame}
 
-\begin{frame}[fragile]{Architecture}
+\begin{frame}{Architecture}
 \centering
 \includegraphics[width=10.5cm]{img/hlasm_architecture}
-
 \end{frame}
 
 
-
-\begin{frame}[fragile]{Preview version}
-
+\begin{frame}{Already done: Preview version}
 \centering
 \includegraphics[width=9cm]{img/screenshot}
 
-\small
+\footnotesize
 Source code taken from \url{https://github.com/zhaimlill/EnhanceStartOnZ}
-
 \end{frame}
 
 
-\begin{frame}[fragile]{Project timeline}
+\begin{frame}{Current timeline}
 
 \centering
 \hspace*{-0.95cm}
@@ -129,7 +132,10 @@ Source code taken from \url{https://github.com/zhaimlill/EnhanceStartOnZ}
 
 
 \begin{frame}[standout]
-  Questions?
+
+  Thank you for attention.
+
+  \small Questions?
 \end{frame}
 
 
