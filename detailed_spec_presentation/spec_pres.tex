@@ -4,14 +4,10 @@
 \usepackage[utf8]{inputenc}
 \usetheme{metropolis}
 \usepackage{appendixnumberbeamer}
-\usepackage{pgfgantt}
 
 
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
-
-\usepackage{pgfplots}
-\usepgfplotslibrary{dateplot}
 
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
@@ -33,14 +29,15 @@
 
 \begin{frame}[fragile]{Motivation}
 \centering
-\includegraphics[width=10cm]{img/maxresdefault}
+\hspace*{-1cm}
+\includegraphics[width=12.6cm]{img/maxresdefault}
 
 \end{frame}
 
 \begin{frame}[fragile]{Introduction}
 
     \begin{itemize}
-    	\item The aim of the software project is to create an extension that adds language support for HLASM to Visual Studio Code.
+    	\item provide HLASM support for contemporary source code editors using Language Server Protocol
     	\item Code validation
     	\item Code navigation (Go to definition, Find all references)
     	\item Tooltips when hovering over symbols
@@ -59,8 +56,6 @@ There are 3 types of instructions:
 \end{enumerate}
 
 
-*Short slide just to introduce instructions*
-
 \end{frame}
 
 
@@ -76,10 +71,12 @@ There are 3 types of instructions:
 	[06]   SIZE       EQU   1
 	\end{verbatim}
 	
+	Resulting memory layout:
+	
 	\begin{table}[]
-		\begin{tabular}{llll}
-			\hline
-			\multicolumn{1}{|p{1cm}|}{\texttt{2}\hspace{5cm}} & \multicolumn{1}{p{1cm}|}{\texttt{LEN}} & \multicolumn{1}{p{1cm}|}{\texttt{SIZE}} & \multicolumn{1}{p{1cm}|}{\texttt{5}}  \\ \hline
+		\begin{tabular}{clll}
+			
+			\multicolumn{1}{|p{0.5cm}|}{\centering\texttt{2}} & \multicolumn{1}{p{2cm}|}{\centering\texttt{LEN}} & \multicolumn{1}{p{3cm}|}{\centering\texttt{SIZE}} & \multicolumn{1}{p{1.5cm}|}{\centering\texttt{5}}  \\ \hline
 			 &   & \multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{ADDR->} }}  & \multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{HERE->}}}                       
 		\end{tabular}
 	\end{table}
@@ -92,7 +89,7 @@ There are 3 types of instructions:
 \begin{verbatim}
 	[00]   &VAR       SETA    1
 	[01]   .LOOP      ANOP         
-	[02]   SYM        DC      (&VAR)C'A'
+	[02]   SYM        DC      &VAR.C'A'
 	[03]              AIF     (L'SYM GE 10).END
 	[04]              MAC     &VAR
 	[06]   &VAR       SETA    &VAR+1
@@ -105,7 +102,7 @@ There are 3 types of instructions:
 
 \begin{frame}[fragile]{Architecture}
 \centering
-\includegraphics[width=10cm]{img/hlasm_architecture}
+\includegraphics[width=10.5cm]{img/hlasm_architecture}
 
 \end{frame}
 
@@ -114,7 +111,7 @@ There are 3 types of instructions:
 \begin{frame}[fragile]{Preview version}
 
 \centering
-\includegraphics[width=8cm]{img/screenshot}
+\includegraphics[width=9cm]{img/screenshot}
 
 \small
 Source code taken from \url{https://github.com/zhaimlill/EnhanceStartOnZ}
@@ -125,7 +122,8 @@ Source code taken from \url{https://github.com/zhaimlill/EnhanceStartOnZ}
 \begin{frame}[fragile]{Project timeline}
 
 \centering
-\includegraphics[width=10cm]{img/timeline}
+\hspace*{-0.95cm}
+\includegraphics[width=12.5cm]{img/timeline}
 
 \end{frame}
 
