@@ -10,6 +10,8 @@
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
 
+\usepackage{xparse}
+
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
 
@@ -66,28 +68,134 @@ There are 3 types of instructions:
 
 \end{frame}
 
+\newcommand{\coltt}[2]{\multicolumn{1}{#1}{\centering\texttt{#2}}}
+\newcommand{\rotl}[1]{\multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{#1} }}}
+\newcommand{\rotc}{\multicolumn{1}{c}{\rotatebox{90}{\texttt{<-} }}}
 
-\begin{frame}[fragile]{Example --- assembler instructions}
-  
-	\begin{verbatim}
-	[00]              LR    1,2
-	[01]              DS    CL(LEN)
-	[02]   ADDR       DS    CL(SIZE)
-	[03]   HERE       DS    CL5
-	[04]
-	[05]   LEN        EQU   HERE-ADDR
-	[06]   SIZE       EQU   1
-	\end{verbatim}
+\newcommand{\mem}[4]
+{
 	
 	Resulting memory layout:
 	
 	\begin{table}[]
-		\begin{tabular}{clll}
-			
-			\multicolumn{1}{|p{0.5cm}|}{\centering\texttt{2}} & \multicolumn{1}{p{2cm}|}{\centering\texttt{LEN}} & \multicolumn{1}{p{3cm}|}{\centering\texttt{SIZE}} & \multicolumn{1}{p{1.5cm}|}{\centering\texttt{5}}  \\ \hline
-			 &   & \multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{ADDR->} }}  & \multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{HERE->}}}                       
+		\begin{tabular}{llll}
+			#1                    & #2                   & #3                    & #4                   \\
+			\coltt{|p{0.5cm}|}{2} & \coltt{p{2cm}|}{LEN} & \coltt{p{3cm}|}{SIZE} & \coltt{p{1.5cm}|}{5} \\ \hline
+			                      &                      & \rotl{ADDR->}         & \rotl{HERE->}
 		\end{tabular}
 	\end{table}
+}
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+	
+	\begin{verbatim}
+  [00]              LR    1,2
+  [01]              DS    CL(LEN)
+  [02]   ADDR       DS    CL(SIZE)
+  [03]   HERE       DS    CL5
+  [04]
+  [05]   LEN        EQU   HERE-ADDR
+  [06]   SIZE       EQU   1
+	\end{verbatim}
+	
+	\mem{}{}{}{}
+	
+\end{frame}
+
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+  
+\begin{verbatim}
+->[00]              LR    1,2       known size 2
+  [01]              DS    CL(LEN) 
+  [02]   ADDR       DS    CL(SIZE)
+  [03]   HERE       DS    CL5
+  [04]
+  [05]   LEN        EQU   HERE-ADDR
+  [06]   SIZE       EQU   1
+\end{verbatim}
+	
+	\mem{\rotc}{}{}{}
+	
+\end{frame}
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+	
+	\begin{verbatim}
+  [00]              LR    1,2
+->[01]              DS    CL(LEN)   unknown symbol !!!
+  [02]   ADDR       DS    CL(SIZE)
+  [03]   HERE       DS    CL5
+  [04]
+  [05]   LEN        EQU   HERE-ADDR
+  [06]   SIZE       EQU   1
+	\end{verbatim}
+	
+	\mem{}{\rotc}{}{}
+	
+\end{frame}
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+	
+	\begin{verbatim}
+  [00]              LR    1,2
+  [01]              DS    CL(LEN)
+->[02]   ADDR       DS    CL(SIZE)   unknown symbol !!!
+  [03]   HERE       DS    CL5
+  [04]
+  [05]   LEN        EQU   HERE-ADDR
+  [06]   SIZE       EQU   1
+\end{verbatim}
+	
+	\mem{}{}{\rotc}{}
+	
+\end{frame}
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+	
+	\begin{verbatim}
+  [00]              LR    1,2
+  [01]              DS    CL(LEN)
+  [02]   ADDR       DS    CL(SIZE)
+->[03]   HERE       DS    CL5        known size 5
+  [04]
+  [05]   LEN        EQU   HERE-ADDR
+  [06]   SIZE       EQU   1
+	\end{verbatim}
+	
+	\mem{}{}{}{\rotc}
+	
+\end{frame}
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+	
+	\begin{verbatim}
+  [00]              LR    1,2
+  [01]              DS    CL(LEN)
+  [02]   ADDR       DS    CL(SIZE)
+  [03]   HERE       DS    CL5        
+  [04]
+->[05]   LEN        EQU   HERE-ADDR  LEN depends ONLY on SIZE !!!
+  [06]   SIZE       EQU   1
+	\end{verbatim}
+	
+	\mem{}{}{}{}
+	
+\end{frame}
+
+\begin{frame}[fragile]{Example --- assembler instructions}
+	
+	\begin{verbatim}
+  [00]              LR    1,2
+  [01]              DS    CL(LEN)
+  [02]   ADDR       DS    CL(SIZE)
+  [03]   HERE       DS    CL5        
+  [04]
+  [05]   LEN        EQU   HERE-ADDR
+->[06]   SIZE       EQU   1           all dependencies resolved by now
+	\end{verbatim}
+	
+	\mem{}{}{}{}
 	
 \end{frame}
 
@@ -97,12 +205,19 @@ There are 3 types of instructions:
 \begin{verbatim}
 	[00]   &VAR       SETA    1
 	[01]   .LOOP      ANOP         
-	[02]   SYM        DC      &VAR.C'A'
-	[03]              AIF     (L'SYM GE 10).END
-	[04]              MAC     &VAR
-	[06]   &VAR       SETA    &VAR+1
-	[07]              AIF     (&VAR LE 5).LOOP
-	[08]   .END       END     
+	[02]   SYM&VAR    DC      C'A'
+	[03]              AIF     (D'SYM2).END
+	[04]   &VAR       SETA    &VAR+1
+	[05]              AIF     (&VAR LE 3).LOOP
+	[06]   .END       END     
+\end{verbatim}
+
+\pause
+Listing:
+\begin{verbatim}
+[00]   SYM1       DC      C'A'
+[01]   SYM2       DC      C'A'
+[02]              END
 \end{verbatim}
 
 \end{frame}
