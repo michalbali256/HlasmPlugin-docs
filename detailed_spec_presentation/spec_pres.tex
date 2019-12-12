@@ -7,6 +7,9 @@
 \usepackage[defaultsans]{droidsans}
 
 
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{fancyvrb}
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
 
@@ -68,158 +71,52 @@ There are 3 types of instructions:
 
 \end{frame}
 
-\newcommand{\coltt}[2]{\multicolumn{1}{#1}{\centering\texttt{#2}}}
-\newcommand{\rotl}[1]{\multicolumn{1}{l}{\hspace{-10pt}\rotatebox{90}{\texttt{#1} }}}
-\newcommand{\rotc}{\multicolumn{1}{c}{\rotatebox{90}{\texttt{<-} }}}
-
-\newcommand{\mem}[4]
-{
-	
-	Resulting memory layout:
-	
-	\begin{table}[]
-		\begin{tabular}{llll}
-			#1                    & #2                   & #3                    & #4                   \\
-			\coltt{|p{0.5cm}|}{2} & \coltt{p{2cm}|}{LEN} & \coltt{p{3cm}|}{SIZE} & \coltt{p{1.5cm}|}{5} \\ \hline
-			                      &                      & \rotl{ADDR->}         & \rotl{HERE->}
-		\end{tabular}
-	\end{table}
-}
-
+\newcommand{\aaa}[2]{\alert<#1>{#2}}
 \begin{frame}[fragile]{Example --- assembler instructions}
-	
-	\begin{verbatim}
-  [00]              LR    1,2
-  [01]              DS    CL(LEN)
-  [02]   ADDR       DS    CL(SIZE)
-  [03]   HERE       DS    CL5
-  [04]
-  [05]   LEN        EQU   HERE-ADDR
-  [06]   SIZE       EQU   1
-	\end{verbatim}
-	
-	\mem{}{}{}{}
-	
-\end{frame}
+\begin{Verbatim}[commandchars=\\\{\}]
+[00]              \aaa{2}{LR    1,2}
+[01]              \aaa{3}{DS    CL(LEN)}
+[02]   \aaa{4}{ADDR       DS    CL(SIZE)}
+[03]   \aaa{5}{HERE       DS    CL5}
+[04]
+[05]   \aaa{6}{LEN        EQU   HERE-ADDR}
+[06]   \aaa{7}{SIZE       EQU   1}
+\end{Verbatim}
 
+Output layout:
+\begin{center}
+\begin{tikzpicture}[node distance=0mm, font=\tt]
+\node[rectangle,draw, minimum width=7em, minimum height=2em] (a) {\only<2->{\alert<2>{2}}};
+\node[rectangle,draw, minimum width=7em, minimum height=2em, right=of a] (b) {\only<3->{\alert<3>{LEN}}\only<3-5>{=?}\only<6>{=\alert{SIZE}}\only<7>{=\alert{1}}};
+\node[rectangle,draw, minimum width=7em, minimum height=2em, right=of b] (c) {\only<4->{\alert<4>{SIZE}}\only<4-6>{=?}\only<7>{=\alert{1}}};
+\node[rectangle,draw, minimum width=7em, minimum height=2em, right=of c] (d) {\only<5->{\alert<5>{5}}};
 
-\begin{frame}[fragile]{Example --- assembler instructions}
-  
-\begin{verbatim}
-->[00]              LR    1,2       known size 2
-  [01]              DS    CL(LEN) 
-  [02]   ADDR       DS    CL(SIZE)
-  [03]   HERE       DS    CL5
-  [04]
-  [05]   LEN        EQU   HERE-ADDR
-  [06]   SIZE       EQU   1
-\end{verbatim}
-	
-	\mem{\rotc}{}{}{}
-	
-\end{frame}
+\node[below=of b.south east, minimum width=5em, anchor=east, rotate=90] {\only<4->{ADDR $\to$}};
+\node[below=of c.south east, minimum width=5em, anchor=east, rotate=90] {\only<5->{HERE $\to$}};
+\end{tikzpicture}
+\end{center}
 
-\begin{frame}[fragile]{Example --- assembler instructions}
-	
-	\begin{verbatim}
-  [00]              LR    1,2
-->[01]              DS    CL(LEN)   unknown symbol !!!
-  [02]   ADDR       DS    CL(SIZE)
-  [03]   HERE       DS    CL5
-  [04]
-  [05]   LEN        EQU   HERE-ADDR
-  [06]   SIZE       EQU   1
-	\end{verbatim}
-	
-	\mem{}{\rotc}{}{}
-	
-\end{frame}
-
-\begin{frame}[fragile]{Example --- assembler instructions}
-	
-	\begin{verbatim}
-  [00]              LR    1,2
-  [01]              DS    CL(LEN)
-->[02]   ADDR       DS    CL(SIZE)   unknown symbol !!!
-  [03]   HERE       DS    CL5
-  [04]
-  [05]   LEN        EQU   HERE-ADDR
-  [06]   SIZE       EQU   1
-\end{verbatim}
-	
-	\mem{}{}{\rotc}{}
-	
-\end{frame}
-
-\begin{frame}[fragile]{Example --- assembler instructions}
-	
-	\begin{verbatim}
-  [00]              LR    1,2
-  [01]              DS    CL(LEN)
-  [02]   ADDR       DS    CL(SIZE)
-->[03]   HERE       DS    CL5        known size 5
-  [04]
-  [05]   LEN        EQU   HERE-ADDR
-  [06]   SIZE       EQU   1
-	\end{verbatim}
-	
-	\mem{}{}{}{\rotc}
-	
-\end{frame}
-
-\begin{frame}[fragile]{Example --- assembler instructions}
-	
-	\begin{verbatim}
-  [00]              LR    1,2
-  [01]              DS    CL(LEN)
-  [02]   ADDR       DS    CL(SIZE)
-  [03]   HERE       DS    CL5        
-  [04]
-->[05]   LEN        EQU   HERE-ADDR  LEN depends ONLY on SIZE !!!
-  [06]   SIZE       EQU   1
-	\end{verbatim}
-	
-	\mem{}{}{}{}
-	
-\end{frame}
-
-\begin{frame}[fragile]{Example --- assembler instructions}
-	
-	\begin{verbatim}
-  [00]              LR    1,2
-  [01]              DS    CL(LEN)
-  [02]   ADDR       DS    CL(SIZE)
-  [03]   HERE       DS    CL5        
-  [04]
-  [05]   LEN        EQU   HERE-ADDR
-->[06]   SIZE       EQU   1           all dependencies resolved by now
-	\end{verbatim}
-	
-	\mem{}{}{}{}
-	
 \end{frame}
 
 \begin{frame}[fragile]{Example --- Conditional Assembly}
-
-
-\begin{verbatim}
-	[00]   &VAR       SETA    1
-	[01]   .LOOP      ANOP         
-	[02]   SYM&VAR    DC      C'A'
-	[03]              AIF     (D'SYM2).END
-	[04]   &VAR       SETA    &VAR+1
-	[05]              AIF     (&VAR LE 3).LOOP
-	[06]   .END       END     
-\end{verbatim}
+\begin{Verbatim}[commandchars=\\\{\}]
+[00]   &VAR       \aaa{3}{SETA    1}
+[01]   .LOOP      ANOP         
+[02]   \aaa{2}{SYM&VAR}    DC      C'A'
+[03]              \aaa{4}{AIF     (D'SYM3).END}
+[04]   \aaa{3}{&VAR       SETA    &VAR+1}
+[05]              \aaa{3}{AIF     (&VAR LE 4).LOOP}
+[06]   .END       END     
+\end{Verbatim}
 
 \pause
-Listing:
-\begin{verbatim}
-[00]   SYM1       DC      C'A'
+\textbf{Output:}
+\begin{Verbatim}[commandchars=\\\{\}]
+[00]   \aaa{2}{SYM1}       DC      C'A' \pause
 [01]   SYM2       DC      C'A'
-[02]              END
-\end{verbatim}
-
+[02]   \aaa{4}{SYM3}       DC      C'A' \pause
+[03]              END
+\end{Verbatim}
 \end{frame}
 
 \begin{frame}{Architecture}
@@ -246,24 +143,23 @@ Source code taken from \url{https://github.com/zhaimlill/EnhanceStartOnZ}
 \end{frame}
 
 
-\begin{frame}{Risks}
-
-\large
-Performance
-\normalsize
+\begin{frame}{Future perspectives}
 \begin{itemize}
-	\item The preview version shows that the performance of the extension may be problematic.
-	\item Currently we are not sure, whether it will be possible to optimize the parser to achieve good response times to user actions.
+\item the prototype has been already tested\\ on realistically large projects
+	\begin{itemize}
+		\item ``proof of concept'' works well
+		\item additional integration problems seem unlikely
+	\end{itemize}
+\item one possible problem:\\ syntax highlighting performance
+	\begin{itemize}
+		\item small changes require reprocessing\\ of huge amounts of generated code
+		\item optimizations are possible
+	\end{itemize}
 \end{itemize}
-
-We are fairly confident that the rest of the project will continue as planned, since we have already tested the preview version on production code.
-
-
 \end{frame}
 
 
 \begin{frame}[standout]
-
   Thank you for attention.
 
   \small Questions?
