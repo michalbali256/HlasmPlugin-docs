@@ -91,8 +91,8 @@ Output layout:
 \node[rectangle,draw, minimum width=7em, minimum height=2em, right=of b] (c) {\only<4->{\alert<4>{SIZE}}\only<4-6>{=?}\only<7>{=\alert{1}}};
 \node[rectangle,draw, minimum width=7em, minimum height=2em, right=of c] (d) {\only<5->{\alert<5>{5}}};
 
-\node[below=of b.south east, minimum width=5em, anchor=east, rotate=90] {\only<4->{ADDR $\to$}};
-\node[below=of c.south east, minimum width=5em, anchor=east, rotate=90] {\only<5->{HERE $\to$}};
+\node[below=of b.south east, minimum width=5em, anchor=east, rotate=45] {\only<4->{ADDR $\to$}};
+\node[below=of c.south east, minimum width=5em, anchor=east, rotate=45] {\only<5->{HERE $\to$}};
 \end{tikzpicture}
 \end{center}
 
