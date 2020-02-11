@@ -1,0 +1,61 @@
+\chapter {Analyzer}
+
+\section{Analyzer overview}
+
+\todo{picture of analyzer architecture}
+
+
+The analyzer is able to process a single HLASM file. The processing includes:
+\begin{itemize}
+	\item recognition of statements and their parts (lexing and parsing)
+	\item interpretation of instructions that should be executed in compile time
+	\item a check whether the HLASM source code is well-formed
+	\item reporting of problems with the source by producing LSP diagnostics
+	\item providing highlighting and LSP information
+\end{itemize}
+
+A HLASM file may have dependencies --- other files that define macros or files brought in by the COPY instruction. The dependencies are only discovered during the processing of files, so it is not possible to provide the files beforehand. The analyzer gets a callback that would find a file with specified name, parse its contents and return it as list of parsed statements. 
+
+To sum up, the analyzer has a pretty simple API: it takes the contents of a source file by common string and a callback that can parse external files with specified name. It provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
+
+The analyzer is further decomposed into xxx components.
+
+\subsection{Lexer}
+
+Lexer's task is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
+\begin{itemize}
+	\item each token has location in the source text
+	\item has the ability to check whether all characters are valid in the HLASM source
+	\item has the ability to jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool and the lexer has to be implemented from scratch.
+\end{itemize}
+
+\subsection{Parser}
+
+Parser component takes the stream of tokens the lexer produces and recognizes HLASM statements according to the syntax. To accomplish this, a parser generator tool Antlr 4 \footnote{\url{https://www.antlr.org}} is used.
+
+The input to Antlr is a grammar (written in antlr-specific language) that specifies the syntax of HLASM language and generates source code (in C++) for a recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code.
+
+\subsection{Instruction interpretation}
+
+Results of the parser component are further analyzed in the processing component. Its most important capabilities are:
+\begin{itemize}
+	\item Interpretation of CA instructions, which results in modifying the lexer state (moving back and forth in the input file).
+	\item Substitution of variable symbols. After the substitution, the statement must be reparsed in the lexer and the parser, since the substitution may completely change its meaning.
+	\item Interpretation of assembler instructions
+	\item Ordinary symbols resolution
+	\item MACRO and COPY expansion.
+\end{itemize}
+
+\subsection{Expressions}
+overview
+
+they are parsed in grammar, later you give an expression "symbol evaluator" and it returns its value
+
+\subsection{Instruction format validation}
+After a statement is fully processed and all operands of each instruction are known, the statement needs to be checked for errors. There are over 2000 machine instructions with variable number of operands and various restrictions on those operands --- some of them take only positive numbers, numbers that are in specific range or are limited to addresses only. The core of the component is a great table that describes all the instructions and their operands.
+
+The API of the validation component is simple: it takes an instruction and list of its operands and returns a list of warnings and errors in the form of LSP diagnostics.
+
+\subsection{Data definition}
+
+validation and processing purpose

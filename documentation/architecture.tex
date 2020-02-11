@@ -1,0 +1,104 @@
+\chapter{Architecture overview}
+\label{arch}
+\todo{Make analyzer black box in this overview}
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{img/language-server-sequence}
+	\caption[LSP session example.]{LSP session example. (source: \url{https://microsoft.github.io/language-server-protocol/overview} )}
+	\label{fig04:LSP}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{img/hlasm_architecture}
+	\caption{The architecture of HLASM Plugin}
+	
+	\label{fig04:arch}
+\end{figure}
+
+The architecture is based on the way modern code editors and IDEs are extended to support additional languages. We chose to implement Language Server Protocol \footnote{\url{https://microsoft.github.io/language-server-protocol/}} (LSP), which is supported by a majority of contemporary editors.
+
+In LSP, the two parties that communicate are called a \emph{client} and a \emph{language server}. A simple example is displayed in \cref{fig04:LSP} The client runs as a part of an editor. The language server may be a standalone application that is connected to the client by a pipe or TCP. All language-specific user actions (for example Go to definition command) are transformed into standard LSP messages and sent to the language server. The language server then analyzes the source code and sends back a response, which is then interpreted and presented to the user in editor-specific way. This architecture makes possible to only have one LSP client implementation for each code editor, which may be reused by all programming languages. And vice versa, every language server may be easily used by any editor that has an implementation of the LSP client.
+
+To add support for HLASM, we have to implement the LSP language server and write a thin extension to an editor, which will use an already existing implementation of the LSP client. To implement source code highlighting, we need to extend the protocol with a new notification. This notification will be used for transferring information from language server to VS Code client, which is extended to highlight code in editor based on the incoming custom notifications.
+
+Here, we further decompose the project into smaller components and describe their relations. The two main components are the parser library and the language server --- an executable application that uses the parser library. The overall architecture is pictured in \cref{fig04:arch}.
+
+\section{Language server description}
+
+The responsibility of the language server component is to maintain the LSP session, convert incoming JSON messages and use the parser library to execute them. The functionality includes:
+\begin{itemize}
+    \item reading LSP messages from standard input or TCP and writing responses
+    \item parsing JSON RPC to C++ structures, so they can be further used
+    \item serializing C++ structures into JSON, so it can be sent back to the client
+    \item implementing asynchronous request handling: e.g. when user makes several consecutive changes to a source code, it is not needed to parse on every change
+\end{itemize}
+
+\section{Parser library description}
+
+Parser library is the core of the project --- it encapsulates the analyzer, which provides all parsing capabilities, and workspace manager, which keeps track of open files in the editor and manages their dependencies. It has to keep the representation of workspaces and files in the parser library exactly the same as the user sees in the editor. It also starts the analyzer when needed, manages workspace configuration and provides external macro and copy libraries to analyzer.
+
+\subsection{Parser library API}
+The parser library API is based on LSP --- every relevant request and notification has a corresponding method in the parsing library.
+
+Firstly, the API has to implement the LSP notifications that ensure the editor state synchronization. Apart from working with individual files, the LSP also supports workspaces. A workspace is basically just a folder which contains related source codes. The LSP also supports working with multiple workspaces at the same time. We use it when searching for dependencies of HLASM source codes (macros, and copy files).
+
+The parser library needs to have the exact contents of all files in opened workspaces. To achieve that, there is a file watcher running in the LSP client that notifies the server when any of the HLASM source files is changed outside of editor. For example, when a user deletes an external macro file, the parser library should react by reporting that it cannot find the macro.
+
+The list of necessary editor state synchronization notifications follows:
+\begin{itemize}
+	\item Text synchronization notifications (didOpen, didChange, didClose) which inform the library about files that are currently open in the editor and their exact contents.
+	\item DidChangeWorkspaceFolders notification which informs the library when a workspace has been opened or closed.
+	\item DidChangeWatchedFiles notification
+\end{itemize}
+
+
+
+Secondly, the API has to implement the requests and notifications that provide the parsing results:
+\begin{itemize}
+	\item publishDiagnostics notification. A diagnostic is used to indicate a problem with source files, such as a compiler error or a warning. The parser library provides a callback to let the language server know that diagnostics have changed.
+	\item Callback for highlighting information provision.
+	\item Language feature requests (definition, references, hover, completion), which provide information needed for proper reaction of the editor on user actions.
+\end{itemize}
+
+\subsection{Analyzer}
+
+The analyzer is able to process a single HLASM file. The processing includes:
+\begin{itemize}
+ \item recognition of statements and their parts (lexing and parsing)
+ \item interpretation of instructions that should be executed in compile time
+ \item a check whether the HLASM source code is well-formed
+ \item reporting of problems with the source by producing LSP diagnostics
+ \item providing highlighting and LSP information
+\end{itemize}
+
+A HLASM file may have dependencies --- other files that define macros or files brought in by the COPY instruction. The dependencies are only discovered during the processing of files, so it is not possible to provide the files beforehand. The analyzer gets a callback that would find a file with specified name, parse its contents and return it as list of parsed statements. 
+
+To sum up, the analyzer has a pretty simple API: it takes the contents of a source file by common string and a callback that can parse external files with specified name. It provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
+
+\section{Client-side VS Code extension}
+\label{arch:client}
+
+The VS Code extension component ensures seamless integration with the editor. Its functions are:
+
+\begin{itemize}
+	\item to start the HLASM language server and the LSP client that comes with VS Code, and create a connection between them
+	\item to implement extension of the LSP protocol to enable server-side highlighting. The extended client parses the information from the server and uses VS Code API to actually color the text in the editor.
+	\item to implement continuation handling --- when the user types something in front of the continuation character, it should stay in place.
+\end{itemize}
+
+
+\section{Macro tracer}
+\label{arch:macro}
+The macro tracer enables the user to trace the compilation of HLASM source code in a way similar to common debugging. This is the reason why we chose to implement the Debug Adapter Protocol \footnote{\url{https://microsoft.github.io/debug-adapter-protocol/}} (DAP). It is very similar to LSP, so most of the code implementing LSP in the language server component may be reused for both protocols.
+
+The language server component communicates with the macro tracer component in the parser library. Its API mirrors the requests and events of DAP. The most important features to implement are:
+
+\begin{itemize}
+	\item launch, continue, next, stepIn and disconnect requests, which allow the user to control the flow of the compilation
+	\item SetBreakpoints, which transfers the information about breakpoints that the user has placed in the code
+	\item Threads, StackTrace, Scopes and Variables requests to allow the DAP client to retrieve information about the current processing stack (stack of nested macros and copy instructions), available variable symbols and their values
+	\item stopped, exited and terminated events to let the DAP client know about state of traced source code
+\end{itemize}
+
+The macro tracer communicates with the workspace manager to retrieve the content of the traced files. Afterwards, it starts analyzing the source file in a separate thread and gets callbacks from the analyzer before each statement is processed. In the callback, the tracer puts the thread to sleep and waits for user interaction. During this time, it is possible to retrieve all variable and stack information from the processing to display it to the user.
