@@ -1,0 +1,84 @@
+\chapter{Dependency Search}
+
+Usage of external files in HLASM is a highly common phenomenon. On mainframes, HLASM programs are built according to its JCL\footnote{Job Control Language, instructs the system how to run a specific task} file, which contains a list of libraries. When the compiler encounters an undefined instruction or a \texttt{COPY} instruction, it does a top-down search through the whole list. Both ways of invoking a dependency search are demonstrated in xxx. As a large portion of the programs use the same libraries, defining these JCL files gets repetitive. Therefore, the build and source management system Endevor creates an abstraction above the libraries and groups them into \texttt{processor groups}. As a result, JCL offers an option to identify the libraries to be included by their processor group's ID instead of listing them all manually.
+
+\section{Configuration files}
+
+The HLASM Language Support extension looks for locally stored members when a macro or COPY instruction is evaluated. The paths of these members are specified in two configuration files in the .hlasmplugin folder of the currently open workspace. Ensure that you configure these files before using macros from separate files or the COPY instruction.
+
+When you open a HLASM file or manually set the HLASM language for a file, you can choose to automatically create these files for the current program.
+
+The structure of the configuration is based on CA Endevor SCM. \texttt{proc\_grps} defines processor groups by assigning a group name to a list of directories which are searched in the order they are listed. \texttt{pgm\_conf.json} provides mapping between source files (open code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
+
+Example \texttt{proc\_grps.json} :
+
+The following example defines two processor groups, GROUP1 and GROUP2, and a list of directories to search for macros and COPY files.
+
+
+	\begin{verbatim}
+{
+    "pgroups": [
+	{
+		"name": "GROUP1",
+		"libs": [
+		"ASMMAC/",
+		"C:/SYS.ASMMAC"
+		]
+	},
+	{
+		"name": "GROUP2",
+		"libs": [
+		"G2MAC/",
+		"C:/SYS.ASMMAC"
+		]
+	}
+	]
+}
+	\end{verbatim}
+
+
+
+Example \texttt{pgm\_conf.json}:
+
+The following example specifies that GROUP1 is used when working with \texttt{source\_code.hlasm} and GROUP2 is used when working with \texttt{second\_file.hlasm}.
+
+	\begin{verbatim}
+{
+	"pgms": [
+	{
+		"program": "source_code",
+		"pgroup": "GROUP1"
+	},
+	{
+		"program": "second_file",
+		"pgroup": "GROUP2"
+	},
+	]
+}
+	\end{verbatim}
+
+
+If you have the two configuration files configured as above and invoke the MAC1 macro from \texttt{source\_code.hlasm}, the folder ASMMAC/ in the current workspace is searched for a file with the exact name "MAC1". If that search is unsuccessful the folder \texttt{C:/SYS.ASMMAC} is searched. If that search is unsuccessful an error displays that the macro does not exist.
+
+The program field in \texttt{pgm\_conf.json} supports regular expressions, for example:
+
+	\begin{verbatim}
+{
+	"pgms": [
+	{
+		"program": ".*",
+		"pgroup": "GROUP1"
+	}
+	]
+}
+	\end{verbatim}
+
+
+In this example, GROUP1 is used for all open code programs.
+
+\section{Macro development}
+
+When you only have a macro opened, you do not get any diagnostics since there is no macro call
+
+Then you open the opencode and can see diagnostics. From which calls? what if there are more open codes opened calling the same macro?
+

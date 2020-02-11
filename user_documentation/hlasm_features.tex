@@ -1,0 +1,30 @@
+\chapter{Supported language features}
+\label{LSPFeatures}
+This part provides a brief overview of the parts of HLASM that are currently implemented.
+
+\begin{description}
+	\item [High-level interpretation] The library interprets high-level parts of the assembler. Following are the conditional assembly instructions for code generation and macro expansion:
+	\begin{itemize}
+		\item AIF
+		\item AGO
+		\item MACRO, MEND, MEXIT
+		\item ACTR
+		\item SETA, SETB, SETC
+		\item ANOP
+		\item LCLA, LCLB, LCLC
+		\item GBLA, GBLB, GBLC
+		\item AEJECT
+		\item ASPACE
+	\end{itemize}
+	and assembler instructions for code layout determination:
+	\begin{itemize}
+		\item EQU 
+		\item DC 
+		\item DS 
+		\item DSECT, CSECT, RSECT 
+		\item LOCTR
+	\end{itemize}
+\end{description}
+
+checking for all instructions, no support for AREAD, how is the user limited by current implementation
+

@@ -1,0 +1,54 @@
+
+\newcommand{\cool}{\color{green!50!white!80!black}}
+\newcommand{\textcool}[1]{{\cool #1}}
+
+\newcommand{\XX}[1]{\textcolor{red}{#1}}
+\newcommand{\TT}[1]{\texttt{#1}}
+\newcommand{\X}[1]{\textsc{#1}}
+
+% Draw black "slugs" whenever a line overflows, so that we can spot it easily.
+
+
+% avoid some slugs naturally
+\clubpenalty=1000
+\widowpenalty=1000
+%\hyphenpenalty=100  % turn this on to prevent hyphenation
+\emergencystretch=2cm
+
+
+%%% The field of all real and natural numbers
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newcommand{\bms}{\begin{enumerate}[label=\bf (M\arabic*)]}
+\newcommand{\bwp}{\begin{enumerate}[label=\bf \normalsize  (WP\arabic*), resume=del]}
+\newcommand{\eenum}{\end{enumerate}}
+\newcommand{\itemm}{\large \item }
+\newcommand{\itemwp}{ \normalsize \item }
+\newcommand{\deadline}[2]{\small (deadline: \textit{month #1}, duration: \textit{#2 moths})}
+\newcommand{\people}[1]{\textit{\small (#1)}}
+
+
+% move the headings out of gutenberg era
+\setcounter{secnumdepth}{4}
+\titleformat{\chapter}{\cool\fontsize{24pt}{24pt}\bfseries}{\color{black!25}\thechapter.}{1em}{}
+\titleformat{\section}{\cool\fontsize{16pt}{18pt}\bfseries}{\scriptsize\color{black!25}\thesection}{1em}{}
+\titleformat{\subsection}{\cool\fontsize{14pt}{16pt}\bfseries}{\scriptsize\color{black!25}\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\cool\fontsize{12pt}{14pt}\bfseries}{\scriptsize\color{black!25}\thesubsubsection}{1em}{}
+
+% code floats
+\colorlet{shadecolor}{cyan!10}
+\makeatletter
+\newcommand\floatc@code[2]{{\@fs@cfont #1} #2\par}
+\newcommand\fs@code{\def\@fs@cfont{\bfseries}\let\@fs@capt\floatc@code
+\def\@fs@pre{}%
+\def\@fs@mid{\vspace{-.5ex}\begin{shaded}}%
+\def\@fs@post{\vspace{-1em}\end{shaded}}%
+\let\@fs@iftopcapt\iftrue}
+\makeatother
+
+\floatstyle{code}
+\newfloat{listing}{tbp}{lst}
+\floatname{listing}{Listing}
