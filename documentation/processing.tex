@@ -1,1 +1,23 @@
-\section{Processing}
+\section{Processing manager}
+
+\subsection{Instruction interpretation}
+
+Results of the parser component are further analyzed in the processing component. Its most important capabilities are:
+\begin{itemize}
+	\item Interpretation of CA instructions, which results in modifying the lexer state (moving back and forth in the input file).
+	\item Substitution of variable symbols. After the substitution, the statement must be reparsed in the lexer and the parser, since the substitution may completely change its meaning.
+	\item Interpretation of assembler instructions
+	\item Ordinary symbols resolution
+	\item MACRO and COPY expansion.
+\end{itemize}
+
+\subsection{Expressions}
+overview
+
+they are parsed in grammar, later you give an expression "symbol evaluator" and it returns its value
+
+
+
+\subsection{Data definition}
+
+validation and processing purpose
