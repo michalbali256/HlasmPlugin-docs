@@ -70,3 +70,20 @@ It simplifies work with IDs and saves space.
 \subsection{LSP context}
 
 \subsection{Ordinary assembly context}
+
+The above described structures aimed the high-level part of the language (code generation). As we move closer to the resulting object code of the source file, the describing structures get complicated. Therefore, HLASM context contains object storing just this part of the processing.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth / 2]{img/ord_ctx_arch}
+	\caption{The composition of Ordinary assembly context}
+	\label{fig06:ord_ctx}
+\end{figure}
+
+Ordinary assembly context consists of three main components (see \cref{fig06:ord_ctx}):
+\begin{enumerate}
+	\item \emph{Symbol storage}. Stores ordinary symbols (see ??).
+	\item \emph{Section storage}. Has notion of all generated sections, each section containing its location counter.
+	\item \emph{Symbol dependency tables}. Contains yet unresolved dependencies between symbols prior to the currently processed instruction.
+\end{enumerate}
+
