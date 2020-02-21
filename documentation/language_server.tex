@@ -108,7 +108,11 @@ The DAP server uses only one feature: Launch feature, which handles stepping thr
  terminated & Launch feature \\\bottomrule
 \end{longtable}
 
-\section{result respond}
+\section{Result respond}
+
+According to the LSP and DAP, the server is required to send messages back to LSP/DAP client either as responds to requests(e.g. hover), notifications (e.g. textDocument/publishDiagnostics notification) or events(e.g. stopped). Features require reference to an instance of the \TT{response provider} interface that provides methods \TT{respond} and \TT{notify} for sending messages back to LSP client. Both LSP and DAP server classes implement the \TT{response provider} to form protocol-specific correct json with the arguments.
+
+The servers then send The json to the LSP/DAP client using the \TT{send message provider} interface. At this point, the whole json is formed, the send message provide has to add message header and serialize the json using the JSON for Modern C++ library. The only implementation of the \TT{send message provider} interface is the \TT{dispatcher}.
 
 \section{Request Manager}
 
@@ -123,16 +127,25 @@ There are three threads running in the language server:
 
 The threads are synchronized in two ways: first, there is a mutex that protects adding to the request queue simultaneously by the LSP and DAP read threads. Second, there is a conditional variable to control the worker thread so it sleeps when there are no requests and wakes up when a new request has been added.
 
-In request manager, there is a mechanism for invalidating requests that have been obsoleted by a new requests.
-
+In request manager, there is a mechanism for invalidating requests that have been obsoleted by a new request. When a new request comes, all previous requests that are concerning the same file are invalidated. That means that they still have to be \todo{paragraph about invalidating requests}
 
 \section{Example: hover request handling}
+
+The \cref{hover_sequence} shows handling of the hover request in the language server. The whole process begins by the LSP instance of dispatcher reading from the standard input. It first reads the header of message that contains information about the length of the following json. Then it reads json itself and deserializes it using the JSON for Modern C++ library. All other components of the language server work only with the parsed representation of the message. The dispatcher adds the message to the request manager with a non-blocking call and returns to reading next message from standard input.
+
+The request in the request manager waits in a queue to be processed or the worker thread wakes up from sleep using conditional variable if the the queue was empty. The worker then sends the json to \TT{LSP server}, which looks at the name of the method written in the message and calls the method \TT{hover} from \TT{language feature} with arguments from the json.
+
+The hover method unpacks the actual arguments from json and converts any URIs to paths using the cpp-netlib URI library. Then, it calls the hover method from parser library, which returns string to be showed in tooltip next to hovering mouse. The language feature then wraps the return value back in json and calls the \TT{respond} method of its \TT{response provider} implemented by \TT{LSP server}.
+
+The \TT{LSP server} wraps the json arguments into LSP response and uses the \TT{send message provider} implemented by \TT{Dispatcher} to send it to LSP client. The Dispatcher serializes the json, adds the header with the length of the json and writes the message to standard output. Finally, all methods return and the worker thread in request manager looks for another request. If there is none, it goes to sleep.
 
 \begin{landscape}
 	\begin{figure}
 		\centering
 		\includegraphics[width=21cm]{img/hover_sequence}
-		\caption{Sequence diagram showing processing of the textDocument/hover request in the language server}
-		\label{lang_server_arch}
+		\caption{Sequence diagram showing processing of the textDocument/hover request in the language server. The green text represents example of data passed in arguments.}
+		\label{hover_sequence}
 	\end{figure}
 \end{landscape}
+
+
