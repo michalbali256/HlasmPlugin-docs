@@ -1,13 +1,29 @@
 \chapter{Language server}
 
-The purpose of Language server is to implement the Language Server Protocol and Debug Adapter Protocol and to provide access to parser library using these protocols. It has to deserialize and serialize LSP and DAP messages, keep them in the right order and then serve all the requests by invoking parser library.
+The purpose of Language server is to implement the Language Server Protocol (LSP) and Debug Adapter Protocol (DAP) and to provide access to parser library using these protocols. It has to deserialize and serialize LSP and DAP messages, extract parameters of particular methods and then serve the requests by invoking functionality of parser library.
 
-\section{LSP}
-short overview of LSP
+\section{Language Server Protocol}
+Language Server Protocol is used to extend code editors with support for additional programming languages. LSP defines 2 communicating entities: client and server. LSP client is editor-specific and wraps interaction with the user. LSP server is language-specific and provides information about source code.
 
-definition of message, notification, request
+LSP is based on JSON RPC\footnote{\url{https://www.jsonrpc.org/specification}}. There are two types of interaction in JSON RPC: requests and notifications. Both of them carry the information to invoke a method on the recipient side ---  name of the method and its arguments. The difference between the two is that requests require response with result of the method, whereas the notification does not.
+
+The LSP builds on the JSON RPC by specifying how messages are transferred and by defining methods, their arguments and responses. A raw message sent from the client to the server looks like this:
+\begin{verbatim}
+Content-Length: 123\r\n
+\r\n
+{"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":
+{"uri":"file:/c%3A/Users/admin/Documents/source.hlasm"}}}
+\end{verbatim}
+On the first line, there is information how long is the json message, then comes the json itself.
+
+Inside the json, there is the name of the method to be invoked and parameters to pass to the method. In this case, the client is sending a notification that file "C:/Users/admin/Documents/source.hlasm" was closed in the editor by the user. It is a notification, so there must not be any response.
+
+On top of this basic protocol, LSP defines methods and their semantics to cover common functionality that users expect when programming with an editor. List of all implemented methods can be found in \cref{LSP_methods}.
+
 \section{DAP}
-short overview of DAP
+Debug Adapter Protocol is a protocol used to extend code editors with debugging support for additional programming languages. We use it to be able to trace how the HLASM compiler processes source code, to show the user how macros are expanded and the values of compile-time variables.
+
+DAP is very similar to LSP. The main difference is that DAP is not based on the JSON RPC, but the ideas behind DAP are nearly the same. DAP has requests and events ---  requests always go from the client to the server and require response. Events are the same as notifications from JSON RPC that the server sends to the client. The similarity allows our language server component to share a lot of code between implementation of the protocols.
 
 \section{Third party libraries}
 Language server uses three third party libraries: ASIO C++ library \footnote{\url{https://think-async.com/Asio/}}, JSON for Modern C++ \footnote{\url{https://github.com/nlohmann/json}} and 
@@ -127,7 +143,11 @@ There are three threads running in the language server:
 
 The threads are synchronized in two ways: first, there is a mutex that protects adding to the request queue simultaneously by the LSP and DAP read threads. Second, there is a conditional variable to control the worker thread so it sleeps when there are no requests and wakes up when a new request has been added.
 
-In request manager, there is a mechanism for invalidating requests that have been obsoleted by a new request. When a new request comes, all previous requests that are concerning the same file are invalidated. That means that they still have to be \todo{paragraph about invalidating requests}
+In request manager, there is a mechanism for invalidating requests that have been obsoleted by new requests. When a new request comes, all previous requests (including the one currently being processed) that are concerning the same file are invalidated. They cannot be just removed from the queue, they still have to be processed, but the parser library gets the information that the request has been obsoleted by another one in the queue and may behave differently.
+
+For example, when the user is typing, each character he writes comes to the language server as a textDocument/didChange notification. Normally, each such notification is processed in two parts: firstly, it changes the internal representation of the changed text document. Secondly, starts parsing of the file to update diagnostics and highlighting, which may take some time. When more didChange notifications come in succession, the first part must be done with all the notifications to keep the contents of the file updated. However the user is interested only in diagnostics and semantic highlighting for the current state of the text, so we need to parse the file only once --- during the last request.
+
+The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the request manager. When set to true, is means that the results of current request or notification are no longer needed and the parser library should stop all parsing and return as soon as possible.
 
 \section{Example: hover request handling}
 
