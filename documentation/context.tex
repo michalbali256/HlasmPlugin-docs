@@ -49,7 +49,7 @@ When copy is visited, copy member invocation is created and pushed in the copy s
 
 This stacks are responsible for the nests of opened files (source stack) and what they are opened for (processing stack). As the relation of source entry and processing entry is one-to-many, the information is stored in two arrays rather than one.
 
-When an statement processor (see \cref{sect_proc}) change (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. When, during the change, new file is opened then source stack is updated correspondingly.
+When an statement processor (see \cref{lab06:sect_proc}) change (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. When, during the change, new file is opened then source stack is updated correspondingly.
 
 Source stack contains copy stack active for a respective source file and data that locates last processed statement in the source file.
 Processing stack contains \emph{processing kind}.

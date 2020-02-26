@@ -1,6 +1,6 @@
 \chapter {Analyzer}
 
-Analyzer is used as a manner of facade pattern. It's role is to wrap objects and methods that compose the component and provide simple interface for a user of the analyzer. The main functionality is a processing --- analyzing --- of a single HLASM source file. Output of the analysis is data for LSP server.
+Analyzer's role is to facade objects and methods that compose the component and provide a simple interface for a processing --- analyzing --- of a single HLASM source file. The output of the analysis is data for LSP server.
 
 \section{Overview}
 
@@ -19,14 +19,27 @@ Analyzer is composed of several sub-components all required to properly process 
 	\item \emph{Processing manager} contains the main loop where file is processed.
 \end{itemize}
 
+\subsection{Construction}
 
-In order to parse a HLASM file, analyzer is constructed with contents of the file (its name and content as a string) and object that is responsible for parsing external files --- \emph{Parse library provider}. The provider is responsible for resolving source file dependencies. The dependencies are only discovered during the analysis, so it is not possible to provide the files beforehand.
+In order to parse a HLASM file, analyzer is constructed with the following parameters:
+\begin{itemize}
+	\item \emph{Name and content of the file}
+	\item \emph{Parse library provider} -- object responsible for resolving source file dependencies. The dependencies are only discovered during the analysis, so it is not possible to provide the files beforehand.
+\end{itemize}
 
-In construction, analyzer creates all the mentioned subcomponents. Then, created HLASM contex tables and parser is passed to Processing manager.
+When this constructor is used, analyzer creates HLASM context tables and analyses the provided source as an open-code. We say that analyzer has \emph{owner semantics}. 
+ 
+Analyzer provides \emph{reference semantics} as well. The provided source is not analyzed as an open-code, rather as an external file dependency. The constructor of analyzer with reference semantics adds two parameters to the previous one:
+\begin{itemize}
+	\item \emph{HLASM context tables reference} -- belonging to the owning open-code analyzer.
+	\item \emph{Library data} -- states how should be the dependency file further analyzed (see \cref{lab06:lib_data}).
+\end{itemize}
 
-When Parse library provider is called within analyzer, the second analyzer is constructed. This analyzer is ready to parse the file dependency. This \emph{inner} analysis differs from the \emph{topmost} one. The inner analyzer is passed HLASM context tables to retain the contextual consistency. Also, the inner analyzer is constructed with additional information about the library it is requested to analyze --- \emph{Library data}. The data is important for the correct functionality of the processing manager. (This recursive creation of the analyzers is bounded to the depth of 2, see ??).
+This constructor is called within open-code analyzer by it's sub-components when they use Parse library provider.
 
-To sum up, after analyzer is constructed, it analyses the source file. In result, it updated HLASM context tables and provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
+\vspace{0.5cm}
+
+To sum up, after analyzer is constructed, it analyses provided source file. In result, it updated HLASM context tables and provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
 
 \section{LSP data collector}
 
