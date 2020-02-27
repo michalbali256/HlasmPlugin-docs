@@ -85,7 +85,7 @@ In HLASM language, variable symbol is general term for symbols beginning with am
 	\item \emph{Macro parameters} -- represent HLASM macro parameters.
 \end{itemize}
 
-They inherit common abstract ancestor \emph{variable symbol}. SET symbols are further divided into \emph{SETA}, \emph{SETB} and \emph{SETC} symbols. Macro parameters are divided into \emph{keyword} and \emph{positional} parameters (see \cref{fig06:var}). To know more about variable symbols see ??. 
+They inherit common abstract ancestor \emph{variable symbol}. SET symbols are further divided into \emph{SETA}, \emph{SETB} and \emph{SETC} symbols. Macro parameters are divided into \emph{keyword} and \emph{positional} parameters (see \cref{fig06:var}).
 
 \begin{figure}
 	\centering
@@ -109,7 +109,7 @@ The above described structures aimed to describe the high-level part of the lang
 
 Ordinary assembly context consists of three main components (see \cref{fig06:ord_ctx}):
 \begin{enumerate}
-	\item \emph{Symbol storage}. Stores ordinary symbols (see ??).
+	\item \emph{Symbol storage}. Stores ordinary symbols (see \cref{ord_sym}).
 	\item \emph{Section storage}. Has notion of all generated sections, each section containing its location counters.
 	\item \emph{Symbol dependency tables}. Contains yet unresolved dependencies between symbols prior to the currently processed instruction.
 \end{enumerate}
@@ -118,9 +118,9 @@ Ordinary assembly context consists of three main components (see \cref{fig06:ord
 
 This class represents HLASM Ordinary symbol. Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
 
-\paragraph*{Value} can be assigned \emph{absolute} or \emph{relocatable} values (see ??). With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
+\paragraph*{Value} can be assigned \emph{absolute} or \emph{relocatable} values (see \cref{ord_sym}). With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
 
-\paragraph*{Attributes} structure holds symbol attributes like type, length, scale and integer (see ??).
+\paragraph*{Attributes} structure holds symbol attributes like type, length, scale and integer (see \cref{ord_sym}).
 
 \subsubsection{Section}
 
@@ -173,7 +173,7 @@ When a space length becomes known, all addresses containing the spaces need to b
 
 \vspace{0.5cm}
 
-ORG instruction can arbitrarily move location counter's value forward and backward (see ??). With addition to that, ORG  can also order location counter to set it's value to the next available value (the lowest untouched address). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
+ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG  can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
 
 \subsubsection{Symbol dependency tables}
 

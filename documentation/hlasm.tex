@@ -98,12 +98,14 @@ The ordinary processing works with \emph{machine instructions} and \emph{assembl
 With help of machine and assembler instructions, the ordinary assembly processing is responsible for runtime behavior of the program. Ordinary assembly allows to produce code from traditional machine instructions, special-purpose assembler instructions and save values in \emph{ordinary symbols}.
 
 \subsubsection{Ordinary symbols}
+\label{ord_sym}
 
 In HLASM, an \emph{ordinary symbol} is a named constant that can represent either a simple integer or an address. It can be defined by writing its name into the name field of a statement. Each ordinary symbol can only be defined once, and its value is constant. There are two kinds of ordinary symbols:
 \begin{itemize}
 	\item An \emph{absolute symbol} that simply has an integral value. It can be defined using a special assembler instruction.
 	\item A \emph{relocatable symbol} that represents an address in the resulting object code. It can be defined by writing the ordinary symbol name into the name field of a statement with a machine instruction and denotes the address of the instruction.
 \end{itemize}
+They are assigned set of \emph{attributes} adding means of meta-data to the symbol value. The most common attibutes are \emph{type} and \emph{length}.
 
 \subsubsection{Machine instructions}
 \label{mach_instr}
@@ -152,20 +154,38 @@ In the next step, \verb|LEN| is defined, but it cannot be evaluated, because the
 
 The dependency graph created by these principles can be arbitrarily deep and complicated, however it must not contain cycles (a symbol must not be transitively dependent on itself).
 
+\subsection{Object layout}
+
+The product of ordinary assembly is object code. Let us briefly describe it's layout.
+
+\subsubsection{Sections}
+
+Object consist of so called \emph{sections}. They can be of different kind each with different properties (defined by instructions CSECT, DSECT, ...). User can define many sections within an object, whose absolute positions within the object are undefined. 
+
+Any time a machine instruction is encountered, it's opcode is outputed to the \emph{next available address}. Moreover, each section has a structure pointing to this address --- \emph{location counter}. For relocatable values, any address created in a section has it's base equal to the section's beginning.
+
+\subsubsection{Location couter}
+\label{loctr}
+
+A section can have more than one location counter (defined by instruction LOCTR). Here however, the absolute position within a section is correctly defined --- beginning of the next location counter follow the end of the previous one. User can arbitrarily switch between them to state the next address for the code generation.
+
+Using ORG instruction, location counter value can be arbitrarily changed. It can be used to move counter value backward or forward (with restriction of counter underflow) to set the next address. This means that user can generate some code, move counter backwards and overwrite it with a deeper meaning. Then, ORG instruction has option to set location counter to the next available untouched address to continue in object creation.
+
 \subsection{Conditional assembly}
 \label{CA_proc}
 
 On top of machine and assembler instructions, the HLASM assembler offers the conditional assembly. The user may think of it as a macro-language built above traditional assembler. It alters textual representation of the source code and selects which lines will be processed next. Conditional assembly instructions may define \emph{variable symbols} which can be used in any statement to alter its meaning. Moreover, it is possible to define \emph{macros} --- reusable pieces of code with parameters.
 
 \subsubsection{Variable symbols}
-
+\label{var_sym}
 Variable symbols serve as points of substitution or information holders. 
 
-When they occur in a statement, they are substituted by their value to create a statement processable by ordinary assembly. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution.
+When they occur in a statement, they are substituted by their value to create a statement processable by ordinary assembly. For example, in this manner, a user can write a variable symbol in an operation field of a statement and generate any instruction that can be a result of a substitution. Such statements containing variable symbols are called \emph{model statements}.
 
 Variable symbols also have notion of their type --- they can be defined either as an integer, a boolean or a string. CA instructions gather this information for different sorts of conditional branching.
 
 \subsubsection{CA instructions}
+\label{ca_instr}
 
 CA instructions are not assembled into object code. Rather, they select which instructions will be processed by assembler next.
 

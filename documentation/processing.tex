@@ -64,7 +64,7 @@ Lookahead processor is activated when currently processed conditional assembly s
 
 Opencode processor's (in code described as Ordinary processor) usage can be described in the following points:
 \begin{enumerate}
-	\item If model statement is encountered (see ??), it substitutes the variable symbols and resolves the statement.
+	\item If model statement is encountered (see \cref{var_sym}), it substitutes the variable symbols and resolves the statement.
 	\item Checks statement for validity.
 	\item Performs instruction in the manner of updating HLASM context tables with help of \emph{instruction processors}.
 \end{enumerate}
@@ -141,7 +141,7 @@ This providers are activated as when COPY instruction copies a file into the sou
 
 \subsubsection{Opencode Provider}
 
-Opencode provider is active as long as there are statements in the source file. It retrieves statements from the source code with help of lexer and parser (see ??).
+Opencode provider is active as long as there are statements in the source file. It retrieves statements from the source code with help of lexer and parser (see \cref{lab06:parser}).
 
 \subsection{Manager's initial state}
 \label{lab06:lib_data}
@@ -157,7 +157,7 @@ Library data contains a file name and enumeration telling the meaning of the fil
 \subsection{Statement field parser}
 \label{lab06:field_parser}
 
-Statement field parser is an interface passed to the statement providers by processing manager implemented by the parser (see ??).
+Statement field parser is an interface passed to the statement providers by processing manager implemented by the parser (see \cref{lab06:parser}).
 
 Firstly, it is used during statement passing. In some cases provider is requested a concrete format of a string-stored statement. The string is re-parsed with the according format. Then the field is returned back to the statement provider. 
 
@@ -169,9 +169,9 @@ Used by ordinary processor, instruction processors are helper classes that divid
 
 There are four specialized instruction processors:
 \paragraph*{Macro IP} looks up for macro definition in HLASM context tables and calls it.
-\paragraph*{Assembler and Machine IP} process assembler and machine instructions (see ??) to retain consistency in HLASM context tables.
+\paragraph*{Assembler and Machine IP} process assembler and machine instructions (see \cref{asm_instrs} \cref{mach_instr}) to retain consistency in HLASM context tables.
 
-\paragraph*{Conditional assembly IP} executes conditional assembly instructions (see ??). 
+\paragraph*{Conditional assembly IP} executes conditional assembly instructions (see \cref{ca_instr}). 
 
 \vspace{5mm}
 
