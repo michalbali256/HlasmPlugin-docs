@@ -85,7 +85,7 @@ In HLASM language, variable symbol is general term for symbols beginning with am
 	\item \emph{Macro parameters} -- represent HLASM macro parameters.
 \end{itemize}
 
-They inherit common abstract ancestor \emph{variable}. SET symbols are further divided into \emph{SETA}, \emph{SETB} and \emph{SETC} symbols. Macro parameters are divided into \emph{keyword} and \emph{positional} parameters (see \cref{fig06:var}). To know more about variable symbols see ??. 
+They inherit common abstract ancestor \emph{variable symbol}. SET symbols are further divided into \emph{SETA}, \emph{SETB} and \emph{SETC} symbols. Macro parameters are divided into \emph{keyword} and \emph{positional} parameters (see \cref{fig06:var}). To know more about variable symbols see ??. 
 
 \begin{figure}
 	\centering
@@ -147,7 +147,7 @@ The location counter value is transformable into relocatable value. Structure th
 	\item \emph{Offset} from the bases.
 \end{itemize}
 
-The common composition of an address consists of one base section (as the start of the address) and value of storage (as the offset from it).
+The common composition of an address is one base section (as the start of the address) and value of storage (as the offset from it).
 
 The need for the whole array of bases is because addresses from different sections can be arbitrarily added or subtracted. This information is needed as the correct sequence of arithmetic operations can reduce number of bases (even spaces) to zero and create absolute value. This value can be later used in places where a relocatable value would be forbidden.
 
@@ -184,7 +184,7 @@ Let us describe the main components of dependency resolving:
 
 \paragraph*{Dependable} If an object can contain dependencies, it implements \emph{dependable} interface. The interface has a method to retrieve an structure holding the respective \emph{dependants}. 
 
-\paragraph*{Resolvable} interface adds up to the dependable interface It is implemented by objects that serve as values assignable to \emph{depednants}. It provides methods to return \emph{symbol value} with help of the dependency solver. 
+\paragraph*{Resolvable} interface adds up to the dependable interface. It is implemented by objects that serve as values assignable to \emph{depednants}. It provides methods to return \emph{symbol value} with help of the dependency solver. 
 
 \paragraph*{Dependency solver} is an interface that can return value of the symbol providing its identifier. It is implemented by Ordinary assembly context.
 

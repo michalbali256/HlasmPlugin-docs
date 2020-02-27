@@ -34,6 +34,12 @@ When provider or processor finishes its work, it is replaced with another. The f
 	\item When a provider finishes, before the next provider is selected from the array, manager checks whether the provider's end triggers finishing of the current processor as well (next referred as \emph{terminal condition}). If true, performs rule 1.
 \end{enumerate}
 
+\subsection{Statement}
+
+Statement consists of \emph{statement fields} --- \emph{label field}, \emph{instruction field}, \emph{operands field}, \emph{remark field}. It is used by statement processors and produced by statement providers. 
+
+The abstract class \emph{HLASM statement} is the ancestor for all statement related classes. Then, abstract classes \emph{deferred} and \emph{resolved} statements follow. Deferred statement states that operand field is stored in string format as the concrete format is yet not known. Resolved statements are complementary to the deferred statements.
+
 \subsection{Statement Processors}
 \label{lab06:sect_proc}
 
@@ -46,7 +52,7 @@ In processing manager's array, statement processors can not be assigned a priori
 
 Both of this statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction is encountered in the source code or macro definition respectively. 
 
-The statements collected into the copy or macro definition are stored mainly in unstructured string. That is because HLASM nature allows instruction aliasing. Therefore, in the definition processing, as an instruction field is parsed, we still do not know a format of the operands. The format is fully deduced when the definition is handled to a provider and processed by opencode processor.
+The statements collected into the copy or macro definition are mainly deferred. That is because HLASM nature allows instruction aliasing. Therefore, in the definition processing, as an instruction field is parsed, we still do not know a format of the operands. The format is fully deduced when the definition is handled to a provider and processed by opencode processor.
 
 However, some statements in the macro and copy definition forbid aliasing and the operand format can be deduced (e.g. conditional assembly instructions in macro definition). This leads to the processor's necessity to ask provider to retrieve statement with correct format according to the deduced format based on the provided instruction  (see \cref{lab06:proc_stat}).
 
@@ -166,6 +172,23 @@ There are four specialized instruction processors:
 \paragraph*{Assembler and Machine IP} process assembler and machine instructions (see ??) to retain consistency in HLASM context tables.
 
 \paragraph*{Conditional assembly IP} executes conditional assembly instructions (see ??). 
+
+\vspace{5mm}
+
+See the current list of processed instruction in \cref{tab06:instr_proc}.
+
+\begin{table}
+	\centering
+	\begin{tabular}{lr}
+		\textbf{IP}                   &                  \textbf{Processed instructions} \\ \toprule
+		\textbf{Assembler}            & *SECT, COM, LOCTR, EQU, DC, DS, COPY, EXTRN, ORG \\
+		\textbf{Machine}              &                                      \emph{NONE} \\
+		\textbf{Macro}                &                                       \emph{ALL} \\
+		\textbf{Conditional Assembly} &    SET*, GBL*, ANOP, ACTR, AGO, AIF, MACRO, MEND \\ \bottomrule
+	\end{tabular}
+	\caption{Table of instructions that are processed by instruction processors.}
+	\label{tab06:instr_proc}
+\end{table}
 
 \subsubsection{Expressions}
 
