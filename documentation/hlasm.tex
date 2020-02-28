@@ -125,7 +125,7 @@ The assembler instructions include the following examples:
 	
 	\item \textbf{EQU} --- Defines ordinary symbols.
 	
-	\item \textbf{COPY} --- Copies text from a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
+	\item \textbf{COPY} --- Copies text from a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} (called \emph{copy member}) and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
 	
 	\item \textbf{CSECT} --- Creates an executable control section. Serves as the beginning of a machine instruction sequence and as the start of relative addressing.
 \end{itemize}
@@ -169,7 +169,7 @@ Any time a machine instruction is encountered, it's opcode is outputed to the \e
 
 A section can have more than one location counter (defined by instruction LOCTR). Here however, the absolute position within a section is correctly defined --- beginning of the next location counter follow the end of the previous one. User can arbitrarily switch between them to state the next address for the code generation.
 
-Using ORG instruction, location counter value can be arbitrarily changed. It can be used to move counter value backward or forward (with restriction of counter underflow) to set the next address. This means that user can generate some code, move counter backwards and overwrite it with a deeper meaning. Then, ORG instruction has option to set location counter to the next available untouched address to continue in object creation.
+Using ORG instruction, location counter value can be arbitrarily changed. It can be used to move counter value backward or forward (with restriction of counter underflow) to set the next address. This means that user can generate some code, move counter backwards and overwrite it with a \emph{deeper} meaning. Then, ORG instruction has option to set location counter to the next available untouched address to continue in object creation.
 
 \subsection{Conditional assembly}
 \label{CA_proc}
@@ -250,5 +250,14 @@ Instruction \verb|DC| in line \verb|17| creates value of type double and assigns
 Although CA processing may act like a text preprocessing, it is still interlinked with ordinary processing. CA has mechanics that allows the assembler to gather information about statements that are printed during the processing. It can access values created in ordinary assembly and use them in conditional branching. CA is able to lookup constants that are not yet defined prior to the currently processed statement. Moreover, during ordinary assembly, names of these instructions can be aliased.
 
 To sum up, CA processing has variables to store state of compilation and CA instructions for conditional branching. Hence, it is Turing-complete while still evaluated during compile-time.
+
+\section{File composition}
+
+File that generates object code is called \emph{open-code} file. It is the entry file of the HLASM compiler. Moreover, each open-code can have in-file dependencies. Specifically, they are:
+\begin{itemize}
+	\item \textbf{External Macro definitions}
+	\item \textbf{Copy members}
+\end{itemize}
+They are not treated as an open-code files because they do not directly generate object code. Rather, they serve as statement sequences that are included into open-code to specific places to have specific meaning.
 
 

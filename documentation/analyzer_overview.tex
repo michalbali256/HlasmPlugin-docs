@@ -1,6 +1,6 @@
 \chapter {Analyzer}
 
-Analyzer's role is to facade objects and methods that compose the component and provide a simple interface for a processing --- analyzing --- of a single HLASM source file. The output of the analysis is data for LSP server.
+Analyzer's role is to facade objects and methods that compose this component and provide a simple interface for a processing --- analyzing --- of a single HLASM source file. The output of the analysis is data for LSP server.
 
 \section{Overview}
 
@@ -29,7 +29,7 @@ In order to parse a HLASM file, analyzer is constructed with the following param
 
 When this constructor is used, analyzer creates HLASM context tables and analyses the provided source as an open-code. We say that analyzer has \emph{owner semantics}. 
  
-Analyzer provides \emph{reference semantics} as well. The provided source is not analyzed as an open-code, rather as an external file dependency. The constructor of analyzer with reference semantics adds two parameters to the previous one:
+Analyzer provides \emph{reference semantics} as well. The provided source is not treated as an open-code, rather as an external file dependency. The constructor of analyzer with reference semantics adds two parameters to the previous one:
 \begin{itemize}
 	\item \emph{HLASM context tables reference} -- belonging to the owning open-code analyzer.
 	\item \emph{Library data} -- states how should be the dependency file further analyzed (see \cref{lab06:lib_data}).

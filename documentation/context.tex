@@ -22,7 +22,7 @@ Macro definition is represented by:
 	\item \emph{Label storage}. The storage of sequence symbol that occur in the macro definition.
 \end{enumerate}
 
-When macro is called, \emph{macro invocation} object is created. It shares the content of a respective macro definition with an exception of calling parameters as they are assigned real value passed with the call. Also, it contains information which one is the currently processed statement.
+When macro is called, \emph{macro invocation} object is created. It shares the content of a respective macro definition with an exception of calling parameters as they are assigned real value passed with the call. Also, it contains index to the top statement of the invocation.
 
 The macro invocation is stored in the context's \emph{scope stack}.
 
@@ -51,7 +51,7 @@ When copy is visited, copy member invocation is created and pushed in the copy s
 
 This stacks are responsible for the nests of opened files (source stack) and what they are opened for (processing stack). As the relation of source entry and processing entry is one-to-many, the information is stored in two arrays rather than one.
 
-When an statement processor (see \cref{lab06:sect_proc}) change (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. When --- during the change --- new file is opened then source stack is updated as well.
+When an statement processor (see \cref{lab06:sect_proc}) change (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. When --- during this change --- new file is opened then source stack is updated as well.
 
 Source stack contains:
 \begin{itemize}
@@ -116,11 +116,11 @@ Ordinary assembly context consists of three main components (see \cref{fig06:ord
 
 \subsubsection{Symbol}
 
-This class represents HLASM Ordinary symbol. Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
+This class represents HLASM Ordinary symbol (see \cref{ord_sym}). Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
 
-\paragraph*{Value} can be assigned \emph{absolute} or \emph{relocatable} values (see \cref{ord_sym}). With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
+\paragraph*{Value} can be assigned \emph{absolute} or \emph{relocatable} values. With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
 
-\paragraph*{Attributes} structure holds symbol attributes like type, length, scale and integer (see \cref{ord_sym}).
+\paragraph*{Attributes} structure holds symbol attributes like type, length, scale and integer.
 
 \subsubsection{Section}
 
