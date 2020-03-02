@@ -1,6 +1,9 @@
-\subsection{ANTLR 4}
+
+
+\section{ANTLR 4}
 We have based part of our Analyzer on ANTLR 4 parser generator. ANLTR 4 implements Adaptive $LL(*)$ \cite{parr2014adaptive} parsing strategy.
 
+\subsection{Adaptive $LL(*)$ parsing strategy}
 Adaptive $LL(*)$ (or short $ALL(*)$) parsing strategy is a combination of simple, efficient and predictable top-down $LL(k)$ parsing strategy with power of $GLR$ which can handle non-deterministic and ambiguous grammars. 
 Authors move the grammar analysis to parse-time. This lets $ALL(*)$ handle any non-left-recursive context-free grammar rules and for efficiency it caches analysis results in lookahead DFA.
 
@@ -14,6 +17,13 @@ ANTLR 4 uses Java naming convention. In our code, we follow in general \XX{Googl
 When implementing ANTLR 4 classes, we remain consistent with the naming convention used in our project. As a benefit, the overriden functions are better visible in code.
 
 \section{Lexer}
+
+Lexer's task is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
+\begin{itemize}
+	\item each token has location in the source text
+	\item has the ability to check whether all characters are valid in the HLASM source
+	\item has the ability to jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool and the lexer has to be implemented from scratch.
+\end{itemize}
 
 As already mentioned, we designed a custom lexer for HLASM. We have a number of reasons to do so. HLASM language is complex, it was first introduced several decades ago and the language was during this long time subjected to development. This made the HLASM language complex. Also, it contains some aggressive features as for example \texttt{AREAD} or \texttt{COPY} that are able to alter the source code at parse time.
 
@@ -69,5 +79,8 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 \end{description}
 
 
+\subsection{Parser}
 
-\section{Parser}
+Parser component takes the stream of tokens the lexer produces and recognizes HLASM statements according to the syntax. To accomplish this, a parser generator tool Antlr 4 \footnote{\url{https://www.antlr.org}} is used.
+
+The input to Antlr is a grammar (written in antlr-specific language) that specifies the syntax of HLASM language and generates source code (in C++) for a recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code.
