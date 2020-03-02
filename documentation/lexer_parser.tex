@@ -11,6 +11,29 @@ As a possible downside of $ALL(*)$ could be considered theoretical time complexi
 
 Despite the theoretical $O(n^4)$ time complexity, it appears that the $ALL(*)$ behaves linear on most of the code, with no unpredictable performance or large footprint in practice. In order to support this, authors investigate the parse time vs file size for languages \texttt{C}, \texttt{Verilog}, \texttt{Erlang} and \texttt{Lua} files. They found very strong evidence of linearity on all tested languages (see the original paper for details).
 
+\subsection{ANTLR 4 pipeline}
+
+ANTLR 4, as any other conventional parser generator, processes the inputted code as follows: (1) breaks down the source string into tokens using \textit{lexer} (2) \textit{parser} build parse trees. 
+
+This pipeline is in ANTLR 4 breaked into following classes: 
+
+\begin{description}
+	\item[\texttt{CharStream}] represents input code,
+	\item[\texttt{Lexer}] breaks the inputted code into tokens,
+	\item[\texttt{Token}] token representation that includes important information like token type, position in code or the actual text,
+	\item[\texttt{Parser}] builds parse trees,
+	\item[\texttt{TokenStream}] connects the lexer and parser.
+\end{description}
+
+Overview of the described pipeline can be seen in \cref{antlr_pipeline}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=6cm]{img/antlr_pipeline}
+	\label{antlr_pipeline}
+	\caption{ANTLR 4 pipeline overview. Taken from \cite{parr2013definitive}.}
+\end{figure}
+
 \subsection{Naming convetion remark}
 ANTLR 4 uses Java naming convention. In our code, we follow in general \XX{Google C++ Style Guide}\footnote{\url{https://google.github.io/styleguide/cppguide.html}}. 
 
@@ -20,8 +43,8 @@ When implementing ANTLR 4 classes, we remain consistent with the naming conventi
 
 Lexer's task is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
 \begin{itemize}
-	\item each token has location in the source text
-	\item has the ability to check whether all characters are valid in the HLASM source
+	\item each token has location in the source text,
+	\item has the ability to check whether all characters are valid in the HLASM source,
 	\item has the ability to jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool and the lexer has to be implemented from scratch.
 \end{itemize}
 
@@ -39,13 +62,22 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 \end{description}
 
 \subsection{Architecture}
-Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes:
+Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
+
+\begin{figure}[H]
+	\centering
+	\includegraphics{img/lexer_arch}
+	\label{lexer_arch}
+	\caption{Lexer architecture overview. Note, there are two \texttt{input\_source}s and there are many \texttt{token}s generated.}
+\end{figure}
 
 \begin{description}
 	
 		\item[\texttt{token}] implements ANTLR's class \texttt{Token} and extends it by adding properties important for location of the token within the input stream. As the LSP protocol works with offsets encoded in \texttt{UTF-16} and ANTLR 4 works with \texttt{UTF-32} encoding, we add attributes for \texttt{UTF-16} positions, too.
 		
 		Token does not carry the actual text from original source, but rather references to the position in code (unlike \texttt{CommonToken}). Note, that the position of a token is vital for further analysis.
+		
+		\XX{TODO: token types description}
 		
 		\item[\texttt{token\_factory}] produces tokens of previously described custom type \texttt{token}.
 		
@@ -64,15 +96,12 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 			
 			\item[\texttt{consume()}] consumes character from the input stream and updates lexer's internal state (used in \texttt{create\_token()}).
 			
-			\item[\texttt{switch\_input\_streams()}] checks whether the \texttt{AINSERT} buffer is not empty. If so, this buffer is used as input stream.
-			
 			\item[\texttt{lex\_tokens()}] lexing of most of the token types.
 			
 			\item[\texttt{lex\_begin()}] up to certain column, the input can be ignored (can be set in HLASM).
 			
 			\item[\texttt{lex\_end()}] lexes everything after continuation symbol.
 			
-			\item[\texttt{aread()}] called by \XX{parser}. Creates \texttt{AREAD} token, consumes and returns as string the physical line from the input.
 			
 		\end{description}
 		
