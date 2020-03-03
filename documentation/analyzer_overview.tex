@@ -1,61 +1,48 @@
 \chapter {Analyzer}
 
-\section{Analyzer overview}
+Analyzer's role is to facade objects and methods that compose this component and provide a simple interface for a processing --- analyzing --- of a single HLASM source file. The output of the analysis is data for LSP server.
 
-\todo{picture of analyzer architecture}
+\section{Overview}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth / 2]{img/analyzer_arch}
+	\caption{The composition of Analyzer component}
+	\label{fig06:analyzer}
+\end{figure}
 
-The analyzer is able to process a single HLASM file. The processing includes:
+Analyzer is composed of several sub-components all required to properly process the file (see \cref{fig06:analyzer}). 
 \begin{itemize}
-	\item recognition of statements and their parts (lexing and parsing)
-	\item interpretation of instructions that should be executed in compile time
-	\item a check whether the HLASM source code is well-formed
-	\item reporting of problems with the source by producing LSP diagnostics
-	\item providing highlighting and LSP information
+	\item \emph{LSP data collector} collects and retieves all LSP information created while processing of the file.
+	\item \emph{HLASM context tables} holds information about the context of processed HLASM source code.
+	\item Analyzer facades several \emph{Lexer - Parses sub-components} to simplify the interface and ease the use of this component.
+	\item \emph{Processing manager} contains the main loop where file is processed.
 \end{itemize}
 
-A HLASM file may have dependencies --- other files that define macros or files brought in by the COPY instruction. The dependencies are only discovered during the processing of files, so it is not possible to provide the files beforehand. The analyzer gets a callback that would find a file with specified name, parse its contents and return it as list of parsed statements. 
+\subsection{Construction}
 
-To sum up, the analyzer has a pretty simple API: it takes the contents of a source file by common string and a callback that can parse external files with specified name. It provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
-
-The analyzer is further decomposed into xxx components.
-
-\subsection{Lexer}
-
-Lexer's task is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
+In order to parse a HLASM file, analyzer is constructed with the following parameters:
 \begin{itemize}
-	\item each token has location in the source text
-	\item has the ability to check whether all characters are valid in the HLASM source
-	\item has the ability to jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool and the lexer has to be implemented from scratch.
+	\item \emph{Name and content of the file}
+	\item \emph{Parse library provider} -- object responsible for resolving source file dependencies. The dependencies are only discovered during the analysis, so it is not possible to provide the files beforehand.
 \end{itemize}
 
-\subsection{Parser}
-
-Parser component takes the stream of tokens the lexer produces and recognizes HLASM statements according to the syntax. To accomplish this, a parser generator tool Antlr 4 \footnote{\url{https://www.antlr.org}} is used.
-
-The input to Antlr is a grammar (written in antlr-specific language) that specifies the syntax of HLASM language and generates source code (in C++) for a recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code.
-
-\subsection{Instruction interpretation}
-
-Results of the parser component are further analyzed in the processing component. Its most important capabilities are:
+When this constructor is used, analyzer creates HLASM context tables and analyses the provided source as an open-code. We say that analyzer has \emph{owner semantics}. 
+ 
+Analyzer provides \emph{reference semantics} as well. The provided source is not treated as an open-code, rather as an external file dependency. The constructor of analyzer with reference semantics adds two parameters to the previous one:
 \begin{itemize}
-	\item Interpretation of CA instructions, which results in modifying the lexer state (moving back and forth in the input file).
-	\item Substitution of variable symbols. After the substitution, the statement must be reparsed in the lexer and the parser, since the substitution may completely change its meaning.
-	\item Interpretation of assembler instructions
-	\item Ordinary symbols resolution
-	\item MACRO and COPY expansion.
+	\item \emph{HLASM context tables reference} -- belonging to the owning open-code analyzer.
+	\item \emph{Library data} -- states how should be the dependency file further analyzed (see \cref{lab06:lib_data}).
 \end{itemize}
 
-\subsection{Expressions}
-overview
+This constructor is called within open-code analyzer by it's sub-components when they use Parse library provider.
 
-they are parsed in grammar, later you give an expression "symbol evaluator" and it returns its value
+\vspace{0.5cm}
 
-\subsection{Instruction format validation}
-After a statement is fully processed and all operands of each instruction are known, the statement needs to be checked for errors. There are over 2000 machine instructions with variable number of operands and various restrictions on those operands --- some of them take only positive numbers, numbers that are in specific range or are limited to addresses only. The core of the component is a great table that describes all the instructions and their operands.
+To sum up, after analyzer is constructed, it analyses provided source file. In result, it updated HLASM context tables and provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
 
-The API of the validation component is simple: it takes an instruction and list of its operands and returns a list of warnings and errors in the form of LSP diagnostics.
+\section{LSP data collector}
 
-\subsection{Data definition}
 
-validation and processing purpose
+
+

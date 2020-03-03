@@ -32,6 +32,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{longtable}
+\usepackage{makecell}
 
 \usepackage{multirow}
 
@@ -73,11 +74,15 @@
 
 %\chapter{Analyzer}
 \include{analyzer_overview}
-\include{lexer_parser}
 \include{processing}
 \include{checker}
+\include{lexer_parser}
+\include{context}
 
 \include{macro_tracer}
 \include{extension}
 \include{build_guide}
+
+\bibliography{biblio} 
+\bibliographystyle{apalike}
 \end{document}
