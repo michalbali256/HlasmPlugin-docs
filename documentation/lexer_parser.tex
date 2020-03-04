@@ -77,7 +77,27 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 		
 		Token does not carry the actual text from original source, but rather references to the position in code (unlike \texttt{CommonToken}). Note, that the position of a token is vital for further analysis.
 		
-		\XX{TODO: token types description}
+		\begin{table}
+			\centering
+			\begin{tabular}{lr}
+				\toprule
+				\textbf{IGNORED}                                                                     &  sequence of characters ignored in processing \\
+				\textbf{COMMENT}                                                                     &                         commentary statements \\
+				\textbf{EOLLN}                                                                       &         token signalling the end of statement \\
+				\textbf{SPACE}                                                                       &                          a sequence of spaces \\
+				\textbf{IDENTIFIER}                                                                  &                             symbol identifier \\
+				\textbf{ORDSYMBOL}                                                                   &                    Ordinary symbol identifier \\
+				\textbf{PROCESS}                                                                     &                       process statement token \\
+				\textbf{NUM}                                                                         &                                        number \\
+				\textbf{ATTR}                                                                        & apostrophe that serves as attribute reference \\
+				\thead{\textbf{ASTERISK, SLASH, MINUS, PLUS,}\\ \textbf{LT, GT, EQUALS, LPAR, RPAR}} &                             expression tokens \\
+				\thead{\textbf{DOT, COMMA, APOSTROPHE,}\\ \textbf{AMPERSAND, VERTICAL}}              &                        special meaning tokens \\ \bottomrule
+			\end{tabular}
+			\caption{Enumeration of tokens.}
+			\label{tab06:tokens}
+		\end{table}
+		
+		Interesting remark of HLASM language complexity is absence of \emph{string} token (see \cref{tab06:tokens}). Lexer does not generate this token due to existence of model statements (see \cref{var_sym}). There, variable symbol can be written anywhere in the statement (even in the middle of the string), what significantly restricts lexer.
 		
 		\item[\texttt{token\_factory}] produces tokens of previously described custom type \texttt{token}.
 		
