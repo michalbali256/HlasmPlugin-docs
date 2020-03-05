@@ -198,8 +198,61 @@ overview
 
 they are parsed in grammar, later you give an expression "symbol evaluator" and it returns its value
 
+HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) and \emph{Assembler} (ASM) expressions. CA expressions appear in conditional assembly, which is processed during compilation and has a significant impact on the final generated assembly.
+On the other hand, assembler instructions are the actual instructions that the processor executes.
 
+In this section, we first describe CA expressions following with ASM instructions.
 
+\paragraph{CA expressions}
+HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
+
+We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
+
+Each HLASM CA expression has a type. Supported are \emph{arithmetic}, \emph{logic}, \emph{character} expressions. We implement the logic in following classes:
+
+\begin{description}
+	\item[\texttt{diagnostic\_op}] Essential is the concept of \emph{diagnostics}. During the evaluation of an expression, an error can occur (syntactic or semantic). Therefore, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors, and propagates the error upwards. This is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before creation of new expression during evaluation. For an example see \cref{ca_expr:example}. 
+	
+	\item[\texttt{expression}] Pure virtual class. It defines the shared interface, operators, and functions. The class also implements evaluation logic for terms and factors. \XX{figure here}
+	
+	\item[\texttt{keyword\_expression}] Helper class that represents HLASM keywords in expressions. It can decide for a string whether it is a known keyword, if its unary or binary operation and what priority it has.
+	
+	\item[\texttt{logic\_expression}] Represents a logic expression. Note, logic and arithmetic expression have some common function, but their behavior differs. 
+	
+	\item[\texttt{arithmetic\_expression}] Represents an arithmetic expression and implements 
+	
+	\item[\texttt{arithmetic\_logic\_expr\_wrapper}] HLASM language supports expressions with operands of mixed types. For easier and cleaner use of arithmetic and logic expression, this class wraps these expression types under one class.
+	
+	\item[\texttt{character\_expression}] Represents a character expression.
+	
+	\item[\texttt{ebcdic\_encoding}] This class defines a custom EBCDIC literal and provide a helper functions for conversion between ABCDIC and ASCII. EBCDIC is a character encoding used in IBM mainframe. It has different layout than ASCII (see \cref{ca_expr:ebcdic}).
+	
+	\item[\texttt{error\_messages}] It is a static class with list of all \texttt{diagnostic\_op} generated from expressions.
+	
+	
+\end{description}
+\begin{lstlisting}[label={ca_expr:example},language=C++,backgroundcolor=\color{cyan!10}, captionpos=b, caption=Defition of \texttt{copy\_return\_on\_error} macro and an example of its usage while evaluating unary expression \texttt{B2A("123")}. \texttt{this} is an \texttt{character\_expression} with value \texttt{"123"}.]
+#define copy_return_on_error(arg, type) \
+do \
+{ \
+   auto te = test_and_copy_error<type>(arg); \
+   if (te != nullptr) return te; \
+} \
+while(0)
+	
+//before upward propagating the operation result
+//call the macro
+copy_return_on_error(this, arithmetic_expression);
+return arithmetic_expression::from_string(value_, 2);
+
+\end{lstlisting}
+
+\begin{figure}
+	\centering
+	\includegraphics[height=10cm]{img/ebcdic}
+	\caption{EBCDIC layout. Taken from \url{https://www.edn.com/how-it-was-ascii-ebcdic-iso-and-unicode/}.}
+	\label{ca_expr:ebcdic}
+\end{figure}
 
 \subsubsection{Data definition}
 
