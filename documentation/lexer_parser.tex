@@ -140,28 +140,32 @@ The parser inherits from the recognizer to provide further operations.
 
 \subsection{Parser workflow}
 
-Parser (in code referenced as \TT{parser\_impl}) implements opencode statement provider interface. This means that, according to the statement passing in \cref{lab06:proc_stat}, parser needs to:
-\begin{enumerate}
-	\item Retrieve statement instruction field.
-	\item Wait for the retrieval of the operand format by statement processor.
-	\item Retrieve rest of the statement with respect to the passed format.
-\end{enumerate} 
-
-This has several consequences as grammar has to be prepared for that. We describe them followingly:
+Parser (in code referenced as \TT{parser\_impl}) implements opencode statement provider interface. This means that, according to the statement passing in \cref{lab06:proc_stat}, parser needs to parse each statement in \emph{two steps}:
 
 \begin{enumerate}
 	\item Parser calls rule \TT{label\_instr}. It parses label and instruction fields into respective structures. The operand and remark field is stored as string.
-	\item Parser retrieves processing format from the current statement processor. According to the returned format, corresponding rule is selected to parse operands.
-	\item Parsed statement is returned.
+	\item After retrieving processing format, parser selects corresponding rule to parse operands. With the rule, it parses remaining string from the previous step.
 \end{enumerate}
 
-\subsection{Operand formats}
+For the means of parsing remaining strings, parser subcomponent contains actually \emph{two parsers}. The first one parses statement after statement from a source file. The second parses the operands from the string passed by the first parser. 
+
+Operands to have correctly set ranges prior to the source file rather than to the passed string, parser uses \emph{Range provider}. It helps the second parser to have ranges of reparsed operands consistent with the ranges of other fields. It is initialized with the begin location of operand field in the statement and all ranges furtherly created in parsing are adjusted to have correct boundaries.
+
+\subsection{Statement structure}
+
+During parsing of a statement, several structures are created and collected. They are \TT{label\_si, instruction\_si, operand\_si, remark\_si} (\emph{si} as semantic information). They are collected with \TT{collector} and built into \TT{statement\_si} structure.
+
+Label and instruction structures can contain either identifier of a symbol or --- when in model statement --- concatenation of strings and variable symbols. Remark field is simply just a string as it serves as a commentary statement field. Operand field contains list of operands used in the statement. They can be of several formats.
+
+\subsubsection{Operand formats}
 The statement processor can request parser to retrieve statements with this operand formats:
 \begin{itemize}
 	\item \emph{machine/assembler/conditional assembly/macro} -- instruction operands. Each type of instruction has it's specific format.
 	\item \emph{model} -- operands for model statements. It is a chain of strings and variable symbols.
 	\item \emph{deferred} -- operands with not yet known format. Stored as a string.
 \end{itemize}
+
+Each operand format has corresponding \emph{operand structure}. They all inherit abstract \TT{operand} and each have various children for different kinds of the operand format.
 
 \subsection{Grammar rules}
 
@@ -176,5 +180,4 @@ Grammar rules describing parser are separated into several files:
 	\item \textbf{ca/asm\_expression\_rules.g4} -- Rules for expressions.
 	\item \textbf{data\_def\_rules.g4} -- Rules for data definition.
 \end{itemize}
-
 
