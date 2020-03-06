@@ -1,6 +1,62 @@
 \chapter{Workspace Manager}
 
+Workspace manager encapsulates all functionality of the parser library. It is the access point to all parsing capabilities, keeps the current state of all open files and resolves libraries needed by the analyzer. It also manages when files should be reparsed.
+
 \section{Parser library API}
+
+First of all, the workspace manager component is the only public interface of the parser library. The API design is based on LSP and DAP, most of the API is just LSP/DAP rewritten in C++. The API uses the observer pattern for DAP events and notifications originating in parser library (e.g. textDocument/publishDiagnostics).
+
+The API can be divided into three categories:
+\begin{itemize}
+	\item Editor state and file content synchronization
+	\item Parsing results presentation 
+	\item Macro tracer
+\end{itemize}
+
+All the methods from the first category are listed in \cref{text_sync_methods}. There are two types of files that need to be synchronised:
+\begin{itemize}
+	\item Files, that the user has opened in the editor. Those files are being edited by the user and their content may be different from the files actually saved in the filesystem.
+	\item Files, that the parser library opens from the hard disk, because they are needed to parse opened files (e.g. a macro that is used by an opened file)
+\end{itemize}
+
+So the parser library is allowed to load arbitrary files from the disk, and use its contents until such file is opened in the editor. From that point on, the only source of truth for the contents of the file are the did\_change notifications. Once the file is closed in the editor, the parser library is again allowed to rely on its contents in the filesystem.
+
+
+
+
+
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{ll}
+		
+		\toprule
+		Method & Description \\ \midrule
+		did\_open(file name, file content) & \multirow{3}{8cm}{Three methods that are called whenever the user opens a file, changes contents of an already opened file or closes a file in the editor.} \\
+		did\_change(file name, changes)& \\
+		did\_close(file name)& \\
+		\
+	\end{tabular}
+	
+	\caption{List of all Editor state and text synchronization methods}
+	\label{text_sync_methods}
+\end{table}
+
+\begin{table}
+	\centering
+	\begin{tabular}{ll}
+		
+		\toprule
+		Method & Description \\ \midrule
+		did\_open(file name, file content) & \multirow{3}{8cm}{Three methods that are called whenever the user opens a file, changes contents of an already opened file or closes a file in the editor.} \\
+		did\_change(file name, changes)& \\
+		did\_close(file name)& \\
+	\end{tabular}
+	
+	\caption{List of all Editor state and text synchronization methods}
+	\label{text_sync_methods}
+\end{table}
 
 \section{Files}
 
