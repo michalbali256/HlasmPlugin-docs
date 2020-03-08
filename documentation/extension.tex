@@ -1,6 +1,6 @@
 \chapter{VS Code extension}
 
-The frontend of the project is implented as an extension to a modern IDE, instead of creating a completely new GUI. This approach has the advantage of providing a familiar environment and workflow that the developers are used to.
+The frontend of the project is implemented as an extension to a modern IDE, instead of creating a completely new GUI. This approach has the advantage of providing a familiar environment and workflow that the developers are used to.
 
 There are several IDEs that currently (natively) support LSP, such as \emph{Eclipse Che} and \emph{Eclipse IDE}, \emph{vim8}, \emph{Visual Studio} and \emph{Visual Studio Code} and many more. Others, for example \emph{IntelliJ}, have plugins which add the support for LSP.
 
@@ -10,23 +10,23 @@ Our choice is \emph{Visual Studio Code}, due to its popularity and light-weight 
 
 The core of the extension is an activation event which starts the plugin for VSCode.
 
-On activation, \emph{Language Client} and \emph{Language server} are started as child processes of VSCode and a pipe is open for their communication. The LSP communication and its features are included in npm package \emph{vscodelc}. 
+Upon activation, \emph{Language Client} and \emph{Language server}~\ref{chap:lang_server} are started as child processes of VSCode and a pipe is open for their communication. The LSP communication and its features are handled by \emph{vscodelc} package. 
 
-To be independent of pipes, we add an option to use TCP where a random free port is assigned for them to use.
+To be independent of pipes, there is an option to use TCP, where a random free port is assigned for them to use.
 
 \section{DAP Extension}
 
-\emph{Macro Tracer}~(\autoref{chap:macro_tracer}) is implemented using DAP which is also supported out-of-the-box by VSCode. We dynamically set the random free port for DAP communication during activation.
+\emph{Macro Tracer}~\ref{chap:macro_tracer} is implemented using DAP which is also supported out-of-the-box by VSCode. We dynamically assign a random free port for DAP communication during activation as well.
 
 \section{Additions}
 
-Several features are added to the extension to improve the experience with HLASM and the extension as whole. These additions are specific for Visual Studio Code (and Theia) and are not part of the LSP specification.
+Several features are added to the extension to simplify work with HLASM in modern editors. These additions are specific for Visual Studio Code (and Theia) and are not part of the LSP specification.
 
 \subsection{Language Detection}
 
-The usual workflow with the extension begins with downloading HLASM source codes from Mainframe. Typically, these files won't have any file extension and if they do, they might differ across different products.
+The usual workflow with the extension begins with downloading HLASM source codes from mainframe. Typically, these files won't have any file extension and even if they do, they might differ across various products.
 
-To cope with this problem, there are several mechanisms that recognize the file as HLASM.
+To cope with this problem, there are several mechanisms that help the user to recognize the file as HLASM automatically.
 
 \subsubsection{Macro Detection}
 
@@ -34,7 +34,7 @@ Each file starting with line \emph{MACRO} (arbirtary number of whitespace before
 
 \subsubsection{Configuration Files Detection}
 
-Every file either defined as a program or a part of processor group is recognized as HLASM.
+Every file either defined as a program or as a part of processor group is recognized as HLASM.
 
 \subsubsection{Wildcards}
 
@@ -42,23 +42,26 @@ Configuration file \emph{pgm\_conf.json} contains field \emph{alwaysRecognize} w
 
 \subsubsection{Automatic Language Detection}
 
-Whenever a file is open, it's contents are scanned line by line. Whether a file is HLASM or not is determined by a ratio (\# HLASM lines)/(\# all lines). A line is HLASM if:
-\begin{enumerate}
-	\item Line contains an instruction from a set of most used instructions and it is used correctly OR it is a continued line of correct HLASM line
-	\item Line is not a comment (skipped otherwise)
-	\item Line is not empty (skipped otherwise)
-	\item Line is no longer than 80 characters
-\end{enumerate}
+Whenever a file is open, it's contents are scanned line by line. Whether a file is HLASM or not is determined by a ratio (\# HLASM lines)/(\# all lines).
 
-We tested the detection on ~25.000 HLASM files. The best results were observed using ratio 4/10, with 88\% positive recognition and 95\% negative recognition (non-HLASM files not recognized as HLASM). 
+Recognition is mostly based on a pre-defined set of most used instructions. If a line correctly uses one of these instructions, it is counted towards HLASM lines. Continued line of HLASM line is also HLASM line.
+Moreover, HLASM line must not exceed 80 characters.
 
-Because of the uncertain outcomes, this method is meant to be used as a fall-back in case all previous methods do not suffice.
+Comment lines or empty lines are skipped and not counted towards the ratio. 
+
+All non-skipped lines are counted towards all lines.
+
+We tested the detection on ~25.000 HLASM files. The best results were observed using ratio 4/10, with 88\% true positive recognition and 95\% true negative recognition. 
+
+Because of the indeterminate outcomes, this method is meant to be used as a fall-back in case all previous methods do not suffice.
+
+All detection layers are visualized in \cref{fig08:lang}.
 
 \subsection{Continuation Handling}
 
-For historical reasons, HLASM has a 80 character per line limitation. Modern languages do not enforce such restriction and therefore IDEs such as VSCode allow the user to extend their lines freely. This causes 2 major inconveniences.
+For historical reasons, HLASM has a 80 character-per-line limitation. Modern languages do not enforce such restriction and therefore IDEs such as VSCode allow the user to extend their lines freely. This causes 2 major inconveniences.
 
-First of all, the user must add the continuation character on a very specific column manually. Secondly, each time the user types in between continuation character and the instruction/parameters, the continuation character moves from its requisite position and needs to be moved back, again manually.
+First of all, the user must add the continuation character on a very specific column manually. Secondly, each time the user types in between continuation character and the instruction/parameters, the continuation character is pushed from its requisite position and needs to be moved back, again manually.
 
 To improve this behavior, the extension offers an option to activate \emph{Continuation Handling}. 
 
@@ -69,15 +72,15 @@ To improve the second problem, the option overrides standard VSCode commands, co
 
 \subsection{Configuration Prompt}
 
-If the workspace contains HLASM file but it does not have configurations, the user is prompted to create them. This warning offers an option to create configuration templates.
+If the workspace contains HLASM file but it does not have configurations, the user is prompted to create them. The warning message also offers an option to create templates for them.
 
 \subsection{HLASM Semantic Highlighting}
 
-In case of HLASM, a semantic (server-side) highlighting is desired. Multi-layered nature of the language causes that in quite common scenarios, specific parts of code can be highlighted if some previous part was completely processed (parameters for instructions, skipped code thanks to code generation, defined macros, continuations, etc...).
+In case of HLASM, a semantic (server-side) highlighting is desired. Multi-layered nature of the language causes that in quite common scenarios, specific parts of code can be highlighted if and only if some previous part was completely processed (parameters for instructions, skipped code thanks to code generation, defined macros, continuations, etc...).
 
-We added \emph{semanticHighlighting} as an extra feature of LSP. This feature works in a very similar manner, implementing the LSP interfaces that VSCode provides. It works as a notification from server to client, containing ranges of code and their respective tokens (e.g. instruction, label, parameter, comment,..).
+We added \emph{semanticHighlighting} as an extra feature of LSP. This feature works in a very similar manner, implementing the LSP interfaces that VSCode provides. It works as a notification from server to client, containing ranges of code and their respective tokens (e.g. instruction, label, parameter, comment,..). 
 
-On top of that, we extended \emph{semanticHighlighting} to \emph{ASMsemanticHighlighting}, which adds the ability to also notify the client of the new code layout, specifically start, continuation and continue columns. These fields can be set in HLASM code (via ICTL instruction) and are required for the \emph{Continuation Handling} feature to work properly. Our client-server communication is shown in \cref{fig08:lsp}.
+On top of that, we extended \emph{semanticHighlighting} to \emph{ASMsemanticHighlighting}, which adds the ability to notify the client about new code layout, specifically start, continuation and continue columns. These fields can be set in HLASM code (via ICTL instruction) and are required for the \emph{Continuation Handling} feature to work properly. Our client-server communication is shown in \cref{fig08:lsp}.
 
 
 \begin{figure}
@@ -88,3 +91,10 @@ On top of that, we extended \emph{semanticHighlighting} to \emph{ASMsemanticHigh
 	\label{fig08:lsp}
 \end{figure}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=10cm]{img/lang_detection}
+	\caption{Language Detection layers.}
+	
+	\label{fig08:lang}
+\end{figure}
