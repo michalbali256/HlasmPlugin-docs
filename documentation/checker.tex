@@ -1,4 +1,5 @@
 \subsection{Instruction format validation}
+\label{checker}
 After a statement is fully processed and all operands of each instruction are known, the statement needs to be checked for errors. There are over 2000 machine instructions with variable number of operands and various restrictions on those operands --- some of them take only positive numbers, numbers that are in specific range or are limited to addresses only. The core of the component is a great table that describes all the instructions and their operands.
 
 The API of the validation component is simple: it takes an instruction and list of its operands and returns a list of warnings and errors in the form of LSP diagnostics.
