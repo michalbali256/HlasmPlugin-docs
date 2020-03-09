@@ -56,11 +56,12 @@ The statements collected into the copy or macro definition are mainly deferred s
 
 However, some statements in the macro and copy definition forbid aliasing and the operand format can be deduced (e.g. conditional assembly instructions in macro definition). This leads to the processor's necessity to ask provider to retrieve statement with correct format according to the deduced format based on the provided instruction  (see \cref{lab06:proc_stat}).
 
-\subsubsection{Lookahead Processors}
+\subsubsection{Lookahead Processor}
+\label{lab06:look}
 
 Lookahead processor is activated when currently processed conditional assembly statement require value of the ordinary or sequence symbol that is not previously defined. It looks through following statements and finishes when the target symbol is found or when all the statement providers are exhausted.
 
-\subsubsection{Opencode Processors}
+\subsubsection{Opencode Processor}
 
 Opencode processor's (in code described as Ordinary processor) usage can be described in the following points:
 \begin{enumerate}
@@ -198,7 +199,84 @@ overview
 
 they are parsed in grammar, later you give an expression "symbol evaluator" and it returns its value
 
+HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) and \emph{Assembler} (ASM) expressions. CA expressions appear in conditional assembly, which is processed during compilation and has a significant impact on the final generated assembly.
+On the other hand, assembler instructions are the actual instructions that the processor executes.
 
+In this section, we first describe CA expressions following with ASM instructions.
+
+\paragraph{CA expressions}
+\label{ca_expr:logic}
+HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
+
+We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
+
+In this paragraph, we address the representation and functionality of the expressions themselves. Coupling the expressions with grammar and their evaluation in context is further discussed in \cref{ca_expr:eval}.
+
+Each HLASM CA expression has a type. Supported are \emph{arithmetic}, \emph{logic}, \emph{character} expressions. We implement the logic in following classes:
+
+\begin{description}
+	\item[\texttt{diagnostic\_op}] Fundamental is the concept of \emph{diagnostics}. During the evaluation of an expression, an error can occur (syntactic or semantic). Hence, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors and propagates the error upwards. Checking and propagating of error is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before the creation of new expression during evaluation. For an example see \cref{ca_expr:example}. 
+	
+	\item[\texttt{expression}] Pure virtual class. It defines the shared interface, operators, and functions. The class also implements evaluation logic for terms and factors. 
+	
+	The \texttt{expression} class implements the evaluation as follows:
+	A \texttt{std::deque} of \texttt{expression} pointers (see  \cref{ca_expr:example}) is passed. The evaluation iterates the list from left to right.  Functions, binary, and unary operators consume the rest of the deque.
+	
+	Some expression symbols can be either HLASM keywords or variable identifiers. Therefore, the resolution of symbols is complicated and cannot be done straight, but instead during the evaluation-time. The order of the expression's terms and previous evaluation context is crucial for the disambiguation. 
+	
+	\item[\texttt{keyword\_expression}] Helper class that represents HLASM keywords in expressions. It can decide for a string whether it is a known keyword if its unary or binary operation and what priority it has.
+	
+	\item[\texttt{logic\_expression}] Represents a logic expression. Note, logic, and arithmetic expression have some common functions, but their behavior differs. 
+	
+	\item[\texttt{arithmetic\_expression}] Represents an arithmetic expression.
+	
+	\item[\texttt{arithmetic\_logic\_expr\_wrapper}] HLASM language supports expressions with operands of mixed types. For more straightforward and readable use of arithmetic and logical expression, this class wraps these expression types under one class.
+	
+	\item[\texttt{character\_expression}] Represents a character expression.
+	
+	\item[\texttt{ebcdic\_encoding}] This class defines a custom EBCDIC literal and provides helper functions for conversion between EBCDIC and ASCII. EBCDIC is a character encoding used in the IBM mainframe. It has a different layout than ASCII (see \cref{ca_expr:ebcdic}).
+	
+	\item[\texttt{error\_messages}] It is a static class with list of all \texttt{diagnostic\_op} generated from expressions.
+	
+	
+\end{description}
+\begin{lstlisting}[label={ca_expr:example},language=C++,backgroundcolor=\color{cyan!10}, captionpos=b, caption=Defition of \texttt{copy\_return\_on\_error} macro and an example of its usage while evaluating unary expression \texttt{B2A("123")}. \texttt{this} is an \texttt{character\_expression} with value \texttt{"123"}.]
+#define copy_return_on_error(arg, type) \
+do \
+{ \
+auto te = test_and_copy_error<type>(arg); \
+if (te != nullptr) return te; \
+} \
+while(0)
+
+//before upward propagating the operation result
+//call the macro
+copy_return_on_error(this, arithmetic_expression);
+return arithmetic_expression::from_string(value_, 2);
+
+\end{lstlisting}
+
+\begin{figure}
+	\centering
+	\includegraphics[height=13cm]{img/ebcdic}
+	\caption{EBCDIC layout. Taken from \url{https://i.stack.imgur.com/h3u5A.png}.}
+	\label{ca_expr:ebcdic}
+\end{figure}
+
+\paragraph{CA expression evaluation}
+\label{ca_expr:eval}
+
+In the previous section, we described the representation of the CA expressions it selves. In this section, we explain the coupling of CA expressions with grammar via visitor. 
+
+The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
+
+The \texttt{expression\_evaluator} encapsulates the coupling logic between the grammar and the expression logic. That is, the evaluator has a notion about grammar, which translates into C++ expression logic. At this point, it is essential for the reader to be familiar with the grammar (see \cref{parser:rules}).
+
+The top-level expression first gathers a list of space-separated expressions. We gather this list because a token may be a keyword (such as \texttt{AND} operator) or variable identifier, depending on a position in an expression (using language keywords as identifiers is allowed in HLASM). \texttt{expression::evaluate} provides the disambiguation (see \cref{ca_expr:logic}). 
+
+Evaluator substitutes grammar rules with variable and ordinary symbols for their values and retrieves structure that holds real value of the expression. To know which values to substitute, evaluator is given \emph{evaluation context}. It consists of objects that are required for correct evaluation. It is \emph{HLASM context} for symbol values, \emph{attribute provider} for values of symbol attributes that are not yet defined and \emph{library provider} for evaluation of some types of symbol attributes as well.
+
+In conditional assembly expressions --- when visiting yet not defined ordinary symbol --- lookahead is triggered (see \cref{lab06:look}). As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks expression for all the undefined symbol references and collects them to a common collection. Then, lookahead is triggered with requirement of looking for all references of the collection. Hence, it is triggered once each expresssion rather than any time undefined symbol reference is found. 
 
 
 \subsubsection{Data definition}

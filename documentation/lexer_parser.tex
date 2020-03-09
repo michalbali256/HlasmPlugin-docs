@@ -1,21 +1,21 @@
 
 
-\section{ANTLR 4}
+\section{Usage of ANTLR 4}
 We have based part of our Analyzer on ANTLR 4 parser generator. ANLTR 4 implements Adaptive $LL(*)$ \cite{parr2014adaptive} parsing strategy.
 
 \subsection{Adaptive $LL(*)$ parsing strategy}
 Adaptive $LL(*)$ (or short $ALL(*)$) parsing strategy is a combination of simple, efficient and predictable top-down $LL(k)$ parsing strategy with power of $GLR$ which can handle non-deterministic and ambiguous grammars. 
 Authors move the grammar analysis to parse-time. This lets $ALL(*)$ handle any non-left-recursive context-free grammar rules and for efficiency it caches analysis results in lookahead DFA.
 
-As a possible downside of $ALL(*)$ could be considered theoretical time complexity. Parsing of $n$ symbols takes $O(n^4)$ in theory. In practice, however, $ALL(*)$ seems to outperform other parsers by order of magnitude.
+Theoretical time complexity can be viewed as a possible downside of $ALL(*)$. Parsing of $n$ symbols takes $O(n^4)$ in theory. In practice, however, $ALL(*)$ seems to outperform other parsers by order of magnitude.
 
 Despite the theoretical $O(n^4)$ time complexity, it appears that the $ALL(*)$ behaves linear on most of the code, with no unpredictable performance or large footprint in practice. In order to support this, authors investigate the parse time vs file size for languages \texttt{C}, \texttt{Verilog}, \texttt{Erlang} and \texttt{Lua} files. They found very strong evidence of linearity on all tested languages (see the original paper for details).
 
 \subsection{ANTLR 4 pipeline}
 
-ANTLR 4, as any other conventional parser generator, processes the inputted code as follows: (1) breaks down the source string into tokens using \textit{lexer} (2) \textit{parser} build parse trees. 
+ANTLR 4, similar to any other conventional parser generator, processes the inputted code as follows: (1) breaks down the source string into tokens using \textit{lexer} (2) \textit{parser} build parse trees. 
 
-This pipeline is in ANTLR 4 breaked into following classes: 
+This pipeline in ANTLR 4 is broken into following classes: 
 
 \begin{description}
 	\item[\texttt{CharStream}] represents input code,
@@ -25,7 +25,7 @@ This pipeline is in ANTLR 4 breaked into following classes:
 	\item[\texttt{TokenStream}] connects the lexer and parser.
 \end{description}
 
-Overview of the described pipeline can be seen in \cref{antlr_pipeline}.
+\cref{antlr_pipeline} sketches the described pipeline.
 
 \begin{figure}[H]
 	\centering
@@ -34,23 +34,29 @@ Overview of the described pipeline can be seen in \cref{antlr_pipeline}.
 	\caption{ANTLR 4 pipeline overview. Taken from \cite{parr2013definitive}.}
 \end{figure}
 
-\subsection{Naming convetion remark}
-ANTLR 4 uses Java naming convention. In our code, we follow in general \XX{Google C++ Style Guide}\footnote{\url{https://google.github.io/styleguide/cppguide.html}}. 
+\subsection{Naming convention}
+ANTLR 4 uses Java naming convention. In our code, we follow our own naming convention:
 
-When implementing ANTLR 4 classes, we remain consistent with the naming convention used in our project. As a benefit, the overriden functions are better visible in code.
+\begin{description}
+	\item[small\_with\_underscore] namespaces, classes, structs, functions and local variables,
+	\item[small\_with\_underscore\_finished\_by\_underscore\_] private variables,
+	\item[CamelCase] template arguments.
+\end{description} 
+
+When implementing ANTLR 4 classes, we prevail consistent with the naming convention adopted in our project. As a perk, the overridden functions are better visible in code.
 
 \section{Lexer}
 
-Lexer's task is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
+Lexer's responsibility is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
 \begin{itemize}
-	\item each token has location in the source text,
+	\item each token has a location in the source text,
 	\item has the ability to check whether all characters are valid in the HLASM source,
-	\item has the ability to jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool and the lexer has to be implemented from scratch.
+	\item can jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool, and the lexer has to be implemented from scratch.
 \end{itemize}
 
-As already mentioned, we designed a custom lexer for HLASM. We have a number of reasons to do so. HLASM language is complex, it was first introduced several decades ago and the language was during this long time subjected to development. This made the HLASM language complex. Also, it contains some aggressive features as for example \texttt{AREAD} or \texttt{COPY} that are able to alter the source code at parse time.
+As previously mentioned, we designed a custom lexer for HLASM. We have a number of reasons to do so. HLASM language is complex. It was first introduced several decades ago, and the language was during this long time subjected to development. Such a long period made the HLASM language complex. Also, it contains some aggressive features, for example, \texttt{AREAD} or \texttt{COPY}, that can alter the source code at parse time.
 
-Conventional lexing tools are most often based on regular expressions. As commented above, there are several complications that one must consider designing lexer for this particular language. A regular expression-based lexer would be too difficult or even impossible to design\footnote{One could match separate characters from input and let the parser or semantic analysis deal with some of the described problems. Obviously, this drastic solution would cost performance, as parsers are usually more performance demanding.}.
+Conventional lexing tools are most often based on regular expressions. As discussed above, there are several difficulties that one must consider designing lexer for this particular language. A regular expression-based lexer would be too difficult or even impossible to design\footnote{One could match separate characters from the input and let the parser or semantic analysis deal with some of the described problems. This drastic solution would cost performance, as parsers are usually more performance demanding.}.
 
 \subsection{Encodings}
 Source code encodings differ for the used libraries. All strings are encoded in \texttt{UTF} as follows:
@@ -62,7 +68,6 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 \end{description}
 
 \subsection{Architecture}
-Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
 
 \begin{figure}[H]
 	\centering
@@ -71,60 +76,65 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 	\caption{Lexer architecture overview. Note, there are two \texttt{input\_source}s and there are many \texttt{token}s generated.}
 \end{figure}
 
+Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
+
+
+
 \begin{description}
 	
-		\item[\texttt{token}] implements ANTLR's class \texttt{Token} and extends it by adding properties important for location of the token within the input stream. As the LSP protocol works with offsets encoded in \texttt{UTF-16} and ANTLR 4 works with \texttt{UTF-32} encoding, we add attributes for \texttt{UTF-16} positions, too.
+	\item[\texttt{token}] implements ANTLR's class \texttt{Token} and extends it by adding properties important for location of the token within the input stream. As the LSP protocol works with offsets encoded in \texttt{UTF-16} and ANTLR 4 works with \texttt{UTF-32} encoding, we add attributes for \texttt{UTF-16} positions, too.
+	
+	Token does not carry the actual text from the source but instead references the position in code (unlike \texttt{CommonToken}). Note that the position of a token is vital for further analysis.
+	
+	\begin{table}
+		\centering
+		\begin{tabular}{lr}
+			\toprule
+			\textbf{IGNORED}                                                                     &  sequence of characters ignored in processing \\
+			\textbf{COMMENT}                                                                     &                         commentary statements \\
+			\textbf{EOLLN}                                                                       &         token signalling the end of statement \\
+			\textbf{SPACE}                                                                       &                          a sequence of spaces \\
+			\textbf{IDENTIFIER}                                                                  &                             symbol identifier \\
+			\textbf{ORDSYMBOL}                                                                   &                    Ordinary symbol identifier \\
+			\textbf{PROCESS}                                                                     &                       process statement token \\
+			\textbf{NUM}                                                                         &                                        number \\
+			\textbf{ATTR}                                                                        & apostrophe that serves as attribute reference \\
+			\thead{\textbf{ASTERISK, SLASH, MINUS, PLUS,}\\ \textbf{LT, GT, EQUALS, LPAR, RPAR}} &                             expression tokens \\
+			\thead{\textbf{DOT, COMMA, APOSTROPHE,}\\ \textbf{AMPERSAND, VERTICAL}}              &                        special meaning tokens \\ \bottomrule
+		\end{tabular}
+		\caption{Enumeration of tokens.}
+		\label{tab06:tokens}
+	\end{table}
+	
+	Interesting remark of HLASM language complexity is absence of \emph{string} token (see \cref{tab06:tokens}). Lexer does not generate this token due to existence of model statements (see \cref{var_sym}). There, variable symbol can be written anywhere in the statement (even in the middle of the string), what significantly restricts lexer.
+	
+	\item[\texttt{token\_factory}] produces tokens of previously described custom type \texttt{token}.
+	
+	\item[\texttt{input\_source}] implements \texttt{ANTLRInputStream} which encapsulates source code. This implementation adds API for resetting, rewinding and rewriting input. 
+	
+	Beware of the usage of \texttt{UTF} encodings: \texttt{\_data} (source code string) and positions/indices in API are in \texttt{UTF-32}; \texttt{getText} returns \texttt{UTF-8} string.
+	
+	\item[\texttt{lexer}] is based on ANTLR's \texttt{TokenSource} class. As most lexers, it is also, in principle, a finite state machine. The most important difference compared to conventional FSMs and other lexers is added communication interface that connects the parser and the instruction interpreter with the lexer. Unusual is also input rewinding (to support \texttt{AREAD}, for example), lexing from parallel sources (\texttt{AINSERT} buffer), and some helper API for subsequent processing stages.
+	
+	Important functions:
+	
+	\begin{description}
+		\item[\texttt{nextToken()}] implements main functionality: lexes and emits tokens. Before lexing, the function uses the right input stream (either the source code or \texttt{AINSERT} buffer if not empty). After choosing the right input source, the lexer emits token is lexed. HLASM introduces \textit{continuation} symbol (an arbitrary non-blank symbol at column 72 by default) that breaks one logical line into two or more lines in code. The end of one logical line indicates \texttt{EOLLN} token. Such token is important for further (syntactic and semantic) analysis.
 		
-		Token does not carry the actual text from original source, but rather references to the position in code (unlike \texttt{CommonToken}). Note, that the position of a token is vital for further analysis.
 		
-		\begin{table}
-			\centering
-			\begin{tabular}{lr}
-				\toprule
-				\textbf{IGNORED}                                                                     &  sequence of characters ignored in processing \\
-				\textbf{COMMENT}                                                                     &                         commentary statements \\
-				\textbf{EOLLN}                                                                       &         token signalling the end of statement \\
-				\textbf{SPACE}                                                                       &                          a sequence of spaces \\
-				\textbf{IDENTIFIER}                                                                  &                             symbol identifier \\
-				\textbf{ORDSYMBOL}                                                                   &                    Ordinary symbol identifier \\
-				\textbf{PROCESS}                                                                     &                       process statement token \\
-				\textbf{NUM}                                                                         &                                        number \\
-				\textbf{ATTR}                                                                        & apostrophe that serves as attribute reference \\
-				\thead{\textbf{ASTERISK, SLASH, MINUS, PLUS,}\\ \textbf{LT, GT, EQUALS, LPAR, RPAR}} &                             expression tokens \\
-				\thead{\textbf{DOT, COMMA, APOSTROPHE,}\\ \textbf{AMPERSAND, VERTICAL}}              &                        special meaning tokens \\ \bottomrule
-			\end{tabular}
-			\caption{Enumeration of tokens.}
-			\label{tab06:tokens}
-		\end{table}
+		\item[\texttt{create\_token()}] creates token of given type. The lexer's internal state gives the position of the token. 
 		
-		Interesting remark of HLASM language complexity is absence of \emph{string} token (see \cref{tab06:tokens}). Lexer does not generate this token due to existence of model statements (see \cref{var_sym}). There, variable symbol can be written anywhere in the statement (even in the middle of the string), what significantly restricts lexer.
+		\item[\texttt{consume()}] consumes character from the input stream and updates lexer's internal state (used in \texttt{create\_token()}).
 		
-		\item[\texttt{token\_factory}] produces tokens of previously described custom type \texttt{token}.
+		\item[\texttt{lex\_tokens()}] lexing of most of the token types.
 		
-		\item[\texttt{input\_source}] implements \texttt{ANTLRInputStream} which encapsulates source code. This implementation adds API for resetting, rewinding and rewriting input. 
+		\item[\texttt{lex\_begin()}] up to certain column, the input can be ignored (can be set in HLASM).
 		
-		Beware of the usage of \texttt{UTF} encodings: \texttt{\_data} (source code string) and positions/indices in API are in \texttt{UTF-32}; \texttt{getText} returns \texttt{UTF-8} string.
+		\item[\texttt{lex\_end()}] lexes everything after continuation symbol.
 		
-		\item[\texttt{lexer}] is based on ANTLR's \texttt{TokenSource} class. As most lexers, it is also in principle a finite state machine. Most important difference compared to conventional FSMs and other lexers is added communication interface that connects the parser and the instruction interpretator with the lexer. Unusual is also input rewinding (to support \texttt{AREAD}, etc.), lexing from parallel sources (\texttt{AINSERT} buffer) and some helper API for subsequent processing stages.
 		
-		Important functions:
-		
-		\begin{description}
-			\item[\texttt{nextToken()}] implements main functionality: lexes and emits tokens. Before lexing, the function uses right input stream (either the source code or \texttt{AINSERT} buffer if not empty). After choosing right input source, the token is lexed. HLASM introduces \textit{continuation} symbol (an arbitrary non-blank symbol at column 72 by default), that brakes one logical line into two or more lines in code. \texttt{EOLLN} token is introduced to indicate the end of one logical line. Such token is important for further (syntactic and semantic) analysis.
-			
-			\item[\texttt{create\_token()}] creates token of given type. Position of the token is given by the lexer's internal state. 
-			
-			\item[\texttt{consume()}] consumes character from the input stream and updates lexer's internal state (used in \texttt{create\_token()}).
-			
-			\item[\texttt{lex\_tokens()}] lexing of most of the token types.
-			
-			\item[\texttt{lex\_begin()}] up to certain column, the input can be ignored (can be set in HLASM).
-			
-			\item[\texttt{lex\_end()}] lexes everything after continuation symbol.
-			
-			
-		\end{description}
-		
+	\end{description}
+	
 \end{description}
 
 
@@ -180,4 +190,13 @@ Grammar rules describing parser are separated into several files:
 	\item \textbf{ca/asm\_expression\_rules.g4} -- Rules for expressions.
 	\item \textbf{data\_def\_rules.g4} -- Rules for data definition.
 \end{itemize}
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\includegraphics[height=\textheight]{img/grammar}
+		\caption{All of the 193 grammar rules.}
+		\label{parser:rules}
+	\end{figure}
+\end{landscape}
 
