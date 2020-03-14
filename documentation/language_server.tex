@@ -7,32 +7,98 @@ Language Server Protocol is used to extend code editors with support for additio
 
 The main purpose of the LSP is to allow the language server to provide language-specific response to various user interactions with the code editor. Messages that flow through LSP can be divided into two categories:
 
-\begin{itemize}%[font=\raisebox{0.25ex}{\tiny$\bullet$}\scshape\bfseries]
-	\item \textbf{Parsing results presentation} First category of messages allow the language server to send results of source code analysis to the LSP client. The editor is then able to show it to the user. For example, when the user clicks on a symbol in HLASM code and then uses `Go to definition' function, the LSP client sends a request to the language server with currently opened file name and location in the file. The server is expected to send back the location of the definition, so the editor can present that to the user (it would probably move the caret to the definition).
+\begin{itemize}
+	\item \textbf{Parsing results presentation} First category of messages allow the language server to send results of source code analysis to the LSP client. The editor is then able to show it to the user. For example, when the user clicks on a symbol in HLASM code and then uses `Go to definition' function, the LSP client sends a request to the language server with currently opened file name and location in the file. The server is expected to send back the location of the definition, so the editor can present that to the user (it would probably move the caret to the definition). List of all such messages is in \cref{lsp_parse_results}.
 
-	\item \textbf{Editor state and file content synchronization} Messages from the second category flow mainly from the client to the server and ensure that the server has enough information to correctly analyze source code.
+	\item \textbf{Editor state and file content synchronization} Messages from the second category flow mainly from the client to the server and ensure that the server has enough information to correctly analyze source code. List of all such messages is in \cref{lsp_text_sync_methods}.
 
 \end{itemize}
 
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{ll}
+		
+		\toprule
+		Message & Description \\ \midrule
+		& \multirow{3}{9cm}{The client sends a position in an opened file. The server responds with position of definition of a symbol at that position.} \\
+		textDocument/definition &  \\
+		& \\
+		& \\
+		& \multirow{3}{9cm}{The client sends a position in an opened file. If there is a symbol, The server responds with list of positions where the symbol is used.}\\
+		textDocument/references & \\
+		& \\
+		& \\
+		& \multirow{3}{9cm}{The client sends a position in an opened file where the user points with cursor. The server responds with a string to be shown in a tooltip window.}\\
+		textDocument/hover & \\
+		& \\
+		& \\
+		& \multirow{3}{9cm}{The client sends a position in an opened file and how the completion box was triggered (i. e. with what key, automatically/manually). The server responds with list of strings suggested for completion at the position.}\\
+		textDocument/completion & \\
+		& \\
+		& \\
+		& \\
+		& \multirow{3}{9cm}{The server sends diagnostics to the client. A diagnostic represents a problem with the source code, for example compilation errors and warnings.}\\
+		textDocument/publishDiagnostics & \\
+		& \\ \bottomrule
+	\end{tabular}
+	
+	\caption{List of all parse results methods}
+	\label{lsp_parse_results}
+\end{table}
+
+\begin{table}
+	\centering
+	\begin{tabular}{ll}
+		
+		\toprule
+		Method & Description \\ \midrule
+		textDocument/didOpen & \multirow{3}{8.5cm}{The server is notified whenever the user opens a file, changes contents of an already opened file or closes a file in the editor.} \\
+		textDocument/didChange & \\
+		textDocument/didClose & \\
+		& \\
+		 &\multirow{4}{8.5cm}{The client notifies the server when a watched file is changed outside of the editor. Watched files selector is defined when the client is started (in the extension).} \\
+		workspace/ & \\
+		didChangeWatchedFiles& \\
+		& \\
+		& \\
+		workspace/ & \multirow{2}{8.5cm}{The client notifies the server that the user has opened or closed a workspace.} \\
+		didChangeWorkspaceFolders & \\ \bottomrule
+	\end{tabular}
+	
+	\caption{List of all Editor state and text synchronization methods}
+	\label{lsp_text_sync_methods}
+\end{table}
+
+
 LSP is based on JSON RPC\footnote{\url{https://www.jsonrpc.org/specification}}. There are two types of interaction in JSON RPC: requests and notifications. Both of them carry the information to invoke a method on the recipient side ---  name of the method and its arguments. The difference between the two is that each request requires a response containing result of the method, whereas the notifications do not.
 
-The LSP uses the JSON RPC specification and further specifies how messages are transferred and define methods, their arguments, responses and semantics. A raw message sent from the client to the server looks like this:
-\begin{verbatim}
+The LSP uses the JSON RPC specification and further specifies how messages are transferred and define methods, their arguments, responses and semantics. A raw message sent from the client to the server is shown in \cref{hover_message}.
+
+\begin{listing}
+	\begin{verbatim}
 Content-Length: 123\r\n
 \r\n
 {"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":
 {"uri":"file:/c%3A/Users/admin/Documents/source.hlasm"}}}
-\end{verbatim}
-On the first line, there is information how long is the json message, then comes the json itself.
+	\end{verbatim}
+	\caption{An example of a message sent from the client to the server.}
+	\label{hover_message}
+\end{listing}
+
+The raw messages have HTTP-like headers. The only mandatory header is \TT{Content-Length} which tells the recipient how long message follows. After the header, the json itself is sent.
 
 Inside the json, there is the name of the method to be invoked and parameters to pass to the method. In this case, the client is sending a notification that file "C:/Users/admin/Documents/source.hlasm" was closed in the editor by the user. It is a notification, so there must not be any response.
 
 On top of this basic protocol, LSP defines methods and their semantics to cover common functionality that users expect when programming in an editor. List of all methods implemented in the language server can be found in \cref{LSP_methods}.
 
 \section{DAP}
-Debug Adapter Protocol is a protocol used to extend code editors with debugging support for additional programming languages. We use it to be able to trace how the HLASM compiler processes source code, to show the user how macros are expanded and the values of compile-time variables.
+Debug Adapter Protocol is used to extend code editors with debugging support for additional programming languages. We use it to be able to trace how the HLASM compiler processes source code, to show the user how macros are expanded and the values of compile-time variables.
 
-DAP is very similar to LSP. The main difference is that DAP is not based on the JSON RPC, but the ideas behind DAP are nearly the same. DAP has requests and events ---  requests always go from the client to the server and require response. Events are the same as notifications from JSON RPC that the server sends to the client. The similarity allows our language server component to share a lot of code between implementation of the protocols.
+The communication in DAP is between an editor or IDE and a debugger or runtime. The editor notifies the debugger about the user actions, for example when a breakpoint is set or when the user uses step in/step over buttons. The debugger informs the editor about state of the debugged application, for example when the debuggee stopped because it hit a breakpoint. When it is stopped, the debugger sends information about program stack, variables valid in current debuggee scope and its values.
+
+DAP is very similar to LSP. The main difference is that DAP is not based on the JSON RPC, but the ideas behind DAP are nearly the same. Instead, DAP specifies its own implementation of remote procedure call built on top of json. DAP has requests and events ---  requests always go from the client to the server and require response. Events are the same as notifications from JSON RPC that the server sends to the client. The similarity allows our language server component to share a lot of code between implementation of the protocols.
 
 \section{Third party libraries}
 Language server uses three third party libraries: ASIO C++ library \footnote{\url{https://think-async.com/Asio/}}, JSON for Modern C++ \footnote{\url{https://github.com/nlohmann/json}} and 
@@ -115,9 +181,9 @@ The DAP server uses only one feature: Launch feature, which handles stepping thr
 \begin{longtable}{ll}
 	\caption{The list of all implemented DAP methods and the classes where they are implemented}
 	\label{DAP_methods}   \\ \toprule
-	\textbf{LSP Method name} & \textbf{Component} \\ \midrule
-	initialize  & LSP server     \\
-	disconnect    & LSP server     \\
+	\textbf{DAP Method name} & \textbf{Component} \\ \midrule
+	initialize  & DAP server     \\
+	disconnect    & DAP server     \\
 	launch & Launch feature \\
 	setBreakpoints  &  Launch feature    \\
 	configurationDone  & Launch feature     \\
