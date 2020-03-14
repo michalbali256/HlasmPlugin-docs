@@ -5,6 +5,15 @@ The purpose of Language server is to implement the Language Server Protocol (LSP
 \section{Language Server Protocol}
 Language Server Protocol is used to extend code editors with support for additional programming languages. LSP defines 2 communicating entities: client and server. LSP client is editor-specific and wraps interaction with the user. LSP server is language-specific and provides information about source code.
 
+The main purpose of the LSP is to allow the language server to provide language-specific response to various user interactions with the code editor. Messages that flow through LSP can be divided into two categories:
+
+\begin{itemize}%[font=\raisebox{0.25ex}{\tiny$\bullet$}\scshape\bfseries]
+	\item \textbf{Parsing results presentation} First category of messages allow the language server to send results of source code analysis to the LSP client. The editor is then able to show it to the user. For example, when the user clicks on a symbol in HLASM code and then uses `Go to definition' function, the LSP client sends a request to the language server with currently opened file name and location in the file. The server is expected to send back the location of the definition, so the editor can present that to the user (it would probably move the caret to the definition).
+
+	\item \textbf{Editor state and file content synchronization} Messages from the second category flow mainly from the client to the server and ensure that the server has enough information to correctly analyze source code.
+
+\end{itemize}
+
 LSP is based on JSON RPC\footnote{\url{https://www.jsonrpc.org/specification}}. There are two types of interaction in JSON RPC: requests and notifications. Both of them carry the information to invoke a method on the recipient side ---  name of the method and its arguments. The difference between the two is that each request requires a response containing result of the method, whereas the notifications do not.
 
 The LSP uses the JSON RPC specification and further specifies how messages are transferred and define methods, their arguments, responses and semantics. A raw message sent from the client to the server looks like this:
