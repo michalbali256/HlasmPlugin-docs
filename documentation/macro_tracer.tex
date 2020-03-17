@@ -22,7 +22,7 @@ All described functionality (and more) is supported by the DAP.
 \section{Macro tracer architecture}
 \begin{figure}
 	\centering
-	\includegraphics[width=11cm]{img/macro_tracer_arch}
+	\includegraphics[width=\textwidth]{img/macro_tracer_arch}
 	\caption{Architecture of macro tracer.}
 	\label{macro_tracer_arch}
 \end{figure}
@@ -42,12 +42,12 @@ Debugger uses interface variable which represents a variable as it is shown to t
 \end{itemize}
 Each of the first three represent a HLASM symbol of certain type. They adapt the context representation of the symbols to DAP variables.
 
-Attrubute variable represents attributes of all types of symbols.
+Attribute variable represents attributes of all types of symbols. It does not access context, it is only used by the rest of variables to show their attributes.
 
 \section{Debugger}
 
 
-The most important methods of debugger are shown in \cref{debugger_API}. When the user starts debugging, method \TT{launch} is called from the language server component. The debugger creates analyzer and starts analysis in a separate thread. The debugger implements processor tracer interface which only has one method \TT{statement}. The analyzer calls the \TT{statement} method every time when next statement is about to be processed.
+The debugger component is the core of macro tracer implementation. When the user starts debugging, method \TT{launch} is called from the language server component. The debugger creates analyzer and starts analysis in a separate thread. The debugger implements processor tracer interface which only has one method \TT{statement}. The analyzer calls the \TT{statement} method every time when next statement is about to be processed.
 
 This implementation makes it possible for debugger to stop the analysis using conditional variable. When it sees fit (e.g. when a breakpoint was hit), the debugger can put the thread to sleep and wait for further user interaction. At the same time, it notifies the language server through debug event consumer interface that the analyzer has stopped.
 
@@ -59,30 +59,27 @@ There are three important structures in DAP.
 
 \end{itemize}
 
-While the thread is stopped, the editor sends requests to display informations about current context. It is the debugger responsibility to extract list of stack frames from the context, return list of scopes for each stack frame and list of variables for each scope. It does not have to deal with complexity of different types of set symbols and macro parameters, that is done by implementations of the variable interface.
-
 \begin{listing}
 	
 	\begin{verbatim}
- MAC (foo,((bar,ex),am),ple,(lorem,ipsum))
-
-1: foo
-2: ((bar,ex),am)
-  1: (bar,ex)
-    1: bar
-    2: ex
-  2: am
-3: ple
-4: (lorem,ipsum)
-  1: lorem
-  2: ipsum
-    
+	MAC (foo,((bar,ex),am),ple,(lorem,ipsum))
+	
+	1: foo
+	2: ((bar,ex),am)
+	1: (bar,ex)
+	1: bar
+	2: ex
+	2: am
+	3: ple
+	4: (lorem,ipsum)
+	1: lorem
+	2: ipsum
+	
 	\end{verbatim}
 	\caption{An example how macro tracer leverages DAP nested variables. First line shows a macro call with a parameter. HLASM treats such parameters as nested arrays. Second part shows how such parameter is shown in VS Code using nested variables}
 	\label{dap_nested_variables}
 \end{listing}
 
+While the thread is stopped, the editor sends requests to display informations about current context. It is the debugger responsibility to extract list of stack frames from the context, return list of scopes for each stack frame and list of variables for each scope. It does not have to deal with complexity of different types of set symbols and macro parameters, that is done by implementations of the variable interface.
 
-
-Data races
 
