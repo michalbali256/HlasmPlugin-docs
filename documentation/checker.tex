@@ -1,1 +1,5 @@
 \section{Instruction validation}
+
+One of the most essential ways to provide results of the parsing to the user is through error messages. Many of these messages are created in \emph{Instruction checker} which validates the usage of different kinds of instructions.
+
+Instruction checker is an interface for various types of instructions. Its \emph{check()} method is being called from the processors~\ref{chap:process} to check whether the specific instructions is used with correct parameters. As assembler and machine instructions have incoherent formats, we derive separate \emph{assembler} and \emph{machine} checkers from the instruction checker.
