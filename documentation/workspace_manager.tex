@@ -83,33 +83,6 @@ All the methods from the second category are listed in \cref{parse_results}. The
 Additionally, the parser library presents its results using the observer pattern. There are two interfaces: highligting and diagnostics consumer. Each of them has method \TT{consume} that gets updated information as parameter whenever there is an update. Any potential user of the library (e.g. the language server component) just has to implement the interfaces to process the results.
 
 \subsection{Macro tracer}
-\todo{probably move this table to macro tracer section. Just brief summary of macro tracer API here.}
-\begin{table}
-	\centering
-	\begin{tabular}{ll}
-		
-		\toprule
-		Method & Description \\ \midrule
-		launch(file name) & Starts the macro tracer \\
-	    next() & Method called when the user triggered step over. \\
-		step\_in() & Method called when the user triggered step in. \\
-		disconnect() & Method called when the user stopped macro tracer \\
-		continue\_debug() & \multirow{2}{8cm}{Method called when the user wants to continue to next breakpoint} \\
-		& \\
-		
-		get\_stack\_frames() & Returns list of all stack frames\\
-		get\_scopes(frame ID) & Returns list of scopes for given stack frame \\
-		get\_variable(variable reference) & Returns list of variables  \\
-		
-		
-		set\_breakpoints (file name,
-		list of lines) & Sets breakpoints to specified lines of a file \\ \bottomrule
-	\end{tabular}
-	
-	\caption{List of all parse results methods}
-	\label{macro_tracer_API}
-\end{table}
-
 
 The macro tracer part of the API is again just DAP rewritten in C++. All the methods are listed in \cref{macro_tracer_API}. There are methods that are called when the user clicks on buttons to control the macro tracer: launch the tracer, step in, step over, continue and stop. Moreover, there are methods that retrieve information about current state of traced code: stack of macro calls and information about compile time variables.
 
