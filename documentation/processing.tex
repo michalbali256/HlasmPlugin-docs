@@ -191,21 +191,16 @@ See the current list of processed instruction in \cref{tab06:instr_proc}.
 	\label{tab06:instr_proc}
 \end{table}
 
-\subsubsection{Expressions}
-
-distinguished into CA and ASM expressions. 
-image with arch
-overview
-
-they are parsed in grammar, later you give an expression "symbol evaluator" and it returns its value
+\subsubsection{CA Expressions}
+\label{ca_expr:logic}
 
 HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) and \emph{Assembler} (ASM) expressions. CA expressions appear in conditional assembly, which is processed during compilation and has a significant impact on the final generated assembly.
 On the other hand, assembler instructions are the actual instructions that the processor executes.
 
 In this section, we first describe CA expressions following with ASM instructions.
 
-\paragraph{CA expressions}
-\label{ca_expr:logic}
+
+
 HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
 
 We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
@@ -266,7 +261,7 @@ return arithmetic_expression::from_string(value_, 2);
 \paragraph{CA expression evaluation}
 \label{ca_expr:eval}
 
-In the previous section, we described the representation of the CA expressions it selves. In this section, we explain the coupling of CA expressions with grammar via visitor. 
+In the previous section, we described the representation of the CA expressions themselves. In this section, we explain the coupling of CA expressions with grammar via visitor. 
 
 The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
 
@@ -278,6 +273,7 @@ Evaluator substitutes grammar rules with variable and ordinary symbols for their
 
 In conditional assembly expressions --- when visiting yet not defined ordinary symbol --- lookahead is triggered (see \cref{lab06:look}). As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks expression for all the undefined symbol references and collects them to a common collection. Then, lookahead is triggered with requirement of looking for all references of the collection. Hence, it is triggered once each expresssion rather than any time undefined symbol reference is found. 
 
+\subsubsection{Machine expressions}
 
 \subsubsection{Data definition}
 
