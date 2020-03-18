@@ -45,6 +45,12 @@ ANTLR 4 uses Java naming convention. In our code, we follow our own naming conve
 
 When implementing ANTLR 4 classes, we prevail consistent with the naming convention adopted in our project. As a perk, the overridden functions are better visible in code.
 
+\section{Visitor}
+
+We employ ANTLR \emph{visitor} feature during evaluation of CA expressions (see \cref{lab06:expr}). 
+
+The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
+
 \section{Lexer}
 
 Lexer's responsibility is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
@@ -139,6 +145,7 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 
 
 \section{Parser}
+\label{lab06:parser}
 
 Parser component takes the lexer produced tokens from token stream and recognizes HLASM statements. To accomplish this, a parser generator tool ANTLR 4 \footnote{\url{https://www.antlr.org}} is used.
 
@@ -195,7 +202,7 @@ Grammar rules describing parser are separated into several files:
 	\begin{figure}
 		\centering
 		\includegraphics[height=\textheight]{img/grammar}
-		\caption{All of the 193 grammar rules.}
+		\caption{All 193 grammar rules.}
 		\label{parser:rules}
 	\end{figure}
 \end{landscape}

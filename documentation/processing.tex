@@ -19,9 +19,18 @@ To construct processing manager, analyzer passes this objects to the constructor
 	\item \emph{Name} of the processed file.
 	\item \emph{Parse library provider} to solve in file dependencies.
 	\item \emph{Statement fields parser} for parsing deferred statements. 
+	\item \emph{Processing tracer} for tracing processed statements (see \cref{chap:macro_tracer}).
 \end{itemize}
 
 As the processing of the HLASM source file is rather complicated, we defined a \emph{statement provider} for each different source of statements and a \emph{statement processor} for each different manner of statement processing. Therefore, processing manager contains two arrays, each consisting of different instance of statement processor, or statement provider.  Also, it has notion of the processor or provider that is in the current use and implement interfaces that change them.
+
+Let us enumerate the main components that are used in the processing manager:
+\begin{itemize}
+	\item \emph{Statement Provider} (see \cref{lab06:sect_prov})
+	\item \emph{Statement Processor} (see \cref{lab06:sect_proc})
+	\item \emph{Instruction Processor} (see \cref{lab06:instr_proc})
+	\item \emph{Instruction Format Validators} (see \cref{lab06:instr_valid})
+\end{itemize}
 
 \subsection{The main loop}
 
@@ -70,6 +79,8 @@ Opencode processor's (in code described as Ordinary processor) usage can be desc
 	\item Performs instruction in the manner of updating HLASM context tables with help of \emph{instruction processors}.
 \end{enumerate}
 
+It is also passed \emph{processing tracer} by the manager. Each time a statement is processed by opencode processor, it triggers processing tracer. The tracer serves as a listener pattern used by \emph{Macro tracer} (see \cref{chap:macro_tracer}).
+
 \vspace{0.5cm}
 
 During their work, any processor can encounter statement that require processor change (e.g. encountering special instruction or non previously defined sequence symbol, see \cref{tab06:processor_change}). Therefore, they use interface \emph{processing state listener} (implemented by processing manager) that tells manager to change the current processor.
@@ -90,6 +101,7 @@ If we look at the \cref{tab06:processor_change}, we can see that it does not hav
 \end{table}
 
 \subsection{Statement Providers}
+\label{lab06:sect_prov}
 
 In contrary to statement processors, statement providers are stored in the array based on the priority (lower index, greater priority):
 
@@ -165,8 +177,13 @@ Firstly, it is used during statement passing. In some cases provider is requeste
 Another use of field parser is in opencode processor as model statements are resolved there. After variable symbol substitution, the resulting string field is re-parsed with field parser.
 
 \subsection{Instruction processors}
+\label{lab06:instr_proc}
 
 Used by ordinary processor, instruction processors are helper classes that divide processing of HLASM instruction types.
+
+As format of some instruction kinds can be rather complicated, instruction processors contain \emph{Instruction format validators} (see \cref{lab06:instr_valid}). They check the statement to validate correctness of used operand format.
+
+During the work of the processors, they encounter \emph{expression} structures (see \cref{lab06:expr}). Expressions need to be evaluated for processing to be correctly finished.
 
 There are four specialized instruction processors:
 \paragraph*{Macro IP} looks up for macro definition in HLASM context tables and calls it.
@@ -191,7 +208,8 @@ See the current list of processed instruction in \cref{tab06:instr_proc}.
 	\label{tab06:instr_proc}
 \end{table}
 
-\subsubsection{Expressions}
+\subsection{Expressions}
+\label{lab06:expr}
 
 distinguished into CA and ASM expressions. 
 image with arch
@@ -204,7 +222,7 @@ On the other hand, assembler instructions are the actual instructions that the p
 
 In this section, we first describe CA expressions following with ASM instructions.
 
-\paragraph{CA expressions}
+\subsubsection{CA expressions}
 \label{ca_expr:logic}
 HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
 
@@ -263,12 +281,10 @@ return arithmetic_expression::from_string(value_, 2);
 	\label{ca_expr:ebcdic}
 \end{figure}
 
-\paragraph{CA expression evaluation}
+\subsubsection{CA expression evaluation}
 \label{ca_expr:eval}
 
 In the previous section, we described the representation of the CA expressions it selves. In this section, we explain the coupling of CA expressions with grammar via visitor. 
-
-The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
 
 The \texttt{expression\_evaluator} encapsulates the coupling logic between the grammar and the expression logic. That is, the evaluator has a notion about grammar, which translates into C++ expression logic. At this point, it is essential for the reader to be familiar with the grammar (see \cref{parser:rules}).
 
@@ -279,6 +295,6 @@ Evaluator substitutes grammar rules with variable and ordinary symbols for their
 In conditional assembly expressions --- when visiting yet not defined ordinary symbol --- lookahead is triggered (see \cref{lab06:look}). As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks expression for all the undefined symbol references and collects them to a common collection. Then, lookahead is triggered with requirement of looking for all references of the collection. Hence, it is triggered once each expresssion rather than any time undefined symbol reference is found. 
 
 
-\subsubsection{Data definition}
+\subsection{Data definition}
 
 validation and processing purpose
