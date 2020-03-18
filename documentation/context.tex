@@ -176,7 +176,7 @@ When a space length becomes known, all addresses containing the spaces need to b
 ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG  can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
 
 \subsubsection{Symbol dependency tables}
-
+\label{symbol_dependency_tables}
 HLASM forbids cyclic symbol definition. This component maintains dependencies between symbols and detects possible cycles.
 Let us describe the main components of dependency resolving:
 
