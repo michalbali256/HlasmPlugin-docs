@@ -1,9 +1,9 @@
 \chapter{Language server}
 
-The purpose of Language server is to implement the Language Server Protocol (LSP) and Debug Adapter Protocol (DAP) and to provide access to parser library using these protocols. It has to deserialize and serialize LSP and DAP messages, extract parameters of particular methods and then serve the requests by invoking functionality of parser library.
+The purpose of the Language server is to implement the Language Server Protocol (LSP) and the Debug Adapter Protocol (DAP) and to provide access to the parser library by using them. It has to deserialize and serialize LSP and DAP messages, extract parameters of particular methods and then serve the requests by invoking functionality of parser library.
 
 \section{Language Server Protocol}
-Language Server Protocol is used to extend code editors with support for additional programming languages. LSP defines 2 communicating entities: client and server. LSP client is editor-specific and wraps interaction with the user. LSP server is language-specific and provides information about source code.
+Language Server Protocol is used to extend code editors with support for additional programming languages. LSP defines 2 communicating entities: a client and a server. The LSP client is editor-specific and wraps interaction with the user. The LSP server is language-specific and provides information about the source code.
 
 The main purpose of the LSP is to allow the language server to provide language-specific response to various user interactions with the code editor. Messages that flow through LSP can be divided into three categories:
 
@@ -74,7 +74,7 @@ The main purpose of the LSP is to allow the language server to provide language-
 
 LSP is based on JSON RPC\footnote{\url{https://www.jsonrpc.org/specification}}. There are two types of interaction in JSON RPC: requests and notifications. Both of them carry the information to invoke a method on the recipient side ---  name of the method and its arguments. The difference between the two is that each request requires a response containing result of the method, whereas the notifications do not.
 
-The LSP uses the JSON RPC specification and further specifies how messages are transferred and define methods, their arguments, responses and semantics. A raw message sent from the client to the server is shown in \cref{hover_message}.
+The LSP uses the JSON RPC specification and further specifies how messages are transferred and defines methods, their arguments, responses and semantics. A raw message sent from the client to the server is shown in \cref{hover_message}.
 
 \begin{listing}
 	\begin{verbatim}
@@ -89,7 +89,7 @@ Content-Length: 123\r\n
 
 The raw messages have HTTP-like headers. The only mandatory header is \TT{Content-Length} which tells the recipient how long message follows. After the header, the json itself is sent.
 
-Inside the json, there is the name of the method to be invoked and parameters to pass to the method. In this case, the client is sending a notification that file "C:/Users/admin/Documents/source.hlasm" was closed in the editor by the user. It is a notification, so there must not be any response.
+Inside the JSON, there is the name of the method to be invoked and parameters to pass to the method. In this case, the client is sending a notification that file "C:/Users/admin/Documents/source.hlasm" was closed in the editor by the user. It is a notification, so there must not be any response.
 
 On top of this basic protocol, LSP defines methods and their semantics to cover common functionality that users expect when programming in an editor. List of all methods implemented in the language server can be found in \cref{LSP_methods}.
 
