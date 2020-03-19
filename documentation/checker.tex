@@ -44,3 +44,9 @@ Due to these irregularities, we derive instruction-specific classes from assembl
 
 \subsubsection{Data Definition checking}
 
+Data definition is a type of operand in HLASM. It represents data that is assembled directly into object code (see \cref{asm_instrs}).
+
+Since there are many types of data definition, there is a data definition subcomponent of instruction validation. Whenever any component of the project needs information about a data definition operand, it can use this subcomponent. It analyzes each type of data definition and is able to return its length, attributes and check its validity.
+
+Each type is different and many have special conditions that must be met to be valid. That is why there is an abstract class \TT{data\_def\_type\_base}, which has 38 implementations --- one for each type (including type extensions). The types are then available in a static associative map that maps names of types to their representations.
+
