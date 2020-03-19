@@ -174,6 +174,18 @@ During parsing of a statement, several structures are created and collected. The
 
 Label and instruction structures can contain either identifier of a symbol or --- when in model statement --- concatenation of strings and variable symbols. Remark field is simply just a string as it serves as a commentary statement field. Operand field contains list of operands used in the statement. They can be of several formats.
 
+\subsubsection{Concatenation}
+
+A model statement is a statement that contains variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is represented by a concatenation of helper structures. The concatenation can be further evaluated to produce the final string.
+
+The helper structures are:
+\begin{itemize}
+	\item \TT{char\_str} -- character string.
+	\item \TT{var\_sym} -- substitutable variable symbol.
+	\item \TT{dot}, \TT{equals} -- characters with special meaning.
+	\item \TT{sublist} -- with parenthesis enclosed recursive concatenation.
+\end{itemize}
+
 \subsubsection{Operand formats}
 The statement processor can request parser to retrieve statements with this operand formats:
 \begin{itemize}
@@ -182,7 +194,14 @@ The statement processor can request parser to retrieve statements with this oper
 	\item \emph{deferred} -- operands with not yet known format. Stored as a string.
 \end{itemize}
 
-Each operand format has corresponding \emph{operand structure}. They all inherit abstract \TT{operand} and each have various children for different kinds of the operand format.
+Each operand format has corresponding \emph{operand structure}. They all inherit abstract \TT{operand} and each have various children for different kinds of the operand format (see \cref{fig06:operand_arch}). Assembler and Machine operand structures inherit from \emph{Evaluable operand}. It is a common structure for operand objects that are composed of resolvable objects (see \cref{symbol_dependency_tables}).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/operand_arch}
+	\label{fig06:operand_arch}
+	\caption{Operand structure inheritance.}
+\end{figure}
 
 \subsection{Grammar rules}
 
