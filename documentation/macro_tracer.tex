@@ -29,26 +29,26 @@ All described functionality (and more) is supported by the DAP.
 
 The macro tracer architecture is shown in \cref{macro_tracer_arch}.
 
-Debugger is a class that encapsulates all macro tracer functionality. It starts the standard analysis provided by the analyzer component in a special thread. The debugger implements the processor tracer interface, which allows it to receive a notification every time a statement is about to be processed.
+\SC{Debugger} is a class that encapsulates all macro tracer functionality. It starts the standard analysis provided by the \SC{analyzer} component in a special thread. The \SC{debugger} implements the \SC{processor tracer} interface, which allows it to receive a notification every time a statement is about to be processed.
 
-It is also the debugger's responsibility to extract data from the context used by the analyzer and to transform them into a form compatible with the DAP.
+It is also the \SC{debugger's} responsibility to extract data from the \SC{context} used by the \SC{analyzer} and to transform them into a form compatible with the DAP.
 
-Debugger uses an interface variable which represents the variable as it is shown to the user --- most importantly, it is a name-value pair. The variable interface has four implementations:
+\SC{Debugger} uses an interface \SC{variable} which represents the variable as it is shown to the user --- most importantly, it is a name-value pair. The \SC{variable} interface has four implementations:
 \begin{itemize}
-	\item Set symbol variable
-	\item Ordinary symbol variable
-	\item Macro parameter variable
-	\item Attribute variable
+	\item \SC{Set symbol variable}
+	\item \SC{Ordinary symbol variable}
+	\item \SC{Macro parameter variable}
+	\item \SC{Attribute variable}
 \end{itemize}
-First three represent a HLASM symbol of a certain type. They adapt the context representation of the symbols to DAP variables.
+First three represent a HLASM symbol of respectable type. They adapt the \SC{context} representation of the symbols to DAP variables.
 
-The attribute variable represents attributes of all types of symbols. It does not access context, and it is only used by the rest of variables to show their attributes.
+The \SC{attribute variable} represents attributes of all types of symbols. It does not access context, and it is only used by the rest of \SC{variables} to show their attributes.
 
 \section{Debugger}
 
-The debugger component is the core of the macro tracer implementation. When the user starts debugging, the method \TT{launch} is called from the language server component. The debugger creates analyzer and starts the analysis in a separate thread. The debugger implements processor tracer interface, which only has one method --- \TT{statement}. The analyzer calls the \TT{statement} method every time a next statement is about to be processed.
+The \SC{debugger} component is the core of the macro tracer implementation. When the user starts debugging, the method \TT{launch} is called from the language server component. The \SC{debugger} creates \SC{analyzer} and starts the analysis in a separate thread. The \SC{debugger} implements \SC{processor tracer} interface, which only has one method --- \TT{statement}. The \SC{analyzer} calls the \TT{statement} method every time a next statement is about to be processed.
 
-This implementation makes it possible for the debugger to stop the analysis using a conditional variable. When it sees fit (e.g. when a breakpoint was hit), the debugger can put the thread to sleep and wait for further user interaction. At the same time, it notifies the language server through debug event consumer interface that the analyzer has stopped.
+This implementation makes it possible for the \SC{debugger} to stop the analysis using a conditional variable. When it sees fit (e.g. when a breakpoint was hit), the \SC{debugger} can put the thread to sleep and wait for further user interaction. At the same time, it notifies the language server through \SC{debug event consumer} interface that the analysis has stopped.
 
 There are three important structures in the DAP:
 \begin{itemize}
@@ -79,6 +79,6 @@ There are three important structures in the DAP:
 	\label{dap_nested_variables}
 \end{listing}
 
-While the thread is stopped, the editor sends requests to display information about the current context. It is the debugger's responsibility to extract a list of stack frames from the context, return a list of scopes for each stack frame and a list of variables for each scope. It does not have to deal with the complexity of different types of set symbols and macro parameters, which is done by the implementations of the variable interface.
+While the thread is stopped, the editor sends requests to display information about the current context. It is the \SC{debugger's} responsibility to extract a list of stack frames from the context, return a list of scopes for each stack frame and a list of variables for each scope. It does not have to deal with the complexity of different types of set symbols and macro parameters, which is done by the implementations of the \SC{variable} interface.
 
 
