@@ -1,6 +1,6 @@
 \section{Processing manager}
 
-Processing manager is the major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and assigns it to the correct processor. It contains components responsible for instruction interpretation as well as instruction format validation (see \cref{fig06:proc_mngr}). 
+Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and assigns it to the correct processor. It contains components responsible for instruction interpretation as well as instruction format validation (see \cref{fig06:proc_mngr}). 
 
 \begin{figure}
 	\centering
@@ -34,7 +34,7 @@ Let us enumerate the main components that are used in the processing manager:
 
 \subsection{The main loop}
 
-The main processing loop works with the current processor and provider. In the loop body, as the names suggests, statement provider provides next statement for statement processor that processes it accordingly. The loop breaks when the last processor finishes work.
+The main processing loop works with the current processor and provider. In the loop body, statement provider provides next statement for statement processor that processes it accordingly. The loop breaks when the last processor finishes work.
 
 When provider or processor finishes its work, it is replaced with another. The following rules apply:
 
@@ -59,7 +59,7 @@ In processing manager's array, statement processors can not be statically organi
 
 \subsubsection{Copy and Macro definition Processors}
 
-Both of these statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction is encountered in the source code or in the macro definition. 
+Both of these statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction or macro definition is encountered in the source code. 
 
 The statements collected inside copy or macro definitions are mainly deferred statements. That is because HLASM allows instruction aliasing. Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.
 
@@ -85,7 +85,7 @@ It is also passed \emph{processing tracer} by the manager. Each time a statement
 
 During their work, any processor can encounter statement that requires the processor to change (e.g. encountering special instruction or non previously defined sequence symbol, see \cref{tab06:processor_change}). Therefore, they use \emph{processing state listener} interface (implemented by processing manager) that tells the manager to change the current processor.
 
-If we look at the \cref{tab06:processor_change}, we can see that it does not have a field that starts Opencode processor. That is because this processor is set as a default by the manager. The next thing we can see is that Copy processor does not finish itself during its work as it can only be finished by its terminal condition (see \cref{tab06:term_cond}). 
+In the \cref{tab06:processor_change}, we can see that it does not have a field that starts Opencode processor. That is because this processor is set as a default by the manager. Further, Copy processor does not finish itself during its work as it can only be finished by its terminal condition (see \cref{tab06:term_cond}). 
 
 \begin{table}
 	\centering
@@ -103,7 +103,7 @@ If we look at the \cref{tab06:processor_change}, we can see that it does not hav
 \subsection{Statement Providers}
 \label{lab06:sect_prov}
 
-In contrary to statement processors, statement providers are stored in the array based on the priority (lower index, greater priority):
+In contrary to statement processors, statement providers are stored in the array based on their priority (lower index, greater priority):
 
 \begin{enumerate}
 	\item Macro definition statement provider
@@ -131,13 +131,13 @@ For the main loop to be correctly defined, opencode provider's end triggers term
 \subsubsection{Statement passing}
 \label{lab06:proc_stat}
 
-In HLASM language, it is difficult to parse statements into one common structure due to major differences in operand field of different instruction formats. Moreover, when parsing statements, the instruction format is not yet known due to aliasing. Therefore, operand fields are stored as strings. This means that --- during statement passing when instruction format is deduced --- provider has responsibility to produce correct statement format. The following rules apply (also see \cref{fig06:process_next}):
+In HLASM language, it is difficult to parse statements into one common structure due to major differences in operand field of different instruction formats. Moreover, when parsing statements, the instruction format is not yet known due to aliasing. Therefore, operand fields are stored as strings. This means that during statement passing when instruction format is deduced, the provider has responsibility to produce correct statement format. The following rules apply (also see \cref{fig06:process_next}):
 
 \begin{enumerate}
 	\item Provider retrieves the instruction field part of the statement.
 	\item Provider calls processor's \texttt{get\_processing\_status} method with instruction field as a parameter.
 	\item Return value of the call determines the required format of the operand field for the processor.
-	\item With the return value, provider passes correct statement format to the processor. 
+	\item Provider returns correct statement format to the processor. 
 \end{enumerate}
 
 \begin{figure}
@@ -150,13 +150,13 @@ In HLASM language, it is difficult to parse statements into one common structure
 
 \subsubsection{Copy and Macro definition Provider}
 
-These providers are activated when COPY instruction copies a file into the source code or when a macro is visited, respectively. They provide a sequence of statements to an arbitrary processor until all statements from the copy or macro definition are provided. Then, if there is no nested invocation, provider with lower priority is selected.
+These providers are activated when COPY instruction copies a file into the source code or when a macro is visited, respectively. They provide a sequence of statements to an arbitrary processor until all statements from the copy or macro definition are provided. After that, if there is no nested invocation, a provider with lower priority is selected.
 
 \subsubsection{Opencode Provider}
 
 Opencode provider is active as long as there are statements in the source file. It retrieves statements from the source code with help of lexer and parser (see \cref{lab06:parser}).
 
-\subsection{Manager's initial state}
+\subsection{Initial state of manager}
 \label{lab06:lib_data}
 Having described processors and providers, we are ready to talk about which of them are initialized by the manager at the beginning of the processing. The manager determines this from library data passed by analyzer.
 
