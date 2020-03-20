@@ -34,17 +34,6 @@ This pipeline in ANTLR 4 is broken into following classes:
 	\caption{ANTLR 4 pipeline overview. Taken from \cite{parr2013definitive}.}
 \end{figure}
 
-\subsection{Naming convention}
-ANTLR 4 uses Java naming convention. In our code, we follow our own naming convention:
-
-\begin{description}
-	\item[small\_with\_underscore] namespaces, classes, structs, functions and local variables,
-	\item[small\_with\_underscore\_finished\_by\_underscore\_] private variables,
-	\item[CamelCase] template arguments.
-\end{description} 
-
-When implementing ANTLR 4 classes, we prevail consistent with the naming convention adopted in our project. As a perk, the overridden functions are better visible in code.
-
 \section{Visitor}
 
 We employ ANTLR \emph{visitor} feature during evaluation of CA expressions (see \cref{lab06:expr}). 
@@ -147,7 +136,7 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 \section{Parser}
 \label{lab06:parser}
 
-Parser component takes the lexer produced tokens from token stream and recognizes HLASM statements. To accomplish this, a parser generator tool ANTLR 4 \footnote{\url{https://www.antlr.org}} is used.
+Parser component takes the tokens produced by lexer from token stream and recognizes HLASM statements.
 
 \subsection{ANTLR overview}
 
@@ -199,8 +188,8 @@ Each operand format has corresponding \emph{operand structure}. They all inherit
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{img/operand_arch}
-	\label{fig06:operand_arch}
 	\caption{Operand structure inheritance.}
+	\label{fig06:operand_arch}
 \end{figure}
 
 \subsection{Grammar rules}

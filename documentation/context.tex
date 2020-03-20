@@ -64,7 +64,7 @@ When copy is visited, copy member invocation is created and pushed in the copy s
 
 This stacks are responsible for the nests of opened files (source stack) and what they are opened for (processing stack). As the relation of source entry and processing entry is one-to-many, the information is stored in two arrays rather than one.
 
-When an statement processor (see \cref{lab06:sect_proc}) change (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. When --- during this change --- new file is opened then source stack is updated as well.
+When statement processor (see \cref{lab06:sect_proc}) is changed (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. If a new file is opened during this change then source stack is updated as well.
 
 Source stack contains:
 \begin{itemize}
@@ -143,7 +143,7 @@ Section is a structure representing HLASM section (created by CSECT, DSECT, ...)
 
 This structure contains data and operations for one location counter. The data is stored in helper sub-structure \emph{location counter data}.
 
-\paragraph*{Location counter data} is structure defining current value of the location counter. It consist of:
+\paragraph*{Location counter data} is a structure defining current value of the location counter. It consists of:
 \begin{itemize}
 	\item \emph{Storage} stating total number of bytes occupied by the location counter.
 	\item Vector of \emph{spaces}, block of bytes with yet not known length.
@@ -151,11 +151,11 @@ This structure contains data and operations for one location counter. The data i
 	\item Currently valid \emph{alignment} (used when data contain spaces).
 \end{itemize}
 
-The location counter value is transformable into relocatable value. Structure that represents it is called \emph{address}.
+The location counter value is transformable into a relocatable value. It is represented by structure \emph{address}.
 
 \paragraph*{Address} consists of:
 \begin{itemize}
-	\item Array of \emph{bases}. Base is a beginning of a corresponding section. They serve as points of reference for the address.
+	\item Array of \emph{bases}. A base is a beginning of a corresponding section. They serve as points of reference for the address.
 	\item Array of \emph{spaces} that are present in the address. 
 	\item \emph{Offset} from the bases.
 \end{itemize}
@@ -186,7 +186,7 @@ When a space length becomes known, all addresses containing the spaces need to b
 
 \vspace{0.5cm}
 
-ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG  can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
+ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
 
 \subsubsection{Symbol dependency tables}
 \label{symbol_dependency_tables}
@@ -212,11 +212,11 @@ Having described building blocks, we can move to the symbol dependency tables co
 
 \paragraph*{Dependency map} is the primary storage of dependencies. It has \emph{dependants} as keys and \emph{resolvables} as values. The semantics for pair \emph{(D,R)} is that D is dependent on the dependencies from R. Each time new dependency is added, this map is searched for cycle.
 
-\paragraph*{Dependency sources map} serves as a source objects storage of a resolvables in the dependency map. Hence for the pair \emph{(D,R)} form dependency map, source object of \emph{R} is in the dependency source map under the key \emph{D}. 
+\paragraph*{Dependency sources map} serves as a source objects storage of a resolvable in the dependency map. Hence for the pair \emph{(D,R)} from dependency map, source object of \emph{R} is in the dependency source map under the key \emph{D}. 
 
-Those source objects are statements. To be more specific, as one statement can be a source for more distinct resolvables, this source map only stores pointers to the \emph{postponed statements storage}.
+The source objects are statements. To be more specific, as one statement can be a source for more distinct resolvables, this source map only stores pointers to the \emph{postponed statements storage}.
 
-\paragraph*{Postponed statements storage} holds statements that are sources of resolvables in dependency map. The reason they are stored is that --- as they contain dependencies --- they can not be checked yet. Therefore, they are postponed in the storage until all of the dependencies are resolved. Then they are passed to the respective checker.
+\paragraph*{Postponed statements storage} holds statements that are sources of resolvables in dependency map. The reason they are stored is that they can not be checked yet as they contain dependencies. Therefore, they are postponed in the storage until all of the dependencies are resolved. Then they are passed to the respective checker.
 
 
 
