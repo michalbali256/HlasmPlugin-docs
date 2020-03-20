@@ -1,6 +1,6 @@
 \chapter {Analyzer}
 
-Analyzer's role is to provide a facade over objects and methods that compose this component and provide a simple interface for processing --- analyzing --- a single HLASM source file. The output of the analysis is data for LSP server.
+Analyzer's role is to provide a facade over objects and methods to create a simple interface for processing --- analyzing --- a single HLASM source file. The output of the analysis is data for LSP server.
 
 \section{Overview}
 
@@ -15,9 +15,11 @@ Analyzer is composed of several sub-components, all required to properly process
 \begin{itemize}
 	\item \emph{LSP data collector} collects and retieves all LSP information created while processing the file.
 	\item \emph{HLASM context tables} hold information about the context of processed HLASM source code.
-	\item Analyzer contains several \emph{Lexer - Parser sub-components} to simplify the interface and ease the use of this component.
+	\item Analyzer contains several \emph{Lexer - Parser sub-components} to simplify the processing interface and ease the use of this component.
 	\item \emph{Processing manager} executes the main loop where file is processed.
 \end{itemize}
+
+LSP data collector is required by Lexer-Parser sub-components that are required by processing manager. HLASM context tables are used by the manager and the sub-components as well.
 
 \subsection{Construction}
 

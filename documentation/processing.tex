@@ -1,6 +1,6 @@
 \section{Processing manager}
 
-Processing manager is the major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and assigns it to the correct processor. It contains components responsible for instruction interpretation as well as instruction format validation (see \cref{fig06:proc_mngr}). 
+Processing manager is the major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
 \begin{figure}
 	\centering
@@ -11,7 +11,9 @@ Processing manager is the major component in the processing of a HLASM source fi
 
 \subsection{Overview}
 
-To construct processing manager, analyzer passes following objects to the constructor:
+As the processing of the HLASM source file is rather complicated, we define a \emph{statement provider} (see \cref{lab06:sect_prov}) for each different source of statements and a \emph{statement processor} (see \cref{lab06:sect_proc}) for each different manner of statement processing. To lighten functionality of processors, we define \emph{Instruction Processors} (see \cref{lab06:instr_proc}). They focus on different kinds of instructions rather than whole statements. With addition to that, instruction processors use \emph{Instruction format validators}  (see \cref{checker}) that check correct use of the instruction format (see \cref{fig06:proc_mngr}).
+
+Following objects passed by analyzer serve as an input for the processing manager:
 \begin{itemize}
 	\item \emph{Parser} that provides statements from the processed file. Further on in this chapter, we will refer to the parser as to the \emph{Opencode statement provider}.
 	\item \emph{HLASM context tables} that hold current state of the parsed code.
@@ -22,55 +24,49 @@ To construct processing manager, analyzer passes following objects to the constr
 	\item \emph{Processing tracer} for tracing processed statements (see \cref{chap:macro_tracer}).
 \end{itemize}
 
-As the processing of the HLASM source file is rather complicated, we define a \emph{statement provider} for each different source of statements and a \emph{statement processor} for each different manner of statement processing. Therefore, processing manager contains two arrays, each consisting of different instance of statement processor and statement provider respectively.  Also, it has notion of the processor/provider that is in the current use and implement interfaces that swap them.
-
-Let us enumerate the main components that are used in the processing manager:
-\begin{itemize}
-	\item \emph{Statement Provider} (see \cref{lab06:sect_prov})
-	\item \emph{Statement Processor} (see \cref{lab06:sect_proc})
-	\item \emph{Instruction Processor} (see \cref{lab06:instr_proc})
-	\item \emph{Instruction Format Validators} (see \cref{checker})
-\end{itemize}
-
-\subsection{The main loop}
-
-The main processing loop works with the current processor and provider. In the loop body, as the names suggests, statement provider provides next statement for statement processor that processes it accordingly. The loop breaks when the last processor finishes work.
-
-When provider or processor finishes its work, it is replaced with another. The following rules apply:
-
-\begin{enumerate}
-	\item When a processor finishes its work, the next processor is selected from the array.
-	\item When a provider finishes --- before the next provider is selected from the array --- manager checks whether it triggers the termination of the current processor as well (next referred as \emph{terminal condition}). If true, perform rule 1.
-\end{enumerate}
-
-\subsection{Statement}
-
-Statement consists of \emph{statement fields} --- \emph{label field}, \emph{instruction field}, \emph{operands field}, \emph{remark field}. It is used by statement processors and produced by statement providers. 
-
-The abstract class \emph{HLASM statement} is the ancestor for all statement related classes. Then, there are abstract classes \emph{deferred statement} and \emph{resolved statement}. Deferred statement states that operand field is stored in the string format as its specific format is not yet known. Resolved statements are complementary to the deferred statements. Concrete implementation of these statements are used throughout the processing.
-
-\subsection{Statement Processors}
+\subsection{Statement Processor}
 \label{lab06:sect_proc}
+
 
 The motivation in distinguishing different statement processors was the complexity of HLASM language. There are many cases when the same statements require different processing under different circumstances (e.g. COPY instruction in macro is handled differently than in opencode, or lookahead mode can accept statements that would fail when processed by ordinary processing).
 
-In processing manager's array, statement processors can not be statically organized and do not have priorities. Rather, they are being dynamically assigned to the manager's array when needed and removed from it when they finish.
+During processing, kinds of statement processing can be nested. Hence, they are dynamically assigned to the manager when needed and removed from it when they finish.
+
+\subsubsection{Statement}
+
+Statement consists of \emph{statement fields} --- \emph{label field}, \emph{instruction field}, \emph{operands field}, \emph{remark field}. It is used by statement processors and produced by statement providers. 
+
+The abstract class \emph{HLASM statement} is the ancestor for all statement related classes. Then, there are abstract classes \emph{deferred statement} and \emph{resolved statement}. Deferred statement has its operand field stored in uresolved --- deferred --- format (in code stored as string). This statement is created when actual instruction is not yet known prior to the statement creation (see \cref{lst:def_stmt}). Resolved statements are complementary to the deferred statements as their instruction --- as well as operand format --- is known prior to the statement creation.
+
+\begin{listing}[t]
+	\begin{verbatim}
+*VALUE OF INSTRUCTION IN DEFERRED STATEMENT IS PARAMETER OF MACRO MAC
+     MACRO
+     MAC      &INSTR
+     &INSTR   3(2,0),13      < DEFERRED STATEMENT
+     MEND
+	\end{verbatim}
+	\caption{An example of deferred statement in code.}
+	\label{lst:def_stmt}
+\end{listing}
+
+
 
 
 \subsubsection{Copy and Macro definition Processors}
 
 Both of these statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction is encountered in the source code or in the macro definition. 
 
-The statements collected inside copy or macro definitions are mainly deferred statements. That is because HLASM allows instruction aliasing. Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.
+The statements collected inside copy or macro definitions are mainly deferred statements. That is because variable symbols can not be resolved inside the definition and because HLASM allows instruction aliasing. Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.
 
-However, some statements in the macro and copy definitions forbid aliasing and the operand format can be deduced immediately (e.g. conditional assembly instructions in macro definition). This leads to the processor's necessity to ask the provider to retrieve the statement with correct format -- accordingly to the deduced one based on the provided instruction  (see \cref{lab06:proc_stat}).
+However, some statements in the macro and copy definitions forbid aliasing and the operand format can be deduced immediately (e.g. conditional assembly instructions in macro definition). This leads to the processors necessity to ask the provider to retrieve the statement with correct format -- accordingly to the deduced one based on the provided instruction  (see \cref{lab06:proc_stat}).
 
 \subsubsection{Lookahead Processor}
 \label{lab06:look}
 
-Lookahead processor is activated when currently processed conditional assembly statement requires a value of undefined ordinary or sequence symbol. It looks through the following statements and finishes when the target symbol is found or when all statement providers are exhausted.
+Lookahead processor is activated when currently processed conditional assembly statement requires a value of undefined ordinary or sequence symbol. It looks through the following statements and finishes when the target symbol is found or when all statement providers finish.
 
-\subsubsection{Opencode Processors}
+\subsubsection{Opencode Processor}
 \label{ord_proc}
 Opencode processors (in code described as Ordinary processor) usage can be described in the following points:
 \begin{enumerate}
@@ -85,7 +81,9 @@ It is also passed \emph{processing tracer} by the manager. Each time a statement
 
 During their work, any processor can encounter statement that requires the processor to change (e.g. encountering special instruction or non previously defined sequence symbol, see \cref{tab06:processor_change}). Therefore, they use \emph{processing state listener} interface (implemented by processing manager) that tells the manager to change the current processor.
 
-If we look at the \cref{tab06:processor_change}, we can see that it does not have a field that starts Opencode processor. That is because this processor is set as a default by the manager. The next thing we can see is that Copy processor does not finish itself during its work as it can only be finished by its terminal condition (see \cref{tab06:term_cond}). 
+If we look at the \cref{tab06:processor_change}, we can see that it does not have a field that starts Opencode processor. That is because this processor is set as a default by the manager. The next thing we can see is that Copy processor does not finish itself during its work as it can only be finished by its \emph{terminal condition} (see \cref{tab06:term_cond}). 
+
+Terminal condition can be triggered by a finishing provider. It indicates that the processor needs to finish its work when a specific provider exhausted its statement stream.
 
 \begin{table}
 	\centering
@@ -100,10 +98,10 @@ If we look at the \cref{tab06:processor_change}, we can see that it does not hav
 	\label{tab06:processor_change}
 \end{table}
 
-\subsection{Statement Providers}
+\subsection{Statement Provider}
 \label{lab06:sect_prov}
 
-In contrary to statement processors, statement providers are stored in the array based on the priority (lower index, greater priority):
+In contrary to statement processors, statement providers are ordered based on the priority (lower index, greater priority):
 
 \begin{enumerate}
 	\item Macro definition statement provider
@@ -111,16 +109,16 @@ In contrary to statement processors, statement providers are stored in the array
 	\item Opencode statement provider
 \end{enumerate}
 
-Based on the priority, each cycle of the processor's main loop, providers are asked for statements to provide. That is because after each cycle, a provider with greater priority than the current one can be activated. 
+In each iteration of processing manager (see \cref{lab06:mngr_loop}), providers are asked whether they have statements to provide based on the ordering. That is because after each iteration, a provider with greater priority than the previously used one can be activated. 
 
 \begin{table}
 	\centering
-	\begin{tabular}{lccc}
-		                   & \thead{\textbf{Macro provider} \\ \textbf{ends}} & \thead{\textbf{Copy provider} \\ \textbf{ends}} & \thead{\textbf{Opencode provider} \\ \textbf{ends}} \\ \toprule
-		\textbf{Opencode}  &                                                  &                                                 &                     finish self                     \\
-		\textbf{Copy}      &                                                  &                                                 &                     finish self                     \\
-		\textbf{Macro}     &                   finish self                    &                                                 &                     finish self                     \\
-		\textbf{Lookahead} &                   finish self                    &                                                 &                     finish self                     \\ \bottomrule
+	\begin{tabular}{l|ccc}
+		\textbf{Processors} & \thead{\textbf{Macro provider} \\ \textbf{ends}} & \thead{\textbf{Copy provider} \\ \textbf{ends}} & \thead{\textbf{Opencode provider} \\ \textbf{ends}} \\ \toprule
+		\textbf{Opencode}   &                                                  &                                                 &                     finish self                     \\
+		\textbf{Copy}       &                                                  &                                                 &                     finish self                     \\
+		\textbf{Macro}      &                   finish self                    &                                                 &                     finish self                     \\
+		\textbf{Lookahead}  &                   finish self                    &                                                 &                     finish self                     \\ \bottomrule
 	\end{tabular}
 	\caption{Description of statement processors' terminal condition.}
 	\label{tab06:term_cond}
@@ -131,7 +129,7 @@ For the main loop to be correctly defined, opencode provider's end triggers term
 \subsubsection{Statement passing}
 \label{lab06:proc_stat}
 
-In HLASM language, it is difficult to parse statements into one common structure due to major differences in operand field of different instruction formats. Moreover, when parsing statements, the instruction format is not yet known due to aliasing. Therefore, operand fields are stored as strings. This means that --- during statement passing when instruction format is deduced --- provider has responsibility to produce correct statement format. The following rules apply (also see \cref{fig06:process_next}):
+In HLASM language, it is difficult to parse statements into one common structure due to major differences in operand field of different instruction formats. Moreover, when parsing statements, the instruction format can be yet unknown. Therefore, operand fields are stored as strings. This means that --- during statement passing when instruction format is deduced --- provider has responsibility to produce correct statement format. The following steps are applied in the statement passing (also see \cref{fig06:process_next}):
 
 \begin{enumerate}
 	\item Provider retrieves the instruction field part of the statement.
@@ -156,11 +154,25 @@ These providers are activated when COPY instruction copies a file into the sourc
 
 Opencode provider is active as long as there are statements in the source file. It retrieves statements from the source code with help of lexer and parser (see \cref{lab06:parser}).
 
-\subsection{Manager's initial state}
+\subsection{The main loop}
+\label{lab06:mngr_loop}
+
+Processing manager contains two arrays, each consisting of different instance of statement processor and statement provider respectively.  Also, it has notion of the processor/provider that is in the current use and implement interfaces that swap them.
+
+The main processing loop works with the current processor and provider. In the loop body, as the names suggests, statement provider provides next statement for statement processor that processes it accordingly. The loop breaks when the last processor finishes work.
+
+When provider or processor finishes its work, it is replaced with another. The following rules apply:
+
+\begin{enumerate}
+	\item When a processor finishes its work, the next processor is selected from the array.
+	\item When a provider finishes --- before the next provider is selected from the array --- manager checks whether it triggers the termination of the current processor as well (\emph{terminal condition}). If true, perform rule 1.
+\end{enumerate}
+
+\subsection{The initial state}
 \label{lab06:lib_data}
 Having described processors and providers, we are ready to talk about which of them are initialized by the manager at the beginning of the processing. The manager determines this from library data passed by analyzer.
 
-Library data contain a file name and enumeration telling the meaning of the file that is being parsed --- \emph{processing kind}.
+Library data contain a file name and enumeration indicating kind of the file that is being parsed --- \emph{processing kind}.
 
 \emph{Ordinary} processing kind states that the file being processed is the main source file (in HLASM called open-code). It is the first file to be processed. With this information, manager initializes all statement providers in respective order and \emph{only} opencode processor. This enumeration is passed when analyzer has owner semantics.
 
@@ -181,9 +193,9 @@ Another use of field parser is in opencode processor as model statements are res
 
 Used by ordinary processor, instruction processors are helper classes that divide processing of HLASM instruction types.
 
-As format of some instruction kinds can be rather complicated, instruction processors contain \emph{Instruction format validators} (see \cref{checker}). They check the statement to validate correctness of used operand format.
+As format of some instruction kinds can be rather complicated, instruction processors contain \emph{Instruction format validators} (see \cref{checker}). They check the statement to validate the correctness of used operand format as well as the correctness of the actual operand values.
 
-During the work of the processors, they encounter \emph{expression} structures (see \cref{ca_expr:logic}, \cref{mach_expr}). Expressions need to be evaluated for processing to be correctly finished.
+During the instruction processing, processors encounter HLASM \emph{expressions} (see \cref{ca_expr:logic}, \cref{mach_expr}). They need to be evaluated to correctly perform the processing.
 
 There are four specialized instruction processors:
 \paragraph*{Macro IP} looks up for macro definition in HLASM context tables and calls it.
@@ -200,7 +212,7 @@ See the current list of processed instruction in \cref{tab06:instr_proc}.
 	\begin{tabular}{lr}
 		\textbf{IP}                   &                  \textbf{Processed instructions} \\ \toprule
 		\textbf{Assembler}            & *SECT, COM, LOCTR, EQU, DC, DS, COPY, EXTRN, ORG \\
-		\textbf{Machine}              &                                      \emph{NONE} \\
+		\textbf{Machine}              &        \emph{Instruction format validation only} \\
 		\textbf{Macro}                &                                       \emph{ANY} \\
 		\textbf{Conditional Assembly} &    SET*, GBL*, ANOP, ACTR, AGO, AIF, MACRO, MEND \\ \bottomrule
 	\end{tabular}
