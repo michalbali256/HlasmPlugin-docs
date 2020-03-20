@@ -208,28 +208,23 @@ See the current list of processed instruction in \cref{tab06:instr_proc}.
 	\label{tab06:instr_proc}
 \end{table}
 
+HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) and \emph{Machine} expressions. CA expressions appear in conditional assembly, which is processed during compilation. Machine expressions are used with assembler and machine instructions.
+
 \subsubsection{CA Expressions}
 \label{ca_expr:logic}
-
-HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) and \emph{Assembler} (ASM) expressions. CA expressions appear in conditional assembly, which is processed during compilation and has a significant impact on the final generated assembly.
-On the other hand, assembler instructions are the actual instructions that the processor executes.
-
-In this section, we first describe CA expressions following with ASM instructions.
-
-
 
 HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
 
 We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
 
-In this paragraph, we address the representation and functionality of the expressions themselves. Coupling the expressions with grammar and their evaluation in context is further discussed in \cref{ca_expr:eval}.
+In this section, we address the representation and functionality of the expressions themselves. Coupling the expressions with grammar and their evaluation in context is further discussed in \cref{ca_expr:eval}.
 
-Each HLASM CA expression has a type. Supported are \emph{arithmetic}, \emph{logic}, \emph{character} expressions. We implement the logic in following classes:
+Each HLASM CA expression has a type. \emph{Arithmetic}, \emph{logic} and \emph{character} expressions are supported. We implement the logic in the following classes:
 
 \begin{description}
-	\item[\texttt{diagnostic\_op}] Fundamental is the concept of \emph{diagnostics}. During the evaluation of an expression, an error can occur (syntactic or semantic). Hence, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors and propagates the error upwards. Checking and propagating of error is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before the creation of new expression during evaluation. For an example see \cref{ca_expr:example}. 
+	\item[\texttt{expression}] A pure virtual class that defines a shared interface, operators, and functions. The class also implements evaluation logic for terms and factors. 
 	
-	\item[\texttt{expression}] Pure virtual class. It defines the shared interface, operators, and functions. The class also implements evaluation logic for terms and factors. 
+	\item[\texttt{diagnostic\_op}] Fundamental is the concept of \emph{diagnostics}. During the evaluation of an expression, an error can occur (syntactic or semantic). Hence, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors and propagates the error upwards. Checking and propagating of error is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before the creation of new expression during evaluation. For an example see \cref{ca_expr:example}. 
 	
 	The \texttt{expression} class implements the evaluation as follows:
 	A \texttt{std::deque} of \texttt{expression} pointers (see  \cref{ca_expr:example}) is passed. The evaluation iterates the list from left to right.  Functions, binary, and unary operators consume the rest of the deque.
@@ -238,7 +233,7 @@ Each HLASM CA expression has a type. Supported are \emph{arithmetic}, \emph{logi
 	
 	\item[\texttt{keyword\_expression}] Helper class that represents HLASM keywords in expressions. It can decide for a string whether it is a known keyword if its unary or binary operation and what priority it has.
 	
-	\item[\texttt{logic\_expression}] Represents a logic expression. Note, logic, and arithmetic expression have some common functions, but their behavior differs. 
+	\item[\texttt{logic\_expression}] Represents a logic expression. Logic and arithmetic expression have some common functions, but their behavior differs. 
 	
 	\item[\texttt{arithmetic\_expression}] Represents an arithmetic expression.
 	
@@ -284,9 +279,9 @@ The \texttt{expression\_evaluator} encapsulates the coupling logic between the g
 
 The top-level expression first gathers a list of space-separated expressions. We gather this list because a token may be a keyword (such as \texttt{AND} operator) or variable identifier, depending on a position in an expression (using language keywords as identifiers is allowed in HLASM). \texttt{expression::evaluate} provides the disambiguation (see \cref{ca_expr:logic}). 
 
-Evaluator substitutes grammar rules with variable and ordinary symbols for their values and retrieves structure that holds real value of the expression. To know which values to substitute, evaluator is given \emph{evaluation context}. It consists of objects that are required for correct evaluation. It is \emph{HLASM context} for symbol values, \emph{attribute provider} for values of symbol attributes that are not yet defined and \emph{library provider} for evaluation of some types of symbol attributes as well.
+Evaluator substitutes grammar rules with variable and ordinary symbols for their values and retrieves structure that holds real value of the expression. To know which values to substitute, evaluator is given \emph{evaluation context}. It consists of objects that are required for correct evaluation: \emph{HLASM context} for symbol values, \emph{attribute provider} for values of symbol attributes that are not yet defined and \emph{library provider} for evaluation of some types of symbol attributes as well.
 
-In conditional assembly expressions --- when visiting yet not defined ordinary symbol --- lookahead is triggered (see \cref{lab06:look}). As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks expression for all the undefined symbol references and collects them to a common collection. Then, lookahead is triggered with requirement of looking for all references of the collection. Hence, it is triggered once each expresssion rather than any time undefined symbol reference is found. 
+Lookahead (see \cref{lab06:look}) is triggered in conditional assembly expressions, when visiting has not defined an ordinary symbol yet. As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks for all the undefined symbol references in expression and collects them to a common collection. Then, the lookahead is triggered to look for all references of the collection. Hence, it is triggered once per expression rather than any time an undefined symbol reference is found. 
 
 \subsubsection{Machine expressions}
 \label{mach_expr}
