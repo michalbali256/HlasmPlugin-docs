@@ -1,6 +1,7 @@
 
 
 \section{Usage of ANTLR 4}
+\label{antlr}
 We have based part of our Analyzer on ANTLR 4 parser generator. ANLTR 4 implements Adaptive $LL(*)$ \cite{parr2014adaptive} parsing strategy.
 
 \subsection{Adaptive $LL(*)$ parsing strategy}
@@ -34,7 +35,11 @@ This pipeline in ANTLR 4 is broken into following classes:
 	\caption{ANTLR 4 pipeline overview. Taken from \cite{parr2013definitive}.}
 \end{figure}
 
-\section{Visitor}
+\subsection{Parse-Tree walking}
+
+We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
+
+\subsection{Visitor}
 
 We employ ANTLR \emph{visitor} feature during evaluation of CA expressions (see \cref{lab06:expr}). 
 

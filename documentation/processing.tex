@@ -227,21 +227,29 @@ HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) 
 
 HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
 
-We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
+We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. For further detail on ANTLR, refer to \cref{antlr}.
 
 In this section, we address the representation and functionality of the expressions themselves. Coupling the expressions with grammar and their evaluation in context is further discussed in \cref{ca_expr:eval}.
 
-Each HLASM CA expression has a type. \emph{Arithmetic}, \emph{logic} and \emph{character} expressions are supported. We implement the logic in the following classes:
+HLASM CA expression is conceptually similar to the expressions in other languages: they support unary and binary operators, functions, variables and literals. Evaluation of expressions is further reviewed in \cref{ca_expr:eval}. In HLASM, each expression has a type. Supported are:
+
+\begin{itemize}
+	\item  \emph{Arithmetic},
+	\item  \emph{Logic},
+	\item  \emph{Character}
+\end{itemize}
+
+expressions. We implement the logic in the following classes:
 
 \begin{description}
 	\item[\texttt{expression}] A pure virtual class that defines a shared interface, operators, and functions. The class also implements evaluation logic for terms and factors. 
 	
-	\item[\texttt{diagnostic\_op}] Fundamental is the concept of \emph{diagnostics}. During the evaluation of an expression, an error can occur (syntactic or semantic). Hence, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors and propagates the error upwards. Checking and propagating of error is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before the creation of new expression during evaluation. For an example see \cref{ca_expr:example}. 
+	\item[\texttt{diagnostic\_op}] Fundamental is the concept of \emph{diagnostics}. During the evaluation of an expression, an error can occur (syntactic or semantic). Hence, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors and propagates the error upwards. Checking and propagating of error is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before the creation of new expression during evaluation.
 	
 	The \texttt{expression} class implements the evaluation as follows:
-	A \texttt{std::deque} of \texttt{expression} pointers (see  \cref{ca_expr:example}) is passed. The evaluation iterates the list from left to right.  Functions, binary, and unary operators consume the rest of the deque.
+	A \texttt{std::deque} of \texttt{expression} pointers is passed. The evaluation iterates the list from left to right.  Functions, binary, and unary operators consume the rest of the deque.
 	
-	Some expression symbols can be either HLASM keywords or variable identifiers. Therefore, the resolution of symbols is complicated and cannot be done straight, but instead during the evaluation-time. The order of the expression's terms and previous evaluation context is crucial for the disambiguation. 
+	Some expression symbols can be either HLASM keywords or variable identifiers (see example in \cref{lst:example_ca_expr}). Therefore, the resolution of symbols is complicated and cannot be done straight, but instead during the evaluation-time. The order of the expression's terms and previous evaluation context is crucial for the disambiguation. 
 	
 	\item[\texttt{keyword\_expression}] Helper class that represents HLASM keywords in expressions. It can decide for a string whether it is a known keyword if its unary or binary operation and what priority it has.
 	
@@ -253,12 +261,14 @@ Each HLASM CA expression has a type. \emph{Arithmetic}, \emph{logic} and \emph{c
 	
 	\item[\texttt{character\_expression}] Represents a character expression.
 	
-	\item[\texttt{ebcdic\_encoding}] This class defines a custom EBCDIC literal and provides helper functions for conversion between EBCDIC and ASCII. EBCDIC is a character encoding used in the IBM mainframe. It has a different layout than ASCII (see \cref{ca_expr:ebcdic}).
+	\item[\texttt{ebcdic\_encoding}] This class defines a custom EBCDIC literal and provides helper functions for conversion between EBCDIC and ASCII. EBCDIC is a character encoding used in the IBM mainframe. It has a different layout than ASCII.
 	
 	\item[\texttt{error\_messages}] It is a static class with list of all \texttt{diagnostic\_op} generated from expressions.
 	
 	
 \end{description}
+
+\iffalse
 \begin{lstlisting}[label={ca_expr:example},language=C++,backgroundcolor=\color{cyan!10}, captionpos=b, caption=Defition of \texttt{copy\_return\_on\_error} macro and an example of its usage while evaluating unary expression \texttt{B2A("123")}. \texttt{this} is an \texttt{character\_expression} with value \texttt{"123"}.]
 #define copy_return_on_error(arg, type) \
 do \
@@ -274,13 +284,25 @@ copy_return_on_error(this, arithmetic_expression);
 return arithmetic_expression::from_string(value_, 2);
 
 \end{lstlisting}
-
 \begin{figure}
 	\centering
 	\includegraphics[height=13cm]{img/ebcdic}
 	\caption{EBCDIC layout. Taken from \url{https://i.stack.imgur.com/h3u5A.png}.}
 	\label{ca_expr:ebcdic}
 \end{figure}
+\fi
+
+\begin{listing}[t]
+	\begin{verbatim}
+    name        operation   operands
+	
+    AND         EQU         1
+    NOT         EQU         NOT 0
+                AIF         (NOT AND AND AND).LAB
+	\end{verbatim} 
+	\caption{An example of using keywords (\texttt{AND} and \texttt{NOT}) as variable names resulting in a valid expression (line 3).}
+	\label{lst:example_ca_expr}
+\end{listing}
 
 \subsubsection{CA expression evaluation}
 \label{ca_expr:eval}
@@ -289,7 +311,7 @@ In the previous section, we described the representation of the CA expressions t
 
 The \texttt{expression\_evaluator} encapsulates the coupling logic between the grammar and the expression logic. That is, the evaluator has a notion about grammar, which translates into C++ expression logic. At this point, it is essential for the reader to be familiar with the grammar (see \cref{parser:rules}).
 
-The top-level expression first gathers a list of space-separated expressions. We gather this list because a token may be a keyword (such as \texttt{AND} operator) or variable identifier, depending on a position in an expression (using language keywords as identifiers is allowed in HLASM). \texttt{expression::evaluate} provides the disambiguation (see \cref{ca_expr:logic}). 
+The top-level expression first gathers a list of space-separated expressions. The evaluation must be done using a list from left to right (not using a tree) as any token may be a keyword (such as \texttt{AND} operator) or variable identifier, depending on a position in an expression (using language keywords as identifiers is allowed in HLASM). For a better understanding, see \cref{lst:example_ca_expr}. \texttt{expression::evaluate} provides the disambiguation (see \cref{ca_expr:logic}). 
 
 Evaluator substitutes grammar rules with variable and ordinary symbols for their values and retrieves structure that holds real value of the expression. To know which values to substitute, evaluator is given \emph{evaluation context}. It consists of objects that are required for correct evaluation: \emph{HLASM context} for symbol values, \emph{attribute provider} for values of symbol attributes that are not yet defined and \emph{library provider} for evaluation of some types of symbol attributes as well.
 
