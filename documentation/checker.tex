@@ -1,8 +1,8 @@
 \section{Instruction validation}
 
-One of the most essential ways to provide results of the parsing to the user is through error messages. Many of these messages are created in \emph{Instruction checker} which validates the usage of different kinds of instructions.
+One of the essential ways to provide results of the parsing to the user is through error messages. Many of these messages are created in \emph{Instruction checker} which validates the usage of different kinds of instructions.
 
-Instruction checker is an abstract class for various types of instructions. Its \emph{check()} method is being called from the instruction processors~\ref{chap:process} to check whether the specific instruction is used with correct parameters. As assembler and machine instructions have incoherent formats, we derive separate \emph{assembler} and \emph{machine} checkers from the instruction checker. Note that CA instructions do not have a derived checker class as they are all being checked during their interpretation.
+Instruction checker is an abstract class for various types of instructions. Its \emph{check()} method is being called from the instruction processors~\ref{chap:process} to check whether the specific instruction is used with correct parameters. As assembler and machine instructions have incoherent formats, we derive separate \emph{assembler} and \emph{machine} checkers from the instruction checker. CA instructions do not have a derived checker class as they are all being checked during their interpretation.
 
 The checkers need an access to the definitions of all possible instructions. These instructions are stored statically inside an object called \emph{instruction}. It consists of 4 different containers:
 \begin{itemize}
