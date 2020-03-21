@@ -109,6 +109,10 @@ They inherit common abstract ancestor \emph{variable symbol}. SET symbols are fu
 
 \subsection{LSP context}
 
+The LSP context serves as the collection point for the data needed to answer the LSP requests. It is a part of the HLASM context to be able to pass on the LSP data between different parsed files.
+
+The LSP data collector stores its values inside the LSP context tables. More about the collection of the data and their values can be found in~\cref{lsp_data}.
+
 \subsection{Ordinary assembly context}
 
 The above described structures aimed to describe the high-level part of the language (code generation). As we move closer to the resulting object code of the source file, the describing structures get complicated. Therefore, HLASM context contains object storing just this part of the processing.
