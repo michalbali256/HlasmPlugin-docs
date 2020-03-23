@@ -1,16 +1,83 @@
-\chapter{How to build}
+\chapter{Build instructions}
 
-this is how we build it, other compilers may work but not guarenteed
+In this chapter, we describe how to build the project on different platforms. We only describe methods that we use and are guaranteed to work, but other platforms and versions may work as well.
 
-ENVIRONMENT
+The results of a build are:
+\begin{itemize}
+	\item executables \TT{library\_test} and  \TT{server\_test} that can be executed to test the build
+	\item a Visual Studio Code extension packed into a VSIX file
+\end{itemize}
+After the project has been built, the results can be found in bin subdirectory of the build folder.
+
+\section{Prerequisites}
+\label{prereq}
+In order to build the project on any platform, following software needs to be installed:
+
+\begin{itemize}
+	\item CMake 3.10 or higher
+	\item C++ compiler with support for C++17
+	\item Java Development Kit (JDK) 8 or higher 
+	\item Maven
+	\item Git 
+	\item npm
+\end{itemize}
+
+CMake is the build system we use, we use also the C++17 standard. JDK and Maven are needed because of ANTLR4, since we build it from source. Git is needed to download those sources. Npm handles the typescript part of our project.
+
 \section{Windows}
-MSVC, Visual Studio
+
+On windows, we use Visual Studio Community 2019. We also have VS configurations for building and testing the project in WSL.
+
+It is also possible to build the project from command line:
+\begin{verbatim}
+mkdir build && cd build
+cmake ../
+cmake --build .
+\end{verbatim}
+
 \section{Linux}
-clang-8 - libstd-8, libc++-8
-g++-8 - libstd
 
-\section{MacOS}
-clang++-8
+In addition to the prerequisites listed in \cref{prereq}, linux build has two more prerequisites:
 
-cmake build
-list of dependencies
+\begin{itemize}
+	\item pkg-config
+	\item UUID library
+\end{itemize}
+
+
+We build the project for Ubuntu 18.04 and for the Alpine linux.
+\subsection{Ubuntu}
+On Ubuntu 18.04 the following commands install all prerequisites and then build the project into \TT{build} folder:
+
+\begin{verbatim}
+apt update && sudo apt install cmake g++-8 uuid-dev npm default-jdk
+                       pkg-config maven
+mkdir build && cd build
+cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 ../
+cmake --build .
+\end{verbatim}
+
+
+\subsection{Alpine linux}
+
+The build works on Alpine linux version 3.10. The following commands install all prerequisites and then build the project into \TT{build} folder:
+\begin{verbatim}
+apk update && apk add linux-headers git g++ cmake util-linux-dev npm ninja
+                      pkgconfig openjdk8 maven
+mkdir build && cd build
+cmake ../
+cmake --build .
+\end{verbatim}
+
+
+\section{Mac OS}
+We have only built the project on MacOS 10.14. In order to successfully build, we require LLVM 8 (it can be installed by using homebrew).
+
+The project can be built with a snippet like this:
+\begin{verbatim}
+mkdir build && cd build
+cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+      -DLLVM_PATH=<path-to-llvm-installation> ../
+cmake --build .
+\end{verbatim}
+For instance, a possible path to LLVM is \TT{/usr/local/opt/llvm\@8}
