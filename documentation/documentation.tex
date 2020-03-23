@@ -32,6 +32,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{longtable}
+\usepackage{makecell}
 
 \usepackage{multirow}
 
@@ -65,19 +66,26 @@
 \tableofcontents
 
 %%% Each chapter is kept in a separate file
+
 \include{preface}
+\part{Project overview}
 \include{hlasm}
 \include{architecture}
+
+\part{Component description}
 \include{language_server}
 \include{workspace_manager}
 
-%\chapter{Analyzer}
 \include{analyzer_overview}
-\include{lexer_parser}
 \include{processing}
 \include{checker}
+\include{lexer_parser}
+\include{context}
 
 \include{macro_tracer}
 \include{extension}
 \include{build_guide}
+
+\bibliography{biblio} 
+\bibliographystyle{apalike}
 \end{document}
