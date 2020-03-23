@@ -31,8 +31,8 @@ This pipeline in ANTLR 4 is broken into following classes:
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=6cm]{img/antlr_pipeline}
-	\label{antlr_pipeline}
 	\caption{ANTLR 4 pipeline overview. Taken from \cite{parr2013definitive}.}
+	\label{antlr_pipeline}
 \end{figure}
 
 \subsection{Parse-Tree walking}
@@ -69,11 +69,11 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 
 \subsection{Architecture}
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\includegraphics{img/lexer_arch}
-	\label{lexer_arch}
-	\caption{Lexer architecture overview. Note, there are two \texttt{input\_source}s and there are many \texttt{token}s generated.}
+	\caption{Lexer architecture overview. Note, there are two \texttt{input\_source}s and there are many \texttt{token}s
+	\label{lexer_arch} generated.}
 \end{figure}
 
 Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
@@ -190,7 +190,7 @@ The statement processor can request parser to retrieve statements with this oper
 
 Each operand format has corresponding \emph{operand structure}. They all inherit abstract \TT{operand} and each have various children for different kinds of the operand format (see \cref{fig06:operand_arch}). Assembler and Machine operand structures inherit from \emph{Evaluable operand}. It is a common structure for operand objects that are composed of resolvable objects (see \cref{symbol_dependency_tables}).
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{img/operand_arch}
 	\caption{Operand structure inheritance.}

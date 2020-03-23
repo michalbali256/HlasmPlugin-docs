@@ -153,6 +153,7 @@ The language server communicates with the LSP client on a standard input and out
 
 The DAP communicates using TCP/IP, which is less straightforward. Before the VS Code extension starts the language server, it finds a free TCP port and passes it as an argument to the language server executable. The \SC{TCP handler} then starts listening on that port. Once the user wants to start the macro tracer, the DAP client connects to the port on localhost. The \SC{TCP handler} accepts the TCP client and creates a \SC{dispatcher} and a \SC{DAP server}. Once the DAP communication ends, both the \SC{dispatcher} and the \SC{DAP server} are destroyed and the \SC{TCP handler} starts listening again for the next DAP session. Thanks to the ASIO library implementation of the std::iostream interface, the dispatcher is able to completely abstract from the fact that it is communicating through TCP and not through a standard IO.
 
+\afterpage{
 \begin{landscape}
 	\begin{figure}
 		\centering
@@ -161,7 +162,7 @@ The DAP communicates using TCP/IP, which is less straightforward. Before the VS 
 		\label{hover_sequence}
 	\end{figure}
 \end{landscape}
-
+}
 
 \section{Servers}
 The servers are able to process incoming LSP and DAP requests. They get the messages in a form of already parsed JSONs. Then they extract the name of the requested method with its parameters from the message and call the corresponding method with the parameters encoded as JSON.

@@ -17,7 +17,7 @@ It is composed of:
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth / 2]{img/hlasm_arch}
+	\includegraphics[width=\textwidth]{img/hlasm_context}
 	\caption{The composition of HLASM context tables component}
 	\label{fig06:hlasm}
 \end{figure}
@@ -119,8 +119,8 @@ The above described structures aimed to describe the high-level part of the lang
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\textwidth / 2]{img/ord_ctx_arch}
-	\caption{The composition of Ordinary assembly context}
+	\includegraphics[width=\textwidth]{img/ord_ctx_arch}
+	\caption{The composition of ordinary assembly context}
 	\label{fig06:ord_ctx}
 \end{figure}
 
@@ -133,7 +133,7 @@ Ordinary assembly context consists of three main components (see \cref{fig06:ord
 
 \subsubsection{Symbol}
 
-This class represents HLASM Ordinary symbol (see \cref{ord_sym}). Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
+This class represents HLASM ordinary symbol (see \cref{ord_sym}). Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
 
 \paragraph*{Value} can be assigned \emph{absolute} or \emph{relocatable} values. With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
 

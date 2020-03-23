@@ -1,6 +1,6 @@
 \chapter{Architecture overview}
 \label{arch}
-\todo{Make analyzer black box in this overview}
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{img/language-server-sequence}
@@ -92,7 +92,7 @@ The macro tracer enables the user to trace the compilation of HLASM source code 
 
 The language server component communicates with the macro tracer component in the parser library. Its API mirrors the requests and events of DAP.
 
-Following are the most important features of the macro tracer:
+Following are the most important DAP features implemented by macro tracer:
 
 \begin{itemize}
 	\item launch, continue, next, stepIn and disconnect requests, which allow the user to control the flow of the compilation
