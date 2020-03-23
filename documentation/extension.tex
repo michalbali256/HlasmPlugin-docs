@@ -16,7 +16,7 @@ To be independent of pipes, we have added an option to use TCP, which assigns a 
 
 \section{DAP Extension}
 
-\emph{Macro Tracer}~\ref{chap:macro_tracer} is implemented using DAP, which is also supported out-of-the-box by VSCode. Similarly to LSP TCP support, we dynamically assign a random free port for DAP communication during the activation.
+\emph{Macro Tracer}~\ref{macro_tracer} is implemented using DAP, which is also supported out-of-the-box by VSCode. Similarly to LSP TCP support, we dynamically assign a random free port for DAP communication during the activation.
 
 \section{Additions}
 
@@ -37,7 +37,7 @@ Each file starting with line \emph{MACRO} (arbitrary number of whitespace before
 Every file either defined as a program or as a part of a processor group is recognized as HLASM.
 
 \subsubsection{Wildcards}
-
+\label{section:wildcard}
 Configuration file \emph{pgm\_conf.json} contains a field \emph{alwaysRecognize}, which consists of user-defined wildcards. Every file that satisfies at least one of these wildcards is recognized as HLASM.
 
 \subsubsection{Automatic Language Detection}
