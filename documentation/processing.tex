@@ -13,14 +13,16 @@ Processing manager is a major component in the processing of a HLASM source file
 
 As the processing of the HLASM source file is rather complicated, we define a \emph{statement provider} (see \cref{lab06:sect_prov}) for each different source of statements and a \emph{statement processor} (see \cref{lab06:sect_proc}) for each different manner of statement processing. To lighten functionality of processors, we define \emph{Instruction Processors} (see \cref{lab06:instr_proc}). They focus on different kinds of instructions rather than whole statements. With addition to that, instruction processors use \emph{Instruction format validators}  (see \cref{checker}) that check correct use of the instruction format (see \cref{fig06:proc_mngr}).
 
+Processing manager encapsulates above mentioned objects and determines which processor/provider will be used next (see \cref{lab06:mngr_loop}).
+
 Following objects passed by analyzer serve as an input for the processing manager:
 \begin{itemize}
 	\item \emph{Parser} that provides statements from the processed file. Further on in this chapter, we will refer to the parser as to the \emph{Opencode statement provider}.
 	\item \emph{HLASM context tables} that hold current state of the parsed code.
-	\item \emph{Library data} defining the initial state of the manager.
+	\item \emph{Library data} defining the initial state of the manager (whether the file is copy member, macro definition, etc.; see \cref{lab06:lib_data}). 
 	\item \emph{Name} of the processed file.
-	\item \emph{Parse library provider} to solve in-file dependencies.
-	\item \emph{Statement fields parser} for parsing deferred statements. 
+	\item \emph{Parse library provider} to solve source file dependencies.
+	\item \emph{Statement fields parser} for parsing yet unresolved statement fields. 
 	\item \emph{Processing tracer} for tracing processed statements (see \cref{chap:macro_tracer}).
 \end{itemize}
 
@@ -57,14 +59,14 @@ The abstract class \emph{HLASM statement} is the ancestor for all statement rela
 
 Both of these statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction or macro definition is encountered in the source code. 
 
-The statements collected inside copy or macro definitions are mainly deferred statements. That is because variable symbols can not be resolved inside the definition and because HLASM allows instruction aliasing. Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.
+The statements collected inside copy or macro definitions are mainly deferred statements. That is because variable symbols can not be resolved inside the definition and because HLASM allows instruction aliasing (renaming instructions). Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.
 
-However, some statements in the macro and copy definitions forbid aliasing and the operand format can be deduced immediately (e.g. conditional assembly instructions in macro definition). This leads to the processors necessity to ask the provider to retrieve the statement with correct format -- accordingly to the deduced one based on the provided instruction  (see \cref{lab06:proc_stat}).
+However, some statements in the macro and copy definitions forbid aliasing and the operand format can be deduced immediately (e.g. conditional assembly instructions in macro definition). This leads to the processors necessity to ask the provider to retrieve the statement with correct format -- accordingly to the deduced one based on the instruction being provided  (see \cref{lab06:proc_stat}).
 
 \subsubsection{Lookahead Processor}
 \label{lab06:look}
 
-Lookahead processor is activated when currently processed conditional assembly statement requires a value of undefined ordinary or sequence symbol. It looks through the following statements and finishes when the target symbol is found or when all statement providers finish.
+Lookahead processor is activated when currently processed conditional assembly statement requires a value of undefined ordinary or sequence symbol. It looks through the following statements and finishes when the target symbol is found or when all statement providers finish. Then the processing continues from where the lookahead started.
 
 \subsubsection{Opencode Processor}
 \label{ord_proc}
@@ -134,8 +136,8 @@ In HLASM language, it is difficult to parse statements into one common structure
 \begin{enumerate}
 	\item Provider retrieves the instruction field part of the statement.
 	\item Provider calls processor's \texttt{get\_processing\_status} method with instruction field as a parameter.
-	\item Return value of the call determines the required format of the operand field for the processor.
-	\item Provider returns correct statement format to the processor. 
+	\item Return value of the call determines the required format of the operand field for the processor; the whole statemement can be retrieved correctly.
+	\item Provider returns statement with correct format to the processor. 
 \end{enumerate}
 
 \begin{figure}
@@ -191,11 +193,11 @@ Another use of field parser is in opencode processor as model statements are res
 \subsection{Instruction processors}
 \label{lab06:instr_proc}
 
-Used by ordinary processor, instruction processors are helper classes that divide processing of HLASM instruction types.
+Ordinary processor divides processing of HLASM instruction types into several \emph{instruction processors}. Each processor is responsible for processing instructions that belong to one instruction type.
 
 As format of some instruction kinds can be rather complicated, instruction processors contain \emph{Instruction format validators} (see \cref{checker}). They check the statement to validate the correctness of used operand format as well as the correctness of the actual operand values.
 
-During the instruction processing, processors encounter HLASM \emph{expressions} (see \cref{ca_expr:logic}, \cref{mach_expr}). They need to be evaluated to correctly perform the processing.
+During the instruction processing, processors work with HLASM \emph{expressions} (see \cref{ca_expr:logic}, \cref{mach_expr}). They need to be evaluated to correctly perform the processing.
 
 There are four specialized instruction processors:
 \paragraph*{Macro IP} looks up for macro definition in HLASM context tables and calls it.
@@ -309,11 +311,11 @@ return arithmetic_expression::from_string(value_, 2);
 
 In the previous section, we described the representation of the CA expressions themselves. In this section, we explain the coupling of CA expressions with grammar via visitor. 
 
-The \texttt{expression\_evaluator} encapsulates the coupling logic between the grammar and the expression logic. That is, the evaluator has a notion about grammar, which translates into C++ expression logic. At this point, it is essential for the reader to be familiar with the grammar (see \cref{parser:rules}).
+The \texttt{expression\_evaluator} encapsulates the coupling logic between the grammar and the expression logic. That is, the evaluator has a notion about grammar, which translates into C++ expression logic.
 
 The top-level expression first gathers a list of space-separated expressions. The evaluation must be done using a list from left to right (not using a tree) as any token may be a keyword (such as \texttt{AND} operator) or variable identifier, depending on a position in an expression (using language keywords as identifiers is allowed in HLASM). For a better understanding, see \cref{lst:example_ca_expr}. \texttt{expression::evaluate} provides the disambiguation (see \cref{ca_expr:logic}). 
 
-Evaluator substitutes grammar rules with variable and ordinary symbols for their values and retrieves structure that holds real value of the expression. To know which values to substitute, evaluator is given \emph{evaluation context}. It consists of objects that are required for correct evaluation: \emph{HLASM context} for symbol values, \emph{attribute provider} for values of symbol attributes that are not yet defined and \emph{library provider} for evaluation of some types of symbol attributes as well.
+During its work, evaluator substitutes variable and ordinary symbols for their values. To know which values to substitute, evaluator is given \emph{evaluation context}. It consists of objects that are required for correct evaluation: \emph{HLASM context} for symbol values, \emph{attribute provider} for values of symbol attributes that are not yet defined and \emph{library provider} for evaluation of some types of symbol attributes as well.
 
 Lookahead (see \cref{lab06:look}) is triggered in conditional assembly expressions, when visiting has not defined an ordinary symbol yet. As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks for all the undefined symbol references in expression and collects them to a common collection. Then, the lookahead is triggered to look for all references of the collection. Hence, it is triggered once per expression rather than any time an undefined symbol reference is found. 
 

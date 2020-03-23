@@ -195,11 +195,11 @@ ORG instruction can arbitrarily move location counter's value forward and backwa
 \subsubsection{Symbol dependency tables}
 \label{symbol_dependency_tables}
 HLASM forbids cyclic symbol definition. This component maintains dependencies between symbols and detects possible cycles.
-Let us describe the main components of dependency resolving:
+Let us describe the main components of dependency resolving.
 
 \paragraph*{Dependant} is a structure used in the symbol dependency tables. It encapsulates objects that can be dependent on another. Dependant object can be a \emph{symbol}, \emph{symbol attribute} and \emph{space}.
 
-\paragraph*{Dependable} If an object can contain dependencies, it implements \emph{dependable} interface. The interface has a method to retrieve an structure holding the respective \emph{dependants}. 
+\paragraph*{Dependable} interface is implemented by a class if its instance can contain dependencies. The interface has a method to retrieve an structure holding the respective \emph{dependants}. 
 
 \paragraph*{Resolvable} interface adds up to the dependable interface. It is implemented by objects that serve as values assignable to \emph{depednants}. It provides methods to return \emph{symbol value} with help of the dependency solver. 
 

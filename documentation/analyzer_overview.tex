@@ -15,11 +15,13 @@ The analyzer is composed of several sub-components, all required to properly pro
 \begin{itemize}
 	\item \emph{LSP data collector} collects and retrieves all LSP information created while processing the file.
 	\item \emph{HLASM context tables} hold information about the context of the processed HLASM source code.
-	\item The analyzer contains several \emph{Lexer - Parser sub-components} to simplify the processing interface and ease the use of this component.
+	\item The analyzer contains several \emph{Lexer - Parser sub-components} to simplify the processing interface and ease the use of this component. They are needed to create parser
 	\item \emph{Processing manager} executes the main loop where the file is processed.
 \end{itemize}
 
-LSP data collector is required by Lexer-Parser sub-components that are required by processing manager. HLASM context tables are used by the manager and the sub-components as well.
+LSP data collector is required by Lexer-Parser sub-components. They are composed into the parser object required by processing manager. HLASM context tables are used by the manager and the sub-components as well. 
+
+Presence of all this components together is needed for analyzer's method \TT{analyze}. It processes a provided file and fills LSP data collector from which LSP information can be further retrieved.  
 
 \subsection{Construction}
 
