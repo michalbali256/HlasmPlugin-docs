@@ -16,7 +16,7 @@ To be independent of pipes, we have added an option to use TCP, which assigns a 
 
 \section{DAP Extension}
 
-\emph{Macro Tracer}~\ref{chap:macro_tracer} is implemented using DAP, which is also supported out-of-the-box by VSCode. We dynamically assign a random free port for DAP communication during the activation as well.
+\emph{Macro Tracer}~\ref{chap:macro_tracer} is implemented using DAP, which is also supported out-of-the-box by VSCode. Similarly to LSP TCP support, we dynamically assign a random free port for DAP communication during the activation.
 
 \section{Additions}
 
@@ -76,7 +76,7 @@ If the workspace contains a HLASM file, but does not have configurations, the us
 
 In case of HLASM, a semantic (server-side) highlighting is desired. The multi-layered nature of the language causes that in quite common scenarios, specific parts of the code can be highlighted if and only if some previous part was completely processed (parameters for instructions, skipped code thanks to code generation, defined macros, continuations, etc...).
 
-We added \emph{semanticHighlighting} as an extra feature of LSP. This feature works in a very similar manner, implementing the LSP interfaces that VSCode provides. It works as a notification from the server to the client, containing ranges of code and their respective tokens (e.g. instruction, label, parameter, comment,..). 
+Based on the open pull request to the VSCode Language Server \footnote{https://github.com/microsoft/vscode-languageserver-node/pull/367/files}, we added \emph{semanticHighlighting} as an extra feature of LSP. This feature works in a very similar manner, implementing the LSP interfaces that VSCode provides. It works as a notification from the server to the client, containing ranges of code and their respective tokens (e.g. instruction, label, parameter, comment,..). 
 
 On top of that, we extended \emph{semanticHighlighting} to \emph{ASMsemanticHighlighting}, which adds the ability to notify the client about new code layout, specifically start, continuation and continue columns. These fields can be set in the HLASM code (via ICTL instruction) and are required for the \emph{Continuation Handling} feature to work properly. Our client-server communication is shown in \cref{fig08:lsp}.
 
