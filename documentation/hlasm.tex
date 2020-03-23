@@ -126,7 +126,7 @@ Following are examples of assembler instructions:
 \begin{itemize}
 	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
 	
-	\item \textbf{DC}, \textbf{DS} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.).
+	\item \textbf{DC}, \textbf{DS} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.). These instructions take \emph{data definition} as operands. \Cref{data_def_example} shows examples of data definition.
 	
 	\item \textbf{EQU} --- Defines ordinary symbols.
 	
@@ -134,6 +134,28 @@ Following are examples of assembler instructions:
 	
 	\item \textbf{CSECT} --- Creates an executable control section, which serves as the start of relative addressing. It is followed by sequence of machine instructions.
 \end{itemize}
+
+\begin{listing}[t]
+	\begin{verbatim}
+CL8'ABC'
+    C is type of data definition - array of characters
+    L8 specifies length - 8 bytes
+    'ABC' is nominal value of the data definition
+    CL8'ABC' would assemble 8 bytes, first three of which would be EBCDIC
+             representations of letters A, B and C
+
+5AY(A+4,B)
+    5 is duplication factor - the nominal value will be repeated 5 times
+    A is type - address
+    Y is type extension - it modifies the length of the address
+    (A+4,B) is nominal value - comma separated expressions that will
+            be assembled as addresses
+    5AY(A+4,B) would assemble total of 20 bytes, first 2 bytes is value
+               of expression A+4, then B and then 4 more copies of the same
+	\end{verbatim}
+	\caption{Examples of data definition}
+	\label{data_def_example}
+\end{listing}
 
 \subsubsection{Ordinary symbols resolution}
 \label{ordinary_resolution}
