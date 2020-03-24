@@ -34,7 +34,7 @@
 \usepackage{xcolor}
 \usepackage{longtable}
 \usepackage{makecell}
-
+\usepackage[toc,page]{appendix}
 \usepackage{multirow}
 
 \lstset{basicstyle=\ttfamily,
@@ -89,4 +89,35 @@
 
 \bibliography{biblio} 
 \bibliographystyle{apalike}
+
+\begin{appendices}
+
+
+%\includepdf[pages=-,fitpage=true]{all_arch.pdf}
+
+\newenvironment{foldoutfloat}{%
+	\eject\pdfpageheight=52cm\pdfpagewidth=40cm
+	\newgeometry{margin=1in}
+	\textwidth=15in
+	\begin{figure}[p]
+	}{%
+	\end{figure}
+	\clearpage % otherwise it will float to another, non-resized page
+	\eject\pdfpageheight=11in\pdfpagewidth=8.5in
+	\restoregeometry
+}%
+
+\begin{foldoutfloat}
+	\chapter{Architecture of the project}
+	\label{all_arch}
+	\thispagestyle{empty}
+
+	\includegraphics[width=35cm]{img/all_arch}
+	\caption{Architecture of the whole project}
+\end{foldoutfloat}
+
+
+
+\end{appendices}
+
 \end{document}

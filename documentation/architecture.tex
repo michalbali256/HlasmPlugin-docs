@@ -22,7 +22,7 @@ In LSP, the two parties that communicate are called a \emph{client} and a \emph{
 
 To add support for HLASM, we have implemented the LSP language server and written a lightweight extension to an editor, which uses an already existing implementation of the LSP client. To implement source code highlighting, we had to extend the protocol with a new notification. This notification is used for transferring information from the language server to the VS Code client, which is extended to highlight code in editor based on the incoming custom notifications.
 
-In this chapter, we further decompose the project into smaller components and describe their relations. The two main components are the parser library and the language server --- an executable application that uses the parser library. An overview of the architecture is pictured in \cref{fig04:arch}.
+In this chapter, we further decompose the project into smaller components and describe their relations. The two main components are the parser library and the language server --- an executable application that uses the parser library. An overview of the architecture is pictured in \cref{fig04:arch}. The architecture of whole project is shown in \cref{all_arch}
 
 \section{Language server description}
 
