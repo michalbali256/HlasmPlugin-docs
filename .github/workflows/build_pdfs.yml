@@ -18,17 +18,6 @@ jobs:
           name: Detailed-specification
           path: detailed_spec/detailed_spec.pdf
       
-      - name: Compile user documentation
-        uses: xu-cheng/latex-action@master
-        with:
-          root_file: user_docs.tex
-          working_directory: user_documentation
-      - name: Upload detailed specification
-        uses: actions/upload-artifact@v1
-        with:
-          name: User-documentation
-          path: user_documentation/user_docs.pdf
-
       - name: Compile documentation
         uses: xu-cheng/latex-action@master
         with:
