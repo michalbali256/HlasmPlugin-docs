@@ -30,7 +30,7 @@ In order to parse a HLASM file, the analyzer is constructed with the following p
 \begin{itemize}
 	\item \emph{Name and content of the file}
 	\item \emph{Parse library provider} -- an object responsible for resolving source file dependencies. The dependencies are only discovered during the analysis, so it is not possible to provide the files beforehand.
-	\item \emph{Processing tracer} (see \cref{chap:macro_tracer}).
+	\item \emph{Processing tracer} (see \cref{macro_tracer}).
 \end{itemize}
 
 When this constructor is used, the analyzer creates HLASM context tables and processes the provided source as an open-code. We say that the analyzer has \emph{owner semantics}. 

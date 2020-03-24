@@ -24,7 +24,7 @@ Following objects passed by analyzer serve as an input for the processing manage
 	\item \emph{Name} of the processed file.
 	\item \emph{Parse library provider} to solve source file dependencies.
 	\item \emph{Statement fields parser} for parsing yet unresolved statement fields. 
-	\item \emph{Processing tracer} for tracing processed statements (see \cref{chap:macro_tracer}).
+	\item \emph{Processing tracer} for tracing processed statements (see \cref{macro_tracer}).
 \end{itemize}
 
 \subsection{Statement Processor}
@@ -78,7 +78,7 @@ Opencode processors (in code described as Ordinary processor) usage can be descr
 	\item Performs instruction by updating HLASM context tables with the help of \emph{instruction processors}.
 \end{enumerate}
 
-It is also passed \emph{processing tracer} by the manager. Each time a statement is processed by opencode processor, it triggers processing tracer. The tracer serves as a listener pattern used by \emph{Macro tracer} (see \cref{chap:macro_tracer}).
+It is also passed \emph{processing tracer} by the manager. Each time a statement is processed by opencode processor, it triggers processing tracer. The tracer serves as a listener pattern used by \emph{Macro tracer} (see \cref{macro_tracer}).
 
 \vspace{0.5cm}
 

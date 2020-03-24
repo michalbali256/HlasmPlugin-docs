@@ -41,7 +41,7 @@ We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTL
 
 \subsection{Visitor}
 
-We employ ANTLR \emph{visitor} feature during evaluation of CA expressions (see \cref{lab06:expr}). 
+We employ ANTLR \emph{visitor} feature during evaluation of CA expressions. 
 
 The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
 
