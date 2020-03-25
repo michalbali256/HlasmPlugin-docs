@@ -54,19 +54,19 @@ The data collection is necessary to be able to reply to the LSP requests without
 \emph{LSP info processor} is invoked after each parsed and processed statement to collect and store the information it needs inside the \emph{LSP context} (part of HLASM context). 
 
 We will describe the component in better detail as a cross product of distinct symbols and the LSP features. Possible LSP features are:
-\begin{enumerate}
+\begin{itemize}
 	\item \emph{hover}
 	\item \emph{complete}
 	\item \emph{go\_to\_definition}
 	\item \emph{references}
-\end{enumerate}
+\end{itemize}
 The symbols, on which the user might call mentioned LSP features, are:
-\begin{enumerate}
+\begin{itemize}
 	\item \emph{instructions}
 	\item \emph{variable symbols}
 	\item \emph{sequence symbols}
 	\item \emph{ordinary symbols}
-\end{enumerate}
+\end{itemize}
 
 The \emph{references} feature uses the same symbols as \emph{go\_to\_definition}, its usage is straightforward and therefore does nothing that needs to be further explained.
 
