@@ -15,25 +15,18 @@ It is composed of:
 	\item \emph{Ordinary assembly context} -- encapsulates structures describing Ordinary assembly.
 \end{itemize}
 
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{img/hlasm_context}
-	\caption{The composition of HLASM context tables component}
-	\label{fig06:hlasm}
-\end{figure}
-
 \subsection{Macros}
 
 HLASM context stores visited macro definitions in the \emph{macro strorage}. 
 
 Macro definition is represented by:
-\begin{enumerate}
+\begin{itemize}
 	\item \emph{Macro identifier}. It identifies the macro.
 	\item \emph{Calling parameters}. They are assigned real value when the macro is called.
 	\item \emph{Block of statement}. It represents the body of the macro.
 	\item \emph{Block of copy nestings}. It is array with one-to-one relation with block of statements. Each entry is a list of in-file locations that represents how much was the statement nested in COPY calls.
 	\item \emph{Label storage}. The storage of sequence symbol that occur in the macro definition.
-\end{enumerate}
+\end{itemize}
 
 When macro is called, \emph{macro invocation} object is created. It shares the content of a respective macro definition with an exception of calling parameters as they are assigned real value passed with the call. Also, it contains index to the top statement of the invocation.
 
@@ -197,13 +190,12 @@ ORG instruction can arbitrarily move location counter's value forward and backwa
 HLASM forbids cyclic symbol definition. This component maintains dependencies between symbols and detects possible cycles.
 Let us describe the main components of dependency resolving.
 
-\paragraph*{Dependant} is a structure used in the symbol dependency tables. It encapsulates objects that can be dependent on another. Dependant object can be a \emph{symbol}, \emph{symbol attribute} and \emph{space}.
-
-\paragraph*{Dependable} interface is implemented by a class if its instance can contain dependencies. The interface has a method to retrieve an structure holding the respective \emph{dependants}. 
-
-\paragraph*{Resolvable} interface adds up to the dependable interface. It is implemented by objects that serve as values assignable to \emph{depednants}. It provides methods to return \emph{symbol value} with help of the dependency solver. 
-
-\paragraph*{Dependency solver} is an interface that can return value of the symbol providing its identifier. It is implemented by Ordinary assembly context.
+\begin{description}
+	\item[Dependant] is a structure used in the symbol dependency tables. It encapsulates objects that can be dependent on another. Dependant object can be a \emph{symbol}, \emph{symbol attribute} and \emph{space}.
+	\item[Dependable] interface is implemented by a class if its instance can contain dependencies. The interface has a method to retrieve an structure holding the respective \emph{dependants}. 
+	\item[Resolvable] interface adds up to the dependable interface. It is implemented by objects that serve as values assignable to \emph{depednants}. It provides methods to return \emph{symbol value} with help of the dependency solver. 
+	\item[Dependency solver] is an interface that can return value of the symbol providing its identifier. It is implemented by Ordinary assembly context.
+\end{description}
 
 \vspace{0.5cm}
 
@@ -214,13 +206,14 @@ Having described building blocks, we can move to the symbol dependency tables co
 	\item \emph{Postponed statements storage}
 \end{itemize}
 
-\paragraph*{Dependency map} is the primary storage of dependencies. It has \emph{dependants} as keys and \emph{resolvables} as values. The semantics for pair \emph{(D,R)} is that D is dependent on the dependencies from R. Each time new dependency is added, this map is searched for cycle.
-
-\paragraph*{Dependency sources map} serves as a source objects storage of a resolvable in the dependency map. Hence for the pair \emph{(D,R)} from dependency map, source object of \emph{R} is in the dependency source map under the key \emph{D}. 
-
-The source objects are statements. To be more specific, as one statement can be a source for more distinct resolvables, this source map only stores pointers to the \emph{postponed statements storage}.
-
-\paragraph*{Postponed statements storage} holds statements that are sources of resolvables in dependency map. The reason they are stored is that they can not be checked yet as they contain dependencies. Therefore, they are postponed in the storage until all of the dependencies are resolved. Then they are passed to the respective checker.
-
+\begin{description}
+	\item[Dependency map] is the primary storage of dependencies. It has \emph{dependants} as keys and \emph{resolvables} as values. The semantics for pair \emph{(D,R)} is that D is dependent on the dependencies from R. Each time new dependency is added, this map is searched for cycle.
+	
+	\item[Dependency sources map] serves as a source objects storage of a resolvable in the dependency map. Hence for the pair \emph{(D,R)} from dependency map, source object of \emph{R} is in the dependency source map under the key \emph{D}. 
+	
+	The source objects are statements. To be more specific, as one statement can be a source for more distinct resolvables, this source map only stores pointers to the \emph{postponed statements storage}.
+	
+	\item[Postponed statements storage] holds statements that are sources of resolvables in dependency map. The reason they are stored is that they can not be checked yet as they contain dependencies. Therefore, they are postponed in the storage until all of the dependencies are resolved. Then they are passed to the respective checker.
+\end{description}
 
 

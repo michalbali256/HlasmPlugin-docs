@@ -88,14 +88,19 @@ In the \cref{tab06:processor_change}, we can see that it does not have a field t
 
 Terminal condition can be triggered by a finishing provider. It indicates that the processor needs to finish its work when a specific provider exhausted its statement stream.
 
+\newcommand{\fin}{\textcolor{red}{finish}}
+\newcommand{\strt}[1]{\textcolor{red}{start #1}}
+\definecolor{LightGreen}{HTML}{96F97B}
+\newcommand{\cont}{\textcolor{LightGreen}{continue}}
+
 \begin{table}
 	\centering
-	\begin{tabular}{lccccc}
-		                   & \thead{\textbf{END}\\ \textbf{instruction}} & \thead{\textbf{COPY}\\ \textbf{instruction}} & \thead{\textbf{MACRO}\\ \textbf{instruction}} & \thead{\textbf{MEND}\\ \textbf{instruction}} & \thead{\textbf{undefined} \\ \textbf{symbol}} \\ \toprule
-		\textbf{Opencode}  &                 finish self                 &                 starts Copy                  &                 starts Macro                  &                                              &               starts Lookahead                \\
-		\textbf{Copy}      &                                             &                                              &                                               &                                              &                                               \\
-		\textbf{Macro}     &                                             &                 starts Copy                  &                                               &                 finish self                  &                                               \\
-		\textbf{Lookahead} &                 finish self                 &                 starts Copy                  &                                               &                                              &                                               \\ \bottomrule
+	\begin{tabular}{@{}p{0.17\textwidth}ccccc@{}}
+		\textbf{Processor} & \thead{\textbf{END}\\ \textbf{instruction}} & \thead{\textbf{COPY}\\ \textbf{instruction}} & \thead{\textbf{MACRO}\\ \textbf{instruction}} & \thead{\textbf{MEND}\\ \textbf{instruction}} & \thead{\textbf{undefined} \\ \textbf{symbol}} \\ \toprule
+		\textbf{Opencode}  &                    \fin                     &                 \strt{Copy}                  &                 \strt{Macro}                  &                    \cont                     &               \strt{Lookahead}                \\
+		\textbf{Copy}      &                    \cont                    &                    \cont                     &                     \cont                     &                    \cont                     &                     \cont                     \\
+		\textbf{Macro}     &                    \cont                    &                 \strt{Copy}                  &                     \cont                     &                     \fin                     &                     \cont                     \\
+		\textbf{Lookahead} &                    \fin                     &                 \strt{Copy}                  &                     \cont                     &                    \cont                     &                     \cont                     \\ \bottomrule
 	\end{tabular}
 	\caption{Description of statement processor changes.}
 	\label{tab06:processor_change}
@@ -114,14 +119,15 @@ In contrary to statement processors, statement providers are ordered based on th
 
 In each iteration of processing manager (see \cref{lab06:mngr_loop}), providers are asked whether they have statements to provide based on the ordering. That is because after each iteration, a provider with greater priority than the previously used one can be activated. 
 
+
 \begin{table}
 	\centering
-	\begin{tabular}{l|ccc}
+	\begin{tabular}{@{}p{0.20\textwidth}ccc@{}}
 		\textbf{Processors} & \thead{\textbf{Macro provider} \\ \textbf{ends}} & \thead{\textbf{Copy provider} \\ \textbf{ends}} & \thead{\textbf{Opencode provider} \\ \textbf{ends}} \\ \toprule
-		\textbf{Opencode}   &                                                  &                                                 &                     finish self                     \\
-		\textbf{Copy}       &                                                  &                                                 &                     finish self                     \\
-		\textbf{Macro}      &                   finish self                    &                                                 &                     finish self                     \\
-		\textbf{Lookahead}  &                   finish self                    &                                                 &                     finish self                     \\ \bottomrule
+		\textbf{Opencode}   &                      \cont                       &                      \cont                      &                        \fin                         \\
+		\textbf{Copy}       &                      \cont                       &                      \cont                      &                        \fin                         \\
+		\textbf{Macro}      &                       \fin                       &                      \cont                      &                        \fin                         \\
+		\textbf{Lookahead}  &                       \fin                       &                      \cont                      &                        \fin                         \\ \bottomrule
 	\end{tabular}
 	\caption{Description of statement processors' terminal condition.}
 	\label{tab06:term_cond}
