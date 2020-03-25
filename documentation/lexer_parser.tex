@@ -46,7 +46,7 @@ We employ ANTLR \emph{visitor} feature during evaluation of CA expressions.
 The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
 
 \section{Lexer}
-
+\sourceref{parser\_library/include/shared/lexer.h}
 Lexer's responsibility is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
 \begin{itemize}
 	\item each token has a location in the source text,
@@ -68,17 +68,17 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 \end{description}
 
 \subsection{Architecture}
+\sourcerefsu{parser\_library/include/shared/input\_source.h}
+{parser\_library/include/shared/token.h}
+{parser\_library/include/shared/token\_factory.h}
+Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
 
 \begin{figure}
 	\centering
 	\includegraphics{img/lexer_arch}
 	\caption{Lexer architecture overview. Note, there are two \texttt{input\_source}s and there are many \texttt{token}s
-	\label{lexer_arch} generated.}
+		\label{lexer_arch} generated.}
 \end{figure}
-
-Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
-
-
 
 \begin{description}
 	
@@ -150,7 +150,8 @@ The input to ANTLR is a grammar written in antlr-specific language that specifie
 The parser inherits from the recognizer to provide further operations.
 
 \subsection{Parser workflow}
-
+\sourcerefsu{parser\_library/src/parser\_impl.h}
+{parser\_library/src/semantics/range\_provider.h}
 Parser (in code referenced as \TT{parser\_impl}) implements opencode statement provider interface. This means that, according to the statement passing in \cref{lab06:proc_stat}, parser needs to parse each statement in \emph{two steps}:
 
 \begin{enumerate}
@@ -163,13 +164,15 @@ For the means of parsing remaining strings, parser subcomponent contains actuall
 Operands to have correctly set ranges prior to the source file rather than to the passed string, parser uses \emph{Range provider}. It helps the second parser to have ranges of reparsed operands consistent with the ranges of other fields. It is initialized with the begin location of operand field in the statement and all ranges furtherly created in parsing are adjusted to have correct boundaries.
 
 \subsection{Statement structure}
-
+\sourcerefsu{parser\_library/src/semantics/collector.h}
+{parser\_library/src/semantics/statement.h}
+{parser\_library/src/semantics/statement\_fields.h}
 During parsing of a statement, several structures are created and collected. They are \TT{label\_si, instruction\_si, operand\_si, remark\_si} (\emph{si} as semantic information). They are collected with \TT{collector} and built into \TT{statement\_si} structure.
 
 Label and instruction structures can contain either identifier of a symbol or --- when in model statement --- concatenation of strings and variable symbols. Remark field is simply just a string as it serves as a commentary statement field. Operand field contains list of operands used in the statement. They can be of several formats.
 
 \subsubsection{Concatenation}
-
+\sourcerefsu{parser\_library/src/semantics/concatenation.h}
 A model statement is a statement that contains variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is represented by a concatenation of helper structures. The concatenation can be further evaluated to produce the final string.
 
 The helper structures are:
@@ -181,6 +184,7 @@ The helper structures are:
 \end{itemize}
 
 \subsubsection{Operand formats}
+\sourcerefsu{parser\_library/src/semantics/operand.h}
 The statement processor can request parser to retrieve statements with this operand formats:
 \begin{itemize}
 	\item \emph{machine/assembler/conditional assembly/macro} -- instruction operands. Each type of instruction has it's specific format.
@@ -198,17 +202,17 @@ Each operand format has corresponding \emph{operand structure}. They all inherit
 \end{figure}
 
 \subsection{Grammar rules}
-
+\sourcerefsu{parser\_library/src/grammar}
 Grammar rules describing parser are separated into several files:
 \begin{itemize}
-	\item \emph{hlasm\_parser.g4} -- Top level rules are stored here.
-	\item \emph{lookahead\_rules.g4} -- Rules for lookahead mode.
-	\item \emph{label\_field\_rules.g4} -- Rules taking care of label field of statement.
-	\item \emph{instruction\_field\_rules.g4} -- Rules taking care of instruction field of statement.
-	\item \emph{operand\_field\_rules.g4} -- Rules taking care of operand field of statement.
-	\item \emph{macro/machine/assembler/ca/model/deferred\_operand\_rules.g4} -- Concrete operand field rules.
-	\item \emph{ca/asm\_expression\_rules.g4} -- Rules for expressions.
-	\item \emph{data\_def\_rules.g4} -- Rules for data definition.
+	\item \TT{hlasm\_parser.g4} -- Top level rules are stored here.
+	\item \TT{lookahead\_rules.g4} -- Rules for lookahead mode.
+	\item \TT{label\_field\_rules.g4} -- Rules taking care of label field of statement.
+	\item \TT{instruction\_field\_rules.g4} -- Rules taking care of instruction field of statement.
+	\item \TT{operand\_field\_rules.g4} -- Rules taking care of operand field of statement.
+	\item \TT{macro/machine/assembler/ca/model/deferred\_operand\_rules.g4} -- Concrete operand field rules.
+	\item \TT{ca/asm\_expression\_rules.g4} -- Rules for expressions.
+	\item \TT{data\_def\_rules.g4} -- Rules for data definition.
 \end{itemize}
 
 \begin{landscape}

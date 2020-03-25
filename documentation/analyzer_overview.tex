@@ -4,14 +4,7 @@
 The analyzer's role is to provide a facade over objects and methods to create a simple interface for processing (analyzing) a single HLASM source file. The output of the analysis is data for the LSP server.
 
 \section{Overview}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth / 2]{img/analyzer_arch}
-	\caption{The composition of the analyzer component}
-	\label{fig06:analyzer}
-\end{figure}
-
+\sourceref{parser\_library/src/analyzer.h}
 The analyzer is composed of several sub-components, all required to properly process the file (see \cref{fig06:analyzer}). 
 \begin{itemize}
 	\item \emph{LSP data collector} collects and retrieves all LSP information created while processing the file.
@@ -19,6 +12,13 @@ The analyzer is composed of several sub-components, all required to properly pro
 	\item The analyzer contains several \emph{Lexer - Parser sub-components} to simplify the processing interface and ease the use of this component. They are needed to create parser
 	\item \emph{Processing manager} executes the main loop where the file is processed.
 \end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth / 2]{img/analyzer_arch}
+	\caption{The composition of the analyzer component}
+	\label{fig06:analyzer}
+\end{figure}
 
 LSP data collector is required by Lexer-Parser sub-components. They are composed into the parser object required by processing manager. HLASM context tables are used by the manager and the sub-components as well. 
 
@@ -48,6 +48,7 @@ This constructor is called within open-code analyzer by its sub-components when 
 To sum up, after the analyzer is constructed, it analyzes the provided source file. As a result, it updates HLASM context tables and provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
 
 \section{LSP data collector}
+\sourceref{parser\_library/src/semantics/lsp\_info\_processor.h}
 \label{lsp_data}
 The data collection is necessary to be able to reply to the LSP requests without the need to re-parse. During the parsing process, a component called \emph{LSP info processor} processes and stores this information. The main goal of this component is to collect as much information as possible to provide meaningful and complex replies to the LSP requests while maintaining the memory and parse-time overhead negligible.
 
