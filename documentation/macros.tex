@@ -52,3 +52,11 @@
 \floatstyle{code}
 \newfloat{listing}{tbp}{lst}
 \floatname{listing}{Listing}
+
+\makeatletter
+\newcommand{\sourceref}[1]{%
+	\vspace{-0.40cm}
+	\TT{*\ \ \ #1}\\
+	\checknextarg}
+\newcommand{\checknextarg}{\@ifnextchar\bgroup{\gobblenextarg}{\vspace{0.1cm}}}
+\newcommand{\gobblenextarg}[1]{\TT{*\ \ \ #1}\\\@ifnextchar\bgroup{\gobblenextarg}{\vspace{0.1cm}}}
