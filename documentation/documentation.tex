@@ -107,6 +107,18 @@
 	\restoregeometry
 }%
 
+\newenvironment{foldoutfloatlandscape}{%
+	\eject\pdfpageheight=40cm\pdfpagewidth=52cm
+	\newgeometry{margin=1in}
+	\textwidth=15in
+	\begin{figure}[p]
+	}{%
+	\end{figure}
+	\clearpage % otherwise it will float to another, non-resized page
+	\eject\pdfpageheight=11in\pdfpagewidth=8.5in
+	\restoregeometry
+}%
+
 \begin{foldoutfloat}
 	\chapter{Architecture of the project}
 	\label{all_arch}
@@ -115,6 +127,15 @@
 	\includegraphics[width=35cm]{img/all_arch}
 	\caption{Architecture of the whole project}
 \end{foldoutfloat}
+
+\begin{foldoutfloatlandscape}
+	\chapter{Parser grammar}
+	\label{parser_rules}
+	\thispagestyle{empty}
+	
+	\includegraphics[width=45cm]{img/grammar}
+	\caption{All 193 grammar rules}
+\end{foldoutfloatlandscape}
 
 
 
