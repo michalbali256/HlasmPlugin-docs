@@ -128,9 +128,10 @@ Ordinary assembly context consists of three main components (see \cref{fig06:ord
 
 This class represents HLASM ordinary symbol (see \cref{ord_sym}). Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
 
-\paragraph*{Value} can be assigned \emph{absolute} or \emph{relocatable} values. With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
-
-\paragraph*{Attributes} structure holds symbol attributes like type, length, scale and integer.
+\begin{description}
+	\item[Value] can be assigned \emph{absolute} or \emph{relocatable} values. With addition to that, it can also be assigned empty value stating that symbol is not yet defined.
+	\item[Attributes] structure holds symbol attributes like type, length, scale and integer.
+\end{description}
 
 \subsubsection{Section}
 
@@ -140,28 +141,34 @@ Section is a structure representing HLASM section (created by CSECT, DSECT, ...)
 
 This structure contains data and operations for one location counter. The data is stored in helper sub-structure \emph{location counter data}.
 
-\paragraph*{Location counter data} is a structure defining current value of the location counter. It consists of:
-\begin{itemize}
-	\item \emph{Storage} stating total number of bytes occupied by the location counter.
-	\item Vector of \emph{spaces}, block of bytes with yet not known length.
-	\item Vector of \emph{storage} between each space.
-	\item Currently valid \emph{alignment} (used when data contain spaces).
-\end{itemize}
+\begin{description}
+	\item[Location counter data] is a structure defining current value of the location counter. It consists of:
+	\begin{itemize}
+		\item \emph{Storage} stating total number of bytes occupied by the location counter.
+		\item Vector of \emph{spaces}, block of bytes with yet not known length.
+		\item Vector of \emph{storage} between each space.
+		\item Currently valid \emph{alignment} (used when data contain spaces).
+	\end{itemize}
+	
+	The location counter value is transformable into a relocatable value. It is represented by structure \emph{address}.
+	
+	\item[Address] consists of:
+	\begin{itemize}
+		\item Array of \emph{bases}. A base is a beginning of a corresponding section. They serve as points of reference for the address.
+		\item Array of \emph{spaces} that are present in the address. 
+		\item \emph{Offset} from the bases.
+	\end{itemize}
+	
+	The common composition of an address is one base section (as the start of the address) and value of storage (as the offset from it).
+	
+	The need for the whole array of bases is because addresses from different sections can be arbitrarily added or subtracted. This information is needed as the correct sequence of arithmetic operations can reduce number of bases (even spaces) to zero and create absolute value. This value can be later used in places where a relocatable value would be forbidden.
+	
+	\item[Space] is block of bytes with yet not known length. It is created in the active location counter when execution of counter's operation can not be performed due to non previously defined ordinary symbols. See the different kind of spaces and the reason of creation in  the \cref{tab06:space}.
+	
+	When a space length becomes known, all addresses containing the spaces need to be updated (remove the space and append offset). Therefore, space structure contains an array of address listeners. Hence, when an address is assigned a relocatable value that contains the space, the address is added to its array. This serves as an easy point of space resolving.
+\end{description}
 
-The location counter value is transformable into a relocatable value. It is represented by structure \emph{address}.
 
-\paragraph*{Address} consists of:
-\begin{itemize}
-	\item Array of \emph{bases}. A base is a beginning of a corresponding section. They serve as points of reference for the address.
-	\item Array of \emph{spaces} that are present in the address. 
-	\item \emph{Offset} from the bases.
-\end{itemize}
-
-The common composition of an address is one base section (as the start of the address) and value of storage (as the offset from it).
-
-The need for the whole array of bases is because addresses from different sections can be arbitrarily added or subtracted. This information is needed as the correct sequence of arithmetic operations can reduce number of bases (even spaces) to zero and create absolute value. This value can be later used in places where a relocatable value would be forbidden.
-
-\paragraph*{Space} is block of bytes with yet not known length. It is created in the active location counter when execution of counter's operation can not be performed due to non previously defined ordinary symbols. See the different kind of spaces and the reason of creation in  the \cref{tab06:space}.
 
 \begin{table}
 	\centering
@@ -177,11 +184,6 @@ The need for the whole array of bases is because addresses from different sectio
 	\caption{Different kinds of spaces and reasons of creation.}
 	\label{tab06:space}
 \end{table}
-
-
-When a space length becomes known, all addresses containing the spaces need to be updated (remove the space and append offset). Therefore, space structure contains an array of address listeners. Hence, when an address is assigned a relocatable value that contains the space, the address is added to its array. This serves as an easy point of space resolving.
-
-\vspace{0.5cm}
 
 ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
 
