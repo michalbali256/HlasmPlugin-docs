@@ -4,32 +4,16 @@ else
     DEL_COMMAND := rm
 endif
 
-all: main.pdf
+all: documentation.pdf
 
-# LaTeX must be run multiple times to get references right
-ifeq (0,1)
-main.pdf: main.bib main.tex $(wildcard *.tex)
-	pdflatex $< -draftmode
-	pdflatex $<
-
-main.bib: main.aux
-	bibtex main.aux
-
-main.aux: main.bib
-	pdflatex main.tex -draftmode
-	pdflatex main.tex
-endif
-
-main.pdf: documentation.tex $(wildcard *.tex)
-	pdflatex $<
-	pdflatex $<
-
-documentation.tex: 
-	pdflatex documentation.tex
+documentation.pdf: documentation.tex $(wildcard *.tex) $(wildcard img/*)
+	pdflatex documentation
 	bibtex documentation
-	pdflatex documentation.tex
-	pdflatex documentation.tex
+	makeindex documentation
+	pdflatex documentation
+	makeindex documentation
+	pdflatex documentation
 
 clean:
-	$(DEL_COMMAND) -f pdfa.xmpi *.synctex* *.nlo *.nls *.ilg *.log *.dvi *.aux *.toc *.lof *.lot *.out *.bbl *.blg
+	$(DEL_COMMAND) -f pdfa.xmpi *.synctex* *.nlo *.nls *.ilg *.log *.dvi *.aux *.toc *.lof *.lot *.out *.bbl *.blg *.ind *.dix
 	$(DEL_COMMAND) -f main.pdf
