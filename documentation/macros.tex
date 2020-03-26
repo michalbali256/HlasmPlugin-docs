@@ -53,6 +53,7 @@
 \newfloat{listing}{tbp}{lst}
 \floatname{listing}{Listing}
 
+%TODO remove this; this is the old indexing version
 \makeatletter
 \newcommand{\sourceref}[1]{%
 	\vspace{-0.40cm}
@@ -61,8 +62,35 @@
 \newcommand{\checknextarg}{\@ifnextchar\bgroup{\gobblenextarg}{\vspace{0.1cm}\par \noindent }}
 \newcommand{\gobblenextarg}[1]{\TT{*\ \ \ #1}\\\@ifnextchar\bgroup{\gobblenextarg}{\vspace{0.1cm}\par\noindent}}
 
-\makeatletter
 \newcommand{\sourcerefsu}{%
 	\vspace{-0.30cm}
 	\gobblenextargs}
 \newcommand{\gobblenextargs}[1]{\TT{*\ \ \ #1}\\\@ifnextchar\bgroup{\gobblenextargs}{\vspace{-0.2cm}\par \noindent }}
+\makeatother
+%TODO until here
+
+% file indexing
+\renewcommand\indexname{Source file index}
+
+\makeatletter
+\def\patheach#1#2#3{\@test@patheachF{#1}{#2}#3/\endgroup}
+\def\@test@patheachF#1#2#3\endgroup{\if#3\empty\empty\else\@patheachF{#1}{#2}#3\endgroup\fi}
+\def\@patheachF#1#2#3/{#1{#3}\@test@patheach{#1}{#2}}
+\def\@test@patheach#1#2#3\endgroup{\if#3\empty\empty\else\@patheach{#1}{#2}#3\endgroup\fi}
+\def\@patheach#1#2#3/{#2#1{#3}\@test@patheach{#1}{#2}}
+\def\foreach#1#2{\@test@foreach{#1}#2,\endgroup}
+\def\@test@foreach#1#2\endgroup{\if#2\empty\empty\else\@foreach{#1}#2\endgroup\fi}
+\def\@foreach#1#2,{#1{#2}\@test@foreach{#1}}
+\makeatother
+
+\def\makefileindex#1{%
+\index{\patheach{\texttt}{!}{#1}}%
+\hspace{-1ex}\texttt{\patheach{}{/\-}{#1}}\\}
+
+\def\makefileindexes#1{\foreach{\makefileindex}{#1}}
+
+\newcommand{\sectionFiles}[1]{ \strut~\hfill~\hspace{1ex}~\parbox{.3\linewidth}{\tt\scriptsize\textcolor{gray}{\makefileindexes{#1}}}}
+
+\newcommand{\sectionSrc}[2]{\section[#1]{#1\sectionFiles{#2}}}
+\newcommand{\subsectionSrc}[2]{\subsection[#1]{#1\sectionFiles{#2}}}
+\newcommand{\subsubsectionSrc}[2]{\subsubsection[#1]{#1\sectionFiles{#2}}}
