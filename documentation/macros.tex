@@ -90,6 +90,7 @@
 \newcommand{\srcstyle}[1]{\tt\scriptsize\textcolor{gray}{\makefileindexes{#1}}}
 \newcommand{\sectionFiles}[2]{ \strut~\hfill~\hspace{1ex}~\parbox{#1}{\tt\scriptsize\textcolor{gray}{\makefileindexes{#2}}}}
 
+\newcommand{\chapterSrc}[3][.4\linewidth]{\chapter[#2]{#2\sectionFiles{#1}{#3}}}
 \newcommand{\sectionSrc}[3][.4\linewidth]{\section[#2]{#2\sectionFiles{#1}{#3}}}
 \newcommand{\subsectionSrc}[3][.4\linewidth]{\subsection[#2]{#2\sectionFiles{#1}{#3}}}
 \newcommand{\subsubsectionSrc}[3][.4\linewidth]{\subsubsection[#2]{#2\sectionFiles{#1}{#3}}}
