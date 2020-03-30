@@ -9,7 +9,7 @@ all: documentation.pdf
 documentation.pdf: documentation.tex $(wildcard *.tex) $(wildcard img/*)
 	pdflatex documentation
 	bibtex documentation
-	texindy -M indexDepth3 documentation.idx
+	texindy -M indexDepth3 -C utf8 documentation.idx
 	pdflatex documentation
 	pdflatex documentation
 
