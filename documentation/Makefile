@@ -14,5 +14,5 @@ documentation.pdf: documentation.tex $(wildcard *.tex) $(wildcard img/*)
 	pdflatex documentation
 
 clean:
-	$(DEL_COMMAND) -f pdfa.xmpi *.synctex* *.nlo *.nls *.ilg *.log *.dvi *.aux *.toc *.lof *.lot *.out *.bbl *.blg *.ind *.dix *.idx *.xdy
+	$(DEL_COMMAND) -f pdfa.xmpi *.synctex* *.nlo *.nls *.ilg *.log *.dvi *.aux *.toc *.lof *.lot *.out *.bbl *.blg *.ind *.dix *.idx
 	$(DEL_COMMAND) -f documentation.pdf
