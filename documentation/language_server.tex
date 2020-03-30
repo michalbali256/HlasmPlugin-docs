@@ -100,18 +100,6 @@ The communication in DAP is between an editor or an IDE and a debugger. The edit
 
 DAP is very similar to LSP. Although the ideas behind DAP are nearly the same, DAP is not based on the JSON RPC. Instead, DAP specifies its own implementation of remote procedure call, still using JSON as the basic carrier of the messages. DAP has requests and events --- requests always go from the client to the server and require response. Events are the same as the notifications from JSON RPC that are sent from the server to the client. The similarity allows our language server component to share a lot of code between the implementations of the protocols.
 
-\section{Third party libraries}
-HLASM Language server uses three third party libraries.
-
-\begin{description}
-	\item [ASIO C++ library]\hspace{-4px}\footnote{\url{https://think-async.com/Asio/}}
-Asio is a cross-platform C++ library for network and low-level I/O programming that provides developers with a consistent asynchronous model using a modern C++ approach. We use it to handle TCP communication in a cross-platform way. Asio implements std::iostream wrappers around the TCP stream, which allows us to abstract from the actual source of the communication.
-
-\item [JSON for Modern C++]\hspace{-4px}\footnote{\url{https://github.com/nlohmann/json}} We use JSON for Modern C++ library to parse and serialize JSON. It is used in both LSP and DAP. It allows us to seamlessly traverse input JSON and extract the interesting values, as well as easily respond with valid JSON messages.
-
-\item [cpp-netlib URI]\hspace{-4px}\footnote{\url{https://github.com/cpp-netlib/uri}} Cpp-netlib URI library is used for parsing URI specified by the RFC3986\footnote{\url{https://tools.ietf.org/html/rfc3986}}, which is used by the LSP and DAP protocols to transfer paths to files. It is the responsibility of the language server to parse the URIs and convert them to file paths, so it is easier to work with them in the parser library. 
-\end{description}
-
 \section{Language server overview}
 The architecture of the Language server component is illustrated in \cref{lang_server_arch}. It communicates on the standard input/output via LSP with the LSP client and listens on a TCP port to provide DAP support for the macro tracer. The TCP communication is wrapped by a \SC{TCP handler}, which abstracts from the complexity of communicating through TCP/IP.
 
@@ -124,7 +112,7 @@ The architecture of the Language server component is illustrated in \cref{lang_s
 \end{figure}
 
 
-The main purpose of the \SC{Dispatcher} is to provide abstraction for the lowest level communication, which is shared by LSP and DAP. It reads iostream to parse messages using the JSON for Modern C++ library and stores them in the \SC{request manager} as requests.
+The main purpose of the \SC{Dispatcher} is to provide abstraction for the lowest level communication, which is shared by LSP and DAP. It reads iostream to parse messages using the JSON for Modern C++ library (see \cref{3rd_party}) and stores them in the \SC{request manager} as requests.
 
 A \SC{request} encapsulates one message that came from the client and is basically represented only by raw (but parsed) JSON.
 
@@ -138,7 +126,7 @@ There are two implementations of the abstract \SC{server} class: LSP server and 
 
 The \cref{hover_sequence} shows handling of the hover request in the language server. The hover request is sent from the LSP client to the LSP server when the user hovers over the text of a file. The hover request contains location of the mouse cursor in text, i.e. the name of the file, the number of line and column where the cursor is. The LSP client then expects a response containing a string (possibly written in markdown language) to be shown in a tooltip box.
 
-The whole process begins with reading from the standard input by the LSP instance of the \SC{dispatcher}. It first reads the header of the message, which contains the information about the length of the following JSON. Then it reads the JSON itself and deserializes it using the JSON for Modern C++ library. All other components of the language server work only with the parsed representation of the message. The \SC{dispatcher} adds the message to the request manager and returns to reading the next message from the standard input.
+The whole process begins with reading from the standard input by the LSP instance of the \SC{dispatcher}. It first reads the header of the message, which contains the information about the length of the following JSON. Then it reads the JSON itself and deserializes it using the JSON for Modern C++ library (see \cref{3rd_party}). All other components of the language server work only with the parsed representation of the message. The \SC{dispatcher} adds the message to the request manager and returns to reading the next message from the standard input.
 
 The request in the \SC{request manager} either waits in a queue to be processed, or, if the queue was empty, the worker thread is woken up from sleep using conditional variable. The worker then passes the JSON to the \SC{LSP server}, which looks at the name of the method written in the message and calls the method ``hover'' from \SC{language feature}.
 
@@ -151,7 +139,7 @@ The purpose of the \SC{dispatcher} is to abstract from the complexity of working
 
 The language server communicates with the LSP client on a standard input and output, so we simply use the \SC{dispatcher} with the standard std::cin and std::cout objects to communicate with the LSP client.
 
-The DAP communicates using TCP/IP, which is less straightforward. Before the VS Code extension starts the language server, it finds a free TCP port and passes it as an argument to the language server executable. The \SC{TCP handler} then starts listening on that port. Once the user wants to start the macro tracer, the DAP client connects to the port on localhost. The \SC{TCP handler} accepts the TCP client and creates a \SC{dispatcher} and a \SC{DAP server}. Once the DAP communication ends, both the \SC{dispatcher} and the \SC{DAP server} are destroyed and the \SC{TCP handler} starts listening again for the next DAP session. Thanks to the ASIO library implementation of the std::iostream interface, the dispatcher is able to completely abstract from the fact that it is communicating through TCP and not through a standard IO.
+The DAP communicates using TCP/IP, which is less straightforward. Before the VS Code extension starts the language server, it finds a free TCP port and passes it as an argument to the language server executable. The \SC{TCP handler} then starts listening on that port. Once the user wants to start the macro tracer, the DAP client connects to the port on localhost. The \SC{TCP handler} accepts the TCP client and creates a \SC{dispatcher} and a \SC{DAP server}. Once the DAP communication ends, both the \SC{dispatcher} and the \SC{DAP server} are destroyed and the \SC{TCP handler} starts listening again for the next DAP session. Thanks to the ASIO library (see \cref{3rd_party}) implementation of the std::iostream interface, the dispatcher is able to completely abstract from the fact that it is communicating through TCP and not through a standard IO.
 
 \afterpage{
 \begin{landscape}
@@ -232,7 +220,7 @@ The DAP server uses only one feature --- the Launch feature, which handles stepp
 
 According to the LSP and the DAP, the server is required to send messages back to the LSP/DAP client either as responses to requests(e.g. hover), notifications (e.g. textDocument/publishDiagnostics notification) or events(e.g. stopped event). Features require reference to an instance of the \SC{response provider} interface that provides methods \SC{respond} and \SC{notify} for sending messages back to the LSP client. Both LSP and DAP server classes implement the \SC{response provider} to form protocol-specific correct JSON with the arguments.
 
-The servers then send the JSON to the LSP/DAP client using the \SC{send message provider} interface. At this point, the whole JSON is formed. The send message provider then adds the message header and serializes the JSON using the JSON for Modern C++ library. The only implementation of the \SC{send message provider} interface is the \SC{dispatcher}.
+The servers then send the JSON to the LSP/DAP client using the \SC{send message provider} interface. At this point, the whole JSON is formed. The send message provider then adds the message header and serializes the JSON using the JSON for Modern C++ library (see \cref{3rd_party}). The only implementation of the \SC{send message provider} interface is the \SC{dispatcher}.
 
 \section{Request Manager}
 

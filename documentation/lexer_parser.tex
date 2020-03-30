@@ -1,50 +1,3 @@
-
-
-\section{Usage of ANTLR 4}
-\label{antlr}
-We have based part of our Analyzer on ANTLR 4 parser generator. ANLTR 4 implements Adaptive $LL(*)$ \cite{parr2014adaptive} parsing strategy.
-
-\subsection{Adaptive $LL(*)$ parsing strategy}
-Adaptive $LL(*)$ (or short $ALL(*)$) parsing strategy is a combination of simple, efficient and predictable top-down $LL(k)$ parsing strategy with power of $GLR$ which can handle non-deterministic and ambiguous grammars. 
-Authors move the grammar analysis to parse-time. This lets $ALL(*)$ handle any non-left-recursive context-free grammar rules and for efficiency it caches analysis results in lookahead DFA.
-
-Theoretical time complexity can be viewed as a possible downside of $ALL(*)$. Parsing of $n$ symbols takes $O(n^4)$ in theory. In practice, however, $ALL(*)$ seems to outperform other parsers by order of magnitude.
-
-Despite the theoretical $O(n^4)$ time complexity, it appears that the $ALL(*)$ behaves linear on most of the code, with no unpredictable performance or large footprint in practice. In order to support this, authors investigate the parse time vs file size for languages \texttt{C}, \texttt{Verilog}, \texttt{Erlang} and \texttt{Lua} files. They found very strong evidence of linearity on all tested languages (see the original paper for details).
-
-\subsection{ANTLR 4 pipeline}
-
-ANTLR 4, similar to any other conventional parser generator, processes the inputted code as follows: (1) breaks down the source string into tokens using \textit{lexer} (2) \textit{parser} build parse trees. 
-
-This pipeline in ANTLR 4 is broken into following classes: 
-
-\begin{description}
-	\item[\texttt{CharStream}] represents input code,
-	\item[\texttt{Lexer}] breaks the inputted code into tokens,
-	\item[\texttt{Token}] token representation that includes important information like token type, position in code or the actual text,
-	\item[\texttt{Parser}] builds parse trees,
-	\item[\texttt{TokenStream}] connects the lexer and parser.
-\end{description}
-
-\cref{antlr_pipeline} sketches the described pipeline.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=6cm]{img/antlr_pipeline}
-	\caption{ANTLR 4 pipeline overview. Taken from \cite{parr2013definitive}.}
-	\label{antlr_pipeline}
-\end{figure}
-
-\subsection{Parse-Tree walking}
-
-We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
-
-\subsection{Visitor}
-
-We employ ANTLR \emph{visitor} feature during evaluation of CA expressions. 
-
-The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
-
 \section{Lexer}
 \sourceref{parser\_library/include/shared/lexer.h}
 Lexer's responsibility is to read source string and break it into tokens --- small pieces of text with special meaning. The most important properties of the lexer:
@@ -71,7 +24,7 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 \sourcerefsu{parser\_library/include/shared/input\_source.h}
 {parser\_library/include/shared/token.h}
 {parser\_library/include/shared/token\_factory.h}
-Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream}. The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
+Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream} (see \cref{antlr}). The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
 
 \begin{figure}
 	\centering
@@ -142,12 +95,7 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 \label{lab06:parser}
 
 Parser component takes the tokens produced by lexer from token stream and recognizes HLASM statements.
-
-\subsection{ANTLR overview}
-
-The input to ANTLR is a grammar written in antlr-specific language that specifies the syntax of HLASM language. The framework takes grammar and generates source code (in C++) for a recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code and produce helper structures (statements).
-
-The parser inherits from the recognizer to provide further operations.
+The parser inherits from the HLASM recognizer generated by ANTLR (see \cref{antlr}) to provide further operations.
 
 \subsection{Parser workflow}
 \sourcerefsu{parser\_library/src/parser\_impl.h}
