@@ -70,8 +70,6 @@
 %TODO until here
 
 % file indexing
-\renewcommand\indexname{Source file index}
-
 \makeatletter
 \def\patheach#1#2#3{\@test@patheachF{#1}{#2}#3/\endgroup}
 \def\@test@patheachF#1#2#3\endgroup{\if#3\empty\empty\else\@patheachF{#1}{#2}#3\endgroup\fi}
@@ -94,3 +92,28 @@
 \newcommand{\sectionSrc}[2]{\section[#1]{#1\sectionFiles{#2}}}
 \newcommand{\subsectionSrc}[2]{\subsection[#1]{#1\sectionFiles{#2}}}
 \newcommand{\subsubsectionSrc}[2]{\subsubsection[#1]{#1\sectionFiles{#2}}}
+
+% index typesetting customization
+\renewcommand\indexname{Source file documentation index}
+\providecommand*\lettergroup[1]{}
+\makeatletter
+\newcommand\idxitem{\@idxitem}
+\newcommand\idxIitem{\@idxitem\texttt{.\ }}
+\newcommand\idxIIitem{\@idxitem\texttt{.\ .\ }}
+\newcommand\idxIIIitem{\@idxitem\texttt{.\ .\ .\ }}
+\newcommand\idxIIIIitem{\@idxitem\texttt{.\ .\ .\ .\ }}
+\newcommand\idxIIIIIitem{\@idxitem\texttt{.\ .\ .\ .\ .\ }}
+\makeatother
+
+% Include large PDFs
+\newenvironment{foldoutfloat}{%
+	\eject\pdfpageheight=52cm\pdfpagewidth=40cm
+	\newgeometry{margin=1in}
+	\textwidth=15in
+	\begin{figure}[p]
+	}{%
+	\end{figure}
+	\clearpage % otherwise it will float to another, non-resized page
+	\eject\pdfpageheight=11in\pdfpagewidth=8.5in
+	\restoregeometry
+}
