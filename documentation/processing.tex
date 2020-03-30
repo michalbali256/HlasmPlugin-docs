@@ -1,4 +1,4 @@
-\sectionSrc{Processing manager}{processing/processing\_manager.h}
+\sectionSrc{Processing manager}{parser\_library/processing/processing\_manager.h}
 \label{chap:process}
 Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
@@ -26,7 +26,7 @@ Following objects passed by analyzer serve as an input for the processing manage
 	\item \emph{Processing tracer} for tracing processed statements (see \cref{macro_tracer}).
 \end{itemize}
 
-\subsectionSrc{Statement Processor}{processing/statement\_processors/statement\_processor.h}
+\subsectionSrc{Statement Processor}{parser\_library/processing/statement\_processors/statement\_processor.h}
 \label{lab06:sect_proc}
 
 
@@ -35,7 +35,7 @@ The motivation in distinguishing different statement processors was the complexi
 
 During processing, kinds of statement processing can be nested. Hence, they are dynamically assigned to the manager when needed and removed from it when they finish.
 
-\subsubsectionSrc{Statement}{context/hlasm\_statement.h,processing/statement.h,semantics/statement.h}
+\subsubsectionSrc{Statement}{parser\_library/context/hlasm\_statement.h,parser\_library/processing/statement.h,parser\_library/semantics/statement.h}
 Statement consists of \emph{statement fields} --- \emph{label field}, \emph{instruction field}, \emph{operands field}, \emph{remark field}. It is used by statement processors and produced by statement providers. 
 
 The abstract class \emph{HLASM statement} is the ancestor for all statement related classes. Then, there are abstract classes \emph{deferred statement} and \emph{resolved statement}. Deferred statement has its operand field stored in uresolved --- deferred --- format (in code stored as string). This statement is created when actual instruction is not yet known prior to the statement creation (see \cref{lst:def_stmt}). Resolved statements are complementary to the deferred statements as their instruction --- as well as operand format --- is known prior to the statement creation.
@@ -55,9 +55,8 @@ The abstract class \emph{HLASM statement} is the ancestor for all statement rela
 
 
 
-\subsubsection{Copy and Macro definition Processors}
-\sourcerefsu{parser\_library/src/processing/statement\_processors/copy\_processor.h}
-{parser\_library/src/processing/statement\_processors/macrodef\_processor.h}
+\subsubsectionSrc{Copy and Macro definition Processors}
+{parser\_library/processing/statement\_processors/copy\_processor.h,parser\_library/processing/statement\_processors/macrodef\_processor.h}
 Both of these statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction or macro definition is encountered in the source code. 
 
 The statements collected inside copy or macro definitions are mainly deferred statements. That is because variable symbols can not be resolved inside the definition and because HLASM allows instruction aliasing (renaming instructions). Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.

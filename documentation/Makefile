@@ -9,11 +9,10 @@ all: documentation.pdf
 documentation.pdf: documentation.tex $(wildcard *.tex) $(wildcard img/*)
 	pdflatex documentation
 	bibtex documentation
-	makeindex documentation
+	texindy -M indexDepth3 documentation.idx
 	pdflatex documentation
-	makeindex documentation
 	pdflatex documentation
 
 clean:
-	$(DEL_COMMAND) -f pdfa.xmpi *.synctex* *.nlo *.nls *.ilg *.log *.dvi *.aux *.toc *.lof *.lot *.out *.bbl *.blg *.ind *.dix
-	$(DEL_COMMAND) -f main.pdf
+	$(DEL_COMMAND) -f pdfa.xmpi *.synctex* *.nlo *.nls *.ilg *.log *.dvi *.aux *.toc *.lof *.lot *.out *.bbl *.blg *.ind *.dix *.idx *.xdy
+	$(DEL_COMMAND) -f documentation.pdf

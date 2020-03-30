@@ -51,6 +51,25 @@
 \usepackage[unicode]{hyperref}   % Must follow all other packages
 \usepackage{cleveref} % Must follow all other packages including hyperref
 
+\usepackage{filecontents}
+\begin{filecontents*}{indexDepth3.xdy}
+	(markup-indexentry :open "~n      \subIIIitem " :depth 3)
+\end{filecontents*}
+
+
+%\makeatletter
+%\renewenvironment{theindex}
+%{\raggedright\small\let\item\@idxitem \parskip .0pt\@plus .3\p@\relax}{}
+%\makeatother
+
+\usepackage{makeidx}
+\providecommand*\lettergroup[1]{}
+\makeindex
+
+\makeatletter
+\newcommand\subIIIitem{\@idxitem \hspace*{40\p@}}
+\makeatother
+
 % Definitions of macros (see description inside)
 \include{macros}
 
@@ -90,6 +109,7 @@
 \bibliography{biblio} 
 \bibliographystyle{apalike}
 
+\printindex
 \begin{appendices}
 
 
