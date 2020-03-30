@@ -16,5 +16,7 @@
 *.snm
 pdfa.xmpi
 *.pdf
+*.idx
+*.ind
 
 !**/img/*

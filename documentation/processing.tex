@@ -1,6 +1,5 @@
-\section{Processing manager}
+\sectionSrc[.5\linewidth]{Processing manager}{parser\_library/processing/processing\_manager.h}
 \label{chap:process}
-
 Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
 \begin{figure}
@@ -27,16 +26,16 @@ Following objects passed by analyzer serve as an input for the processing manage
 	\item \emph{Processing tracer} for tracing processed statements (see \cref{macro_tracer}).
 \end{itemize}
 
-\subsection{Statement Processor}
+\subsectionSrc{Statement Processor}{parser\_library/processing/statement\_processors/statement\_processor.h}
 \label{lab06:sect_proc}
+
 
 
 The motivation in distinguishing different statement processors was the complexity of HLASM language. There are many cases when the same statements require different processing under different circumstances (e.g. COPY instruction in macro is handled differently than in opencode, or lookahead mode can accept statements that would fail when processed by ordinary processing).
 
 During processing, kinds of statement processing can be nested. Hence, they are dynamically assigned to the manager when needed and removed from it when they finish.
 
-\subsubsection{Statement}
-
+\subsubsectionSrc{Statement}{parser\_library/context/hlasm\_statement.h,parser\_library/processing/statement.h,parser\_library/semantics/statement.h}
 Statement consists of \emph{statement fields} --- \emph{label field}, \emph{instruction field}, \emph{operands field}, \emph{remark field}. It is used by statement processors and produced by statement providers. 
 
 The abstract class \emph{HLASM statement} is the ancestor for all statement related classes. Then, there are abstract classes \emph{deferred statement} and \emph{resolved statement}. Deferred statement has its operand field stored in uresolved --- deferred --- format (in code stored as string). This statement is created when actual instruction is not yet known prior to the statement creation (see \cref{lst:def_stmt}). Resolved statements are complementary to the deferred statements as their instruction --- as well as operand format --- is known prior to the statement creation.
@@ -56,8 +55,8 @@ The abstract class \emph{HLASM statement} is the ancestor for all statement rela
 
 
 
-\subsubsection{Copy and Macro definition Processors}
-
+\subsubsectionSrc{Copy and Macro definition Processors}
+{parser\_library/processing/statement\_processors/copy\_processor.h,parser\_library/processing/statement\_processors/macrodef\_processor.h}
 Both of these statement processors handle statement collecting, forming definition structure and storing it into HLASM context tables. They come into effect when COPY instruction or macro definition is encountered in the source code. 
 
 The statements collected inside copy or macro definitions are mainly deferred statements. That is because variable symbols can not be resolved inside the definition and because HLASM allows instruction aliasing (renaming instructions). Therefore, during the processing of a definition, as the instruction field is parsed, the format of its operands is unknown. It is fully deduced when the definition is handed over to the provider and processed by the opencode processor.
@@ -66,11 +65,12 @@ However, some statements in the macro and copy definitions forbid aliasing and t
 
 \subsubsection{Lookahead Processor}
 \label{lab06:look}
-
+\sourcerefsu{parser\_library/src/processing/statement\_processors/lookahead\_processor.h}
 Lookahead processor is activated when currently processed conditional assembly statement requires a value of undefined ordinary or sequence symbol. It looks through the following statements and finishes when the target symbol is found or when all statement providers finish. Then the processing continues from where the lookahead started.
 
 \subsubsection{Opencode Processor}
 \label{ord_proc}
+\sourcerefsu{parser\_library/src/processing/statement\_processors/ordinary\_processor.h}
 Opencode processors (in code described as Ordinary processor) usage can be described in the following points:
 \begin{enumerate}
 	\item If a model statement is encountered (see \cref{var_sym}), it substitutes the variable symbols and resolves the statement.
@@ -108,7 +108,7 @@ Terminal condition can be triggered by a finishing provider. It indicates that t
 
 \subsection{Statement Provider}
 \label{lab06:sect_prov}
-
+\sourcerefsu{parser\_library/src/processing/statement\_providers/statement\_provider.h}
 In contrary to statement processors, statement providers are ordered based on the priority (lower index, greater priority):
 
 \begin{enumerate}
@@ -156,11 +156,13 @@ In HLASM language, it is difficult to parse statements into one common structure
 
 
 \subsubsection{Copy and Macro definition Provider}
-
+\sourcerefsu{parser\_library/src/processing/statement\_providers/copy\_statement\_provider.h}
+{parser\_library/src/processing/statement\_providers/macro\_statement\_provider.h}
 These providers are activated when COPY instruction copies a file into the source code or when a macro is visited, respectively. They provide a sequence of statements to an arbitrary processor until all statements from the copy or macro definition are provided. After that, if there is no nested invocation, a provider with lower priority is selected.
 
 \subsubsection{Opencode Provider}
-
+\sourcerefsu{parser\_library/src/processing/opencode\_provider.h}
+{parser\_library/src/parser\_impl.h}
 Opencode provider is active as long as there are statements in the source file. It retrieves statements from the source code with help of lexer and parser (see \cref{lab06:parser}).
 
 \subsection{The main loop}
@@ -190,7 +192,7 @@ Library data contain a file name and enumeration indicating kind of the file tha
 
 \subsection{Statement field parser}
 \label{lab06:field_parser}
-
+\sourcerefsu{parser\_library/src/processing/statement\_fields\_parser.h}
 Statement field parser is an interface passed to the statement providers by processing manager implemented by the parser (see \cref{lab06:parser}).
 
 Firstly, it is used during statement passing. In some cases provider is requested a concrete format of a string-stored statement. The string is re-parsed with the according format. Then the field is returned back to the statement provider. 
@@ -199,7 +201,7 @@ Another use of field parser is in opencode processor as model statements are res
 
 \subsection{Instruction processors}
 \label{lab06:instr_proc}
-
+\sourcerefsu{parser\_library/src/processing/instruction\_sets}
 Ordinary processor divides processing of HLASM instruction types into several \emph{instruction processors}. Each processor is responsible for processing instructions that belong to one instruction type.
 
 As format of some instruction kinds can be rather complicated, instruction processors contain \emph{Instruction format validators} (see \cref{checker}). They check the statement to validate the correctness of used operand format as well as the correctness of the actual operand values.
@@ -233,7 +235,7 @@ HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) 
 
 \subsubsection{CA Expressions}
 \label{ca_expr:logic}
-
+\sourcerefsu{parser\_library/src/expressions}
 HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
 
 We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. For further detail on ANTLR, refer to \cref{antlr}.
@@ -315,7 +317,9 @@ return arithmetic_expression::from_string(value_, 2);
 
 \subsubsection{CA expression evaluation}
 \label{ca_expr:eval}
-
+\sourcerefsu{parser\_library/src/expressions/visitors/expression\_analyzer.h}
+{parser\_library/src/expressions/visitors/expression\_evaluator.h}
+{parser\_library/src/expressions/evaluation\_context.h}
 In the previous section, we described the representation of the CA expressions themselves. In this section, we explain the coupling of CA expressions with grammar via visitor. 
 
 The \texttt{expression\_evaluator} encapsulates the coupling logic between the grammar and the expression logic. That is, the evaluator has a notion about grammar, which translates into C++ expression logic.
@@ -328,7 +332,7 @@ Lookahead (see \cref{lab06:look}) is triggered in conditional assembly expressio
 
 \subsubsection{Machine expressions}
 \label{mach_expr}
-
+\sourcerefsu{parser\_library/src/expressions}
 In HLASM, machine expressions are used as operands of machine and assembler instructions. Their result may be a simple absolute number or an address.
 
 We use a standard infix tree representation of expressions. There is an interface \TT{machine\_expression} which is implemented by several classes that represent operators and terms. Each binary operator holds two expressions --- left and right operands. Terms are leaf classes that do not hold any other expressions and directly represent a value. There are several classes representing different terms valid in machine expressions:

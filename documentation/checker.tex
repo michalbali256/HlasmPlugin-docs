@@ -1,6 +1,6 @@
 \section{Instruction format validation}
 \label{checker}
-
+\sourceref{parser\_library/src/checking}
 One of the essential ways to provide results of the parsing to the user is through error messages. Many of these messages are created in \emph{Instruction checker} which validates the usage of different kinds of instructions.
 
 Instruction checker is an abstract class for various types of instructions. Its \emph{check()} method is being called from the instruction processors~\ref{chap:process} to check whether the specific instruction is used with correct parameters. As assembler and machine instructions have incoherent formats, we derive separate \emph{assembler} and \emph{machine} checkers from the instruction checker. CA instructions do not have a derived checker class as they are all being checked during their interpretation.
@@ -23,7 +23,8 @@ Both assembler and machine checker works in a similar manner:
 \end{enumerate}
 
 \subsection{Machine instruction checker}
-
+\sourcerefsu{parser\_library/src/checking/instruction\_checker.h}
+{parser\_library/src/context/instruction.h}
 All machine instructions have a precisely defined format which makes the validation based on these formats straightforward. Machine instructions checker operates with machine instructions and their mnemonic codes.
 
 The formats are pretty straightforward. They define several basic operands such as register or address and state which combination of these operands are acceptable. For example, instruction LR has format RR, which means it accepts only 2 arbitrary (but correct) registers. 
@@ -38,13 +39,13 @@ The formats are pretty straightforward. They define several basic operands such 
 
 \subsection{Assembler instruction checker}
 \label{sub:asm_check}
-
+\sourcerefsu{parser\_library/src/checking/asm\_instr\_check.h}
 Validation of assembler instructions is more complicated as there are no pre-defined formats for them. Each of them is described by custom operand diagrams, which demonstrate the dependencies and relations between operands of a specific instruction. An example of such diagram for the ORG instruction is shown in \cref{fig01:check}. As addition to the basic operands used for machine instructions, each assembler instruction might have its own operands, called keywords.
 
 Due to these irregularities, we derive instruction-specific classes from assembler instruction class. Each of them implements the check() method, to provide the customized checking.
 
 \subsubsection{Data Definition checking}
-
+\sourcerefsu{parser\_library/src/checking/data\_definition}
 Data definition is a type of operand in HLASM. It represents data that is assembled directly into object code (see \cref{asm_instrs}).
 
 Since there are many types of data definition, there is a data definition subcomponent of instruction validation. Whenever any component of the project needs information about a data definition operand, it can use this subcomponent. It analyzes each type of data definition and is able to return its length, attributes and check its validity.
