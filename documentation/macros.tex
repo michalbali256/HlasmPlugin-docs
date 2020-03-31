@@ -53,22 +53,6 @@
 \newfloat{listing}{tbp}{lst}
 \floatname{listing}{Listing}
 
-%TODO remove this; this is the old indexing version
-\makeatletter
-\newcommand{\sourceref}[1]{%
-	\vspace{-0.40cm}
-	\TT{*\ \ \ #1}\\
-	\checknextarg}
-\newcommand{\checknextarg}{\@ifnextchar\bgroup{\gobblenextarg}{\vspace{0.1cm}\par \noindent }}
-\newcommand{\gobblenextarg}[1]{\TT{*\ \ \ #1}\\\@ifnextchar\bgroup{\gobblenextarg}{\vspace{0.1cm}\par\noindent}}
-
-\newcommand{\sourcerefsu}{%
-	\vspace{-0.30cm}
-	\gobblenextargs}
-\newcommand{\gobblenextargs}[1]{\TT{*\ \ \ #1}\\\@ifnextchar\bgroup{\gobblenextargs}{\vspace{-0.2cm}\par \noindent }}
-\makeatother
-%TODO until here
-
 % file indexing
 \renewcommand\indexname{Source file index}
 

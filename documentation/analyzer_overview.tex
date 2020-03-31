@@ -3,8 +3,9 @@
 
 The analyzer's role is to provide a facade over objects and methods to create a simple interface for processing (analyzing) a single HLASM source file. The output of the analysis is data for the LSP server.
 
-\section{Overview}
-\sourceref{parser\_library/src/analyzer.h}
+\sectionSrc{Overview}
+{parser\_library/src/analyzer.h}
+
 The analyzer is composed of several sub-components, all required to properly process the file (see \cref{fig06:analyzer}). 
 \begin{itemize}
 	\item \emph{LSP data collector} collects and retrieves all LSP information created while processing the file.

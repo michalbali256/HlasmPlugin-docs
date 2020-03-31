@@ -1,5 +1,6 @@
-\section{HLASM context tables}
-\sourceref{parser\_library/src/context/hlasm\_context.h}
+\sectionSrc{HLASM context tables}
+{parser\_library/src/context/hlasm\_context.h}
+
 HLASM context tables (in code referred simply as \TT{hlasm\_context}) is composition of tables and stacks that describe state of the currently processed open-code (see \cref{fig06:hlasm}). This structure is persistent between source files within an open-code. It is created in analyzer and has the same lifespan. 
 
 It is composed of:
@@ -15,8 +16,9 @@ It is composed of:
 	\item \emph{Ordinary assembly context} -- encapsulates structures describing Ordinary assembly.
 \end{itemize}
 
-\subsection{Macros}
-\sourcerefsu{parser\_library/src/context/macro.h}
+\subsectionSrc{Macros}
+{parser\_library/src/context/macro.h}
+
 HLASM context stores visited macro definitions in the \emph{macro strorage}. 
 
 Macro definition is represented by:
@@ -32,8 +34,9 @@ When macro is called, \emph{macro invocation} object is created. It shares the c
 
 The macro invocation is stored in the context's \emph{scope stack}.
 
-\subsection{Scope stack}
-\sourcerefsu{parser\_library/src/context/code\_scope.h}
+\subsectionSrc{Scope stack}
+{parser\_library/src/context/code\_scope.h}
+
 This stack holds information about the scope of variable symbols (see \cref{lab06:var_sym}). The scope changes when macro is visited. The initial scope is the open-code. 
 
 
@@ -45,16 +48,18 @@ The stack contains:
 	\item Branch counter (for ACTR instruction).
 \end{itemize}
 
-\subsection{COPY}
-\sourcerefsu{parser\_library/src/context/copy\_member.h}
+\subsectionSrc{COPY}
+{parser\_library/src/context/copy\_member.h}
+
 HLASM context stores visited COPY members in the \emph{copy strorage}.
 
 COPY member definition is much more simple than the macro definition as it does not hold any more semantic information than the sequence of statements (the definition itself).
 
 When copy is visited, copy member invocation is created and pushed in the copy stack of last entry of the \emph{source stack}.
 
-\subsection{Source stack and Processing stack}
-\sourcerefsu{parser\_library/src/context/processing\_context.h}
+\subsectionSrc{Source stack and Processing stack}
+{parser\_library/src/context/processing\_context.h}
+
 This stacks are responsible for the nests of opened files (source stack) and what they are opened for (processing stack). As the relation of source entry and processing entry is one-to-many, the information is stored in two arrays rather than one.
 
 When statement processor (see \cref{lab06:sect_proc}) is changed (e.g. macro or copy definition is processed, lookahead is needed, ...), this information is stored in the processing stack. If a new file is opened during this change then source stack is updated as well.
@@ -73,16 +78,18 @@ The reasoning of organizing this two stacks in such a way is:
 	\item Easy retrieval of the correct copy stack for copy statement provider.
 \end{enumerate} 
 
-\subsection{ID storage}
-\sourcerefsu{parser\_library/src/context/id\_storage.h}
+\subsectionSrc{ID storage}
+{parser\_library/src/context/id\_storage.h}
+
 ID storage holds the string identifiers that are used by the open-code. 
 It stores the string and retrieves a pointer. It is guaranteed that if two different strings with the same value are passed to the storage, the resulting pointers are equal.
 
 It simplifies work with IDs and saves space. 
 
-\subsection{Variable symbols}
+\subsectionSrc{Variable symbols}
+{parser\_library/src/context/variables}
 \label{lab06:var_sym}
-\sourcerefsu{parser\_library/src/context/variables}
+
 In HLASM language, variable symbol is general term for symbols beginning with ampersand. They, however, can be separated into several structures that capture common behavior:
 
 \begin{itemize}
@@ -100,14 +107,16 @@ They inherit common abstract ancestor \emph{variable symbol}. SET symbols are fu
 	\label{fig06:var}
 \end{figure}
 
-\subsection{LSP context}
-\sourcerefsu{parser\_library/src/context/lsp\_context.h}
+\subsectionSrc{LSP context}
+{parser\_library/src/context/lsp\_context.h}
+
 The LSP context serves as the collection point for the data needed to answer the LSP requests. It is a part of the HLASM context to be able to pass on the LSP data between different parsed files.
 
 The LSP data collector stores its values inside the LSP context tables. More about the collection of the data and their values can be found in~\cref{lsp_data}.
 
-\subsection{Ordinary assembly context}
-\sourcerefsu{parser\_library/src/context/ordinary\_assembly/ordinary\_assembly\_context.h}
+\subsectionSrc{Ordinary assembly context}
+{parser\_library/src/context/ordinary\_assembly/ordinary\_assembly\_context.h}
+
 The above described structures aimed to describe the high-level part of the language (code generation). As we move closer to the resulting object code of the source file, the describing structures get complicated. Therefore, HLASM context contains object storing just this part of the processing.
 
 \begin{figure}
@@ -124,9 +133,10 @@ Ordinary assembly context consists of three main components (see \cref{fig06:ord
 	\item \emph{Symbol dependency tables}. Contains yet unresolved dependencies between symbols prior to the currently processed instruction.
 \end{enumerate}
 
-\subsubsection{Symbol}
-\sourcerefsu{parser\_library/src/context/ordinary\_assembly/symbol.h}
-{parser\_library/src/context/ordinary\_assembly/symbol\_attributes.h}
+\subsubsectionSrc{Symbol}
+{parser\_library/src/context/ordinary\_assembly/symbol.h,
+parser\_library/src/context/ordinary\_assembly/symbol\_attributes.h}
+
 This class represents HLASM ordinary symbol (see \cref{ord_sym}). Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
 
 \begin{description}
@@ -134,14 +144,16 @@ This class represents HLASM ordinary symbol (see \cref{ord_sym}). Besides its id
 	\item[Attributes] structure holds symbol attributes like type, length, scale and integer.
 \end{description}
 
-\subsubsection{Section}
-\sourcerefsu{parser\_library/src/context/ordinary\_assembly/section.h}
+\subsubsectionSrc{Section}
+{parser\_library/src/context/ordinary\_assembly/section.h}
+
 Section is a structure representing HLASM section (created by CSECT, DSECT, ...). It contains enumeration \emph{section kind} describing type of the section prior to the used instruction. The structure also holds \emph{location counter storage} with defined location counters.
 
-\subsubsection{Location counter}
-\sourcerefsu{parser\_library/src/context/ordinary\_assembly/location\_counter.h}
-{parser\_library/src/context/ordinary\_assembly/location\_counter\_data.h}
-{parser\_library/src/context/ordinary\_assembly/address.h}
+\subsubsectionSrc{Location counter}
+{parser\_library/src/context/ordinary\_assembly/location\_counter.h,
+parser\_library/src/context/ordinary\_assembly/location\_counter\_data.h,
+parser\_library/src/context/ordinary\_assembly/address.h}
+
 This structure contains data and operations for one location counter. The data is stored in helper sub-structure \emph{location counter data}.
 
 \begin{description}
@@ -190,11 +202,12 @@ This structure contains data and operations for one location counter. The data i
 
 ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
 
-\subsubsection{Symbol dependency tables}
+\subsubsectionSrc{Symbol dependency tables}
+{parser\_library/src/context/ordinary\_assembly/symbol\_dependency\_tables.h,
+parser\_library/src/context/ordinary\_assembly/dependant.h,
+parser\_library/src/context/ordinary\_assembly/dependable.h}
 \label{symbol_dependency_tables}
-\sourcerefsu{parser\_library/src/context/ordinary\_assembly/symbol\_dependency\_tables.h}
-{parser\_library/src/context/ordinary\_assembly/dependant.h}
-{parser\_library/src/context/ordinary\_assembly/dependable.h}
+
 HLASM forbids cyclic symbol definition. This component maintains dependencies between symbols and detects possible cycles.
 Let us describe the main components of dependency resolving.
 
