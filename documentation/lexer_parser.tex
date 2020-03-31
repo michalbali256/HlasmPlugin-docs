@@ -203,7 +203,7 @@ Each operand format has corresponding \emph{operand structure}. They all inherit
 
 \subsection{Grammar rules}
 \sourcerefsu{parser\_library/src/grammar}
-Grammar rules describing parser are separated into several files:
+Grammar rules describing parser are separated into several files (see \cref{parser_rules}):
 \begin{itemize}
 	\item \TT{hlasm\_parser.g4} -- Top level rules are stored here.
 	\item \TT{lookahead\_rules.g4} -- Rules for lookahead mode.
@@ -214,13 +214,4 @@ Grammar rules describing parser are separated into several files:
 	\item \TT{ca/asm\_expression\_rules.g4} -- Rules for expressions.
 	\item \TT{data\_def\_rules.g4} -- Rules for data definition.
 \end{itemize}
-
-\begin{landscape}
-	\begin{figure}
-		\centering
-		\includegraphics[height=\textheight]{img/grammar}
-		\caption{All 193 grammar rules.}
-		\label{parser:rules}
-	\end{figure}
-\end{landscape}
 

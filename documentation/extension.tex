@@ -18,7 +18,7 @@ To be independent of pipes, we have added an option to use TCP, which assigns a 
 
 \emph{Macro Tracer}~\ref{macro_tracer} is implemented using DAP, which is also supported out-of-the-box by VSCode. Similarly to LSP TCP support, we dynamically assign a random free port for DAP communication during the activation.
 
-\section{Additions}
+\section{Additional implemented features}
 
 Several features are added to the extension to simplify work with HLASM in modern editors. These additions are specific for Visual Studio Code (and Theia) and are not a part of the LSP specification.
 
@@ -42,9 +42,9 @@ Configuration file \emph{pgm\_conf.json} contains a field \emph{alwaysRecognize}
 
 \subsubsection{Automatic Language Detection}
 
-Whenever a file is open, its contents are scanned line by line. Whether a file is HLASM or not is determined by a ratio (\# HLASM lines)/(\# all lines).
+Whenever a user opens a file, its contents are scanned line by line. If the file has a sufficient ratio of HLASM lines to all lines, it is considered to be HLASM.
 
-Recognition is mostly based on a pre-defined set of most used instructions. If a line correctly uses one of these instructions, it is counted as a HLASM line. Continued line of a HLASM line is also a HLASM line.
+The HLASM line recognition is mostly based on a pre-defined set of most used instructions. If a line correctly uses one of these instructions, it is counted as a HLASM line. Continued line of a HLASM line is also a HLASM line.
 Moreover, a HLASM line must not exceed 80 characters.
 
 Comment lines or empty lines are skipped and not counted. 

@@ -210,12 +210,12 @@ As format of some instruction kinds can be rather complicated, instruction proce
 During the instruction processing, processors work with HLASM \emph{expressions} (see \cref{ca_expr:logic}, \cref{mach_expr}). They need to be evaluated to correctly perform the processing.
 
 There are four specialized instruction processors:
-\paragraph*{Macro IP} looks up for macro definition in HLASM context tables and calls it.
-\paragraph*{Assembler and Machine IP} processes assembler and machine instructions (see \cref{asm_instrs} \cref{mach_instr}) to retain consistency in HLASM context tables.
-
-\paragraph*{Conditional assembly IP} executes conditional assembly instructions (see \cref{ca_instr}). 
-
-\vspace{5mm}
+\begin{description}
+	\item[Macro IP] looks up for macro definition in HLASM context tables and calls it.
+	\item[Assembler and Machine IP] processes assembler and machine instructions (see \cref{asm_instrs} \cref{mach_instr}) to retain consistency in HLASM context tables.
+	\item[Conditional assembly IP] executes conditional assembly instructions (see \cref{ca_instr}). 
+	
+\end{description}
 
 See the current list of processed instruction in \cref{tab06:instr_proc}.
 
