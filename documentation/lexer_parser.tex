@@ -8,9 +8,9 @@ Lexer's responsibility is to read source string and break it into tokens --- sma
 	\item can jump in the source file backward and forward if necessary (for implementation of instructions like AGO and AIF). Because of this, it is not possible to use any standard lexing tool, and the lexer has to be implemented from scratch.
 \end{itemize}
 
-As previously mentioned, we designed a custom lexer for HLASM. We have a number of reasons to do so. HLASM language is complex. It was first introduced several decades ago, and the language was during this long time subjected to development. Such a long period made the HLASM language complex. Also, it contains some aggressive features, for example, \texttt{AREAD} or \texttt{COPY}, that can alter the source code at parse time.
+As previously mentioned, we designed a custom lexer for HLASM. We had a number of reasons to do so. HLASM language is complex. It was first introduced several decades ago and, during this long time, the language was subjected to development. Such a long time period has made the HLASM language complex. Also, it contains some aggressive features, for example, \texttt{AREAD} or \texttt{COPY}, that can alter the source code at parse time.
 
-Conventional lexing tools are most often based on regular expressions. As discussed above, there are several difficulties that one must consider designing lexer for this particular language. A regular expression-based lexer would be too difficult or even impossible to design\footnote{One could match separate characters from the input and let the parser or semantic analysis deal with some of the described problems. This drastic solution would cost performance, as parsers are usually more performance demanding.}.
+Conventional lexing tools are most often based on regular expressions. As discussed above, there are several difficulties that one must consider while designing lexer for this particular language. A regular expression-based lexer would be too difficult or even impossible to design\footnote{One could match separate characters from the input and let the parser or semantic analysis deal with some of the described problems. This drastic solution would cost performance, as parsers are usually more performance demanding.}.
 
 \subsection{Encodings}
 Source code encodings differ for the used libraries. All strings are encoded in \texttt{UTF} as follows:
@@ -22,11 +22,9 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 \end{description}
 
 \subsectionSrc{Architecture}
-{parser\_library/include/shared/input\_source.h,
-parser\_library/include/shared/token.h,
-parser\_library/include/shared/token\_factory.h}
+{parser\_library/include/shared/input\_source.h,parser\_library/include/shared/token.h,parser\_library/include/shared/token\_factory.h}
 
-Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream} (see \cref{antlr}). The reason is to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
+Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream} (see \cref{antlr}). The reason was to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
 
 \begin{figure}
 	\centering
@@ -37,7 +35,7 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 
 \begin{description}
 	
-	\item[\texttt{token}] implements ANTLR's class \texttt{Token} and extends it by adding properties important for location of the token within the input stream. As the LSP protocol works with offsets encoded in \texttt{UTF-16} and ANTLR 4 works with \texttt{UTF-32} encoding, we add attributes for \texttt{UTF-16} positions, too.
+	\item[\texttt{token}] implements ANTLR's class \texttt{Token} and extends it by adding properties important for location of the token within the input stream. As the LSP protocol works with offsets encoded in \texttt{UTF-16} and ANTLR 4 works with \texttt{UTF-32} encoding, we add attributes for \texttt{UTF-16} positions too.
 	
 	Token does not carry the actual text from the source but instead references the position in code (unlike \texttt{CommonToken}). Note that the position of a token is vital for further analysis.
 	
@@ -61,7 +59,7 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 		\label{tab06:tokens}
 	\end{table}
 	
-	Interesting remark of HLASM language complexity is absence of \emph{string} token (see \cref{tab06:tokens}). Lexer does not generate this token due to existence of model statements (see \cref{var_sym}). There, variable symbol can be written anywhere in the statement (even in the middle of the string), what significantly restricts lexer.
+	Interesting remark of HLASM language complexity is absence of \emph{string} token (see \cref{tab06:tokens}). Lexer does not generate this token due to the existence of model statements (see \cref{var_sym}). There, variable symbol can be written anywhere in the statement (even in the middle of the string), what significantly restricts lexer.
 	
 	\item[\texttt{token\_factory}] produces tokens of previously described custom type \texttt{token}.
 	
@@ -69,12 +67,12 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 	
 	Beware of the usage of \texttt{UTF} encodings: \texttt{\_data} (source code string) and positions/indices in API are in \texttt{UTF-32}; \texttt{getText} returns \texttt{UTF-8} string.
 	
-	\item[\texttt{lexer}] is based on ANTLR's \texttt{TokenSource} class. As most lexers, it is also, in principle, a finite state machine. The most important difference compared to conventional FSMs and other lexers is added communication interface that connects the parser and the instruction interpreter with the lexer. Unusual is also input rewinding (to support \texttt{AREAD}, for example), lexing from parallel sources (\texttt{AINSERT} buffer), and some helper API for subsequent processing stages.
+	\item[\texttt{lexer}] is based on ANTLR's \texttt{TokenSource} class. As most lexers, it is also, in principle, a finite state machine. The most important difference compared to conventional FSMs and other lexers is added communication interface that connects the parser and the instruction interpreter with the lexer. Unusual is also input rewinding (to support \texttt{AREAD}, for example), lexing from parallel sources (\texttt{AINSERT} buffer) and some helper API for subsequent processing stages.
 	
 	Important functions:
 	
 	\begin{description}
-		\item[\texttt{nextToken()}] implements main functionality: lexes and emits tokens. Before lexing, the function uses the right input stream (either the source code or \texttt{AINSERT} buffer if not empty). After choosing the right input source, the lexer emits token is lexed. HLASM introduces \textit{continuation} symbol (an arbitrary non-blank symbol at column 72 by default) that breaks one logical line into two or more lines in code. The end of one logical line indicates \texttt{EOLLN} token. Such token is important for further (syntactic and semantic) analysis.
+		\item[\texttt{nextToken()}] implements main functionality: lexes and emits tokens. Before lexing, the function uses the right input stream (either the source code or \texttt{AINSERT} buffer if not empty). After choosing the right input source, the lexer emits token. HLASM introduces \textit{continuation} symbol (an arbitrary non-blank symbol in the continuation column) that breaks one logical line into two or more source-code lines. The end of one logical line indicates \texttt{EOLLN} token. Such token is important for further (syntactic and semantic) analysis.
 		
 		
 		\item[\texttt{create\_token()}] creates token of given type. The lexer's internal state gives the position of the token. 
@@ -96,45 +94,29 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 \section{Parser}
 \label{lab06:parser}
 
-Parser component takes the tokens produced by lexer from token stream and recognizes HLASM statements.
+Parser component takes tokens produced by lexer from token stream and recognizes HLASM statements.
 The parser inherits from the HLASM recognizer generated by ANTLR (see \cref{antlr}) to provide further operations.
 
 \subsectionSrc{Parser workflow}
-{parser\_library/src/parser\_impl.h,
-parser\_library/src/semantics/range\_provider.h}
+{parser\_library/src/parser\_impl.h,parser\_library/src/semantics/range\_provider.h}
 
 Parser (in code referenced as \TT{parser\_impl}) implements opencode statement provider interface. This means that, according to the statement passing in \cref{lab06:proc_stat}, parser needs to parse each statement in \emph{two steps}:
 
 \begin{enumerate}
-	\item Parser calls rule \TT{label\_instr}. It parses label and instruction fields into respective structures. The operand and remark field is stored as string.
-	\item After retrieving processing format, parser selects corresponding rule to parse operands. With the rule, it parses remaining string from the previous step.
+	\item Parser calls rule \TT{label\_instr}. It parses label and instruction fields into respective structures. The operand and remark field is stored as a string.
+	\item After retrieving the processing format, the parser selects corresponding rule to parse operands. With the rule, it parses remaining string from the previous step.
 \end{enumerate}
 
 For the means of parsing remaining strings, parser subcomponent contains actually \emph{two parsers}. The first one parses statement after statement from a source file. The second parses the operands from the string passed by the first parser. 
 
-Operands to have correctly set ranges prior to the source file rather than to the passed string, parser uses \emph{Range provider}. It helps the second parser to have ranges of reparsed operands consistent with the ranges of other fields. It is initialized with the begin location of operand field in the statement and all ranges furtherly created in parsing are adjusted to have correct boundaries.
+To achieve operands having correctly set ranges prior to the source file rather than to the passed string, the parser uses \emph{Range provider}. It helps the second parser to have ranges of reparsed operands consistent with the ranges of other fields. It is initialized with the begin location of operand field in the statement and all ranges furtherly created in parsing are adjusted to have correct boundaries.
 
 \subsectionSrc{Statement structure}
-{parser\_library/src/semantics/collector.h,
-parser\_library/src/semantics/statement.h,
-parser\_library/src/semantics/statement\_fields.h}
+{parser\_library/src/semantics/collector.h,parser\_library/src/semantics/statement.h,parser\_library/src/semantics/statement\_fields.h}
 
 During parsing of a statement, several structures are created and collected. They are \TT{label\_si, instruction\_si, operand\_si, remark\_si} (\emph{si} as semantic information). They are collected with \TT{collector} and built into \TT{statement\_si} structure.
 
 Label and instruction structures can contain either identifier of a symbol or --- when in model statement --- concatenation of strings and variable symbols. Remark field is simply just a string as it serves as a commentary statement field. Operand field contains list of operands used in the statement. They can be of several formats.
-
-\subsubsectionSrc{Concatenation}
-{parser\_library/src/semantics/concatenation.h}
-
-A model statement is a statement that contains variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is represented by a concatenation of helper structures. The concatenation can be further evaluated to produce the final string.
-
-The helper structures are:
-\begin{itemize}
-	\item \TT{char\_str} -- character string.
-	\item \TT{var\_sym} -- substitutable variable symbol.
-	\item \TT{dot}, \TT{equals} -- characters with special meaning.
-	\item \TT{sublist} -- by parenthesis enclosed recursive concatenation.
-\end{itemize}
 
 \subsubsectionSrc{Operand formats}
 {parser\_library/src/semantics/operand.h}
@@ -154,6 +136,19 @@ Each operand format has corresponding \emph{operand structure}. They all inherit
 	\caption{Operand structure inheritance.}
 	\label{fig06:operand_arch}
 \end{figure}
+
+\subsubsectionSrc{Concatenation}
+{parser\_library/src/semantics/concatenation.h}
+
+A model statement is a statement that contains a variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is represented by a concatenation of helper structures. The concatenation can be further evaluated to produce the final string.
+
+The helper structures are:
+\begin{itemize}
+	\item \TT{char\_str} -- character string.
+	\item \TT{var\_sym} -- substitutable variable symbol.
+	\item \TT{dot}, \TT{equals} -- characters with special meaning.
+	\item \TT{sublist} -- by parenthesis enclosed recursive concatenation.
+\end{itemize}
 
 \subsectionSrc{Grammar rules}
 {parser\_library/src/grammar}
