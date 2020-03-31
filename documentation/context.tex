@@ -134,8 +134,7 @@ Ordinary assembly context consists of three main components (see \cref{fig06:ord
 \end{enumerate}
 
 \subsubsectionSrc{Symbol}
-{parser\_library/src/context/ordinary\_assembly/symbol.h,
-parser\_library/src/context/ordinary\_assembly/symbol\_attributes.h}
+{parser\_library/src/context/ordinary\_assembly/symbol.h,parser\_library/src/context/ordinary\_assembly/symbol\_attributes.h}
 
 This class represents HLASM ordinary symbol (see \cref{ord_sym}). Besides its identifier and location, symbol contains \emph{value} and \emph{attributes} components.
 
@@ -203,9 +202,7 @@ This structure contains data and operations for one location counter. The data i
 ORG instruction can arbitrarily move location counter's value forward and backward. With addition to that, ORG can also order location counter to set it's value to the next available value (the lowest untouched address, see \cref{loctr}). Combining this with the possible spaces creation, location counter holds an array of the location counter data to properly set the next available value.
 
 \subsubsectionSrc{Symbol dependency tables}
-{parser\_library/src/context/ordinary\_assembly/symbol\_dependency\_tables.h,
-parser\_library/src/context/ordinary\_assembly/dependant.h,
-parser\_library/src/context/ordinary\_assembly/dependable.h}
+{parser\_library/src/context/ordinary\_assembly/symbol\_dependency\_tables.h,parser\_library/src/context/ordinary\_assembly/dependant.h,parser\_library/src/context/ordinary\_assembly/dependable.h}
 \label{symbol_dependency_tables}
 
 HLASM forbids cyclic symbol definition. This component maintains dependencies between symbols and detects possible cycles.

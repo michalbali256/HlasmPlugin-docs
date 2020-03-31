@@ -36,6 +36,7 @@
 \usepackage{makecell}
 \usepackage[toc,page]{appendix}
 \usepackage{multirow}
+\usepackage{tocbibind}
 
 \lstset{basicstyle=\ttfamily,
 	showstringspaces=false,
@@ -51,6 +52,10 @@
 \usepackage[unicode]{hyperref}   % Must follow all other packages
 \usepackage{cleveref} % Must follow all other packages including hyperref
 
+% indexing
+\usepackage{makeidx}
+\makeindex
+\usepackage[totoc, columns=1]{idxlayout}
 % Definitions of macros (see description inside)
 \include{macros}
 
@@ -63,7 +68,6 @@
 \maketitle
 
 %%% A page with automatically generated table of contents of the bachelor thesis
-
 \tableofcontents
 
 %%% Each chapter is kept in a separate file
@@ -88,39 +92,16 @@
 \include{extension}
 
 \part{Build Guide}
+\include{3rd_party}
 \include{build_guide}
+
 
 \bibliography{biblio} 
 \bibliographystyle{apalike}
 
+\printindex
 \begin{appendices}
 
-
-%\includepdf[pages=-,fitpage=true]{all_arch.pdf}
-
-\newenvironment{foldoutfloat}{%
-	\eject\pdfpageheight=52cm\pdfpagewidth=40cm
-	\newgeometry{margin=1in}
-	\textwidth=15in
-	\begin{figure}[p]
-	}{%
-	\end{figure}
-	\clearpage % otherwise it will float to another, non-resized page
-	\eject\pdfpageheight=11in\pdfpagewidth=8.5in
-	\restoregeometry
-}%
-
-\newenvironment{foldoutfloatlandscape}{%
-	\eject\pdfpageheight=40cm\pdfpagewidth=52cm
-	\newgeometry{margin=1in}
-	\textwidth=15in
-	\begin{figure}[p]
-	}{%
-	\end{figure}
-	\clearpage % otherwise it will float to another, non-resized page
-	\eject\pdfpageheight=11in\pdfpagewidth=8.5in
-	\restoregeometry
-}%
 
 \begin{foldoutfloat}
 	\chapter{Architecture of the project}

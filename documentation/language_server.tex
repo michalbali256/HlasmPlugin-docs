@@ -1,4 +1,5 @@
 \chapter{Language server}
+\index{language\_server@\texttt{language\_server}}
 \label{chap:lang_server}
 The purpose of the Language server is to implement the Language Server Protocol (LSP) and the Debug Adapter Protocol (DAP) and to provide access to the parser library by using them. It has to deserialize and serialize LSP and DAP messages, extract parameters of particular methods and then serve the requests by invoking functionality of parser library.
 
@@ -100,20 +101,8 @@ The communication in DAP is between an editor or an IDE and a debugger. The edit
 
 DAP is very similar to LSP. Although the ideas behind DAP are nearly the same, DAP is not based on the JSON RPC. Instead, DAP specifies its own implementation of remote procedure call, still using JSON as the basic carrier of the messages. DAP has requests and events --- requests always go from the client to the server and require response. Events are the same as the notifications from JSON RPC that are sent from the server to the client. The similarity allows our language server component to share a lot of code between the implementations of the protocols.
 
-\section{Third party libraries}
-HLASM Language server uses three third party libraries.
-
-\begin{description}
-	\item [ASIO C++ library]\hspace{-4px}\footnote{\url{https://think-async.com/Asio/}}
-Asio is a cross-platform C++ library for network and low-level I/O programming that provides developers with a consistent asynchronous model using a modern C++ approach. We use it to handle TCP communication in a cross-platform way. Asio implements std::iostream wrappers around the TCP stream, which allows us to abstract from the actual source of the communication.
-
-\item [JSON for Modern C++]\hspace{-4px}\footnote{\url{https://github.com/nlohmann/json}} We use JSON for Modern C++ library to parse and serialize JSON. It is used in both LSP and DAP. It allows us to seamlessly traverse input JSON and extract the interesting values, as well as easily respond with valid JSON messages.
-
-\item [cpp-netlib URI]\hspace{-4px}\footnote{\url{https://github.com/cpp-netlib/uri}} Cpp-netlib URI library is used for parsing URI specified by the RFC3986\footnote{\url{https://tools.ietf.org/html/rfc3986}}, which is used by the LSP and DAP protocols to transfer paths to files. It is the responsibility of the language server to parse the URIs and convert them to file paths, so it is easier to work with them in the parser library. 
-\end{description}
-
 \section{Language server overview}
-The architecture of the Language server component is illustrated in \cref{lang_server_arch}. It communicates on the standard input/output via LSP with the LSP client and listens on a TCP port to provide DAP support for the macro tracer. The TCP communication is wrapped by a \SC{TCP handler}, which abstracts from the complexity of communicating through TCP/IP.
+The architecture of the Language server component is illustrated in \cref{lang_server_arch}. It communicates on the standard input/output via LSP with the LSP client and listens on a TCP port to provide DAP support for the macro tracer. The TCP communication is wrapped by class \TT{tcp\_handler}, which abstracts from the complexity of communicating through TCP/IP.
 
 
 \begin{figure}
@@ -124,34 +113,37 @@ The architecture of the Language server component is illustrated in \cref{lang_s
 \end{figure}
 
 
-The main purpose of the \SC{Dispatcher} is to provide abstraction for the lowest level communication, which is shared by LSP and DAP. It reads iostream to parse messages using the JSON for Modern C++ library and stores them in the \SC{request manager} as requests.
+The main purpose of the class \TT{dispatcher} is to provide abstraction for the lowest level communication, which is shared by LSP and DAP. It reads iostream to parse messages using the JSON for Modern C++ library (see \cref{3rd_party}) and stores them in the \TT{request\_manager} as \TT{requests}.
 
-A \SC{request} encapsulates one message that came from the client and is basically represented only by raw (but parsed) JSON.
+A \TT{request} encapsulates one message that came from the client and is basically represented only by raw (but parsed) JSON.
 
-\SC{Request manager} stores \SC{requests} in a queue and runs a worker thread that serves the requests one by one. As there is only one instance of request manager running in the language server, it serializes requests from DAP and LSP (which come asynchronously from separate sources) into one queue.
+\TT{request\_manager} stores \TT{requests} in a queue and runs a worker thread that serves the requests one by one. As there is only one instance of request manager running in the language server, it serializes requests from DAP and LSP (which come asynchronously from separate sources) into one queue.
 
-\SC{Server} is an abstract class that implements protocol behavior that is common for both DAP and LSP --- it basically implements Remote Procedure Call. Actual handling of LSP and DAP requests is implemented in \SC{features}. Each \SC{feature} contains implementation of several protocol requests or notifications. The \SC{features} unwrap the arguments from JSON and call corresponding parser library methods.
+\TT{server} is an abstract class that implements protocol behavior that is common for both DAP and LSP --- it basically implements Remote Procedure Call. Actual handling of LSP and DAP requests is implemented in \TT{features}. Each \TT{feature} contains implementation of several protocol requests or notifications. The features unwrap the arguments from JSON and call corresponding parser library methods.
 
-There are two implementations of the abstract \SC{server} class: LSP server and DAP server. They both implement the initialization and finalization of protocol communication, which is a bit different for both protocols and both use features to serve protocol requests.
+There are two implementations of the abstract \TT{server} class: \TT{lsp\_server} and \TT{dap\_server}. They both implement the initialization and finalization of protocol communication, which is a bit different for both protocols and both use features to serve protocol requests.
 
 \section{Example: hover request handling}
 
-The \cref{hover_sequence} shows handling of the hover request in the language server. The hover request is sent from the LSP client to the LSP server when the user hovers over the text of a file. The hover request contains location of the mouse cursor in text, i.e. the name of the file, the number of line and column where the cursor is. The LSP client then expects a response containing a string (possibly written in markdown language) to be shown in a tooltip box.
+The \cref{hover_sequence} shows handling of the hover request in the language server. The hover request is sent from the LSP client to the \TT{lsp\_server} when the user hovers over the text of a file. The hover request contains location of the mouse cursor in text, i.e. the name of the file, the number of line and column where the cursor is. The LSP client then expects a response containing a string (possibly written in markdown language) to be shown in a tooltip box.
 
-The whole process begins with reading from the standard input by the LSP instance of the \SC{dispatcher}. It first reads the header of the message, which contains the information about the length of the following JSON. Then it reads the JSON itself and deserializes it using the JSON for Modern C++ library. All other components of the language server work only with the parsed representation of the message. The \SC{dispatcher} adds the message to the request manager and returns to reading the next message from the standard input.
+The whole process begins with reading from the standard input by the LSP instance of the \TT{dispatcher}. It first reads the header of the message, which contains the information about the length of the following JSON. Then it reads the JSON itself and deserializes it using the JSON for Modern C++ library (see \cref{3rd_party}). All other components of the language server work only with the parsed representation of the message. The \TT{dispatcher} adds the message to the \TT{request\_manager} and returns to reading the next message from the standard input.
 
-The request in the \SC{request manager} either waits in a queue to be processed, or, if the queue was empty, the worker thread is woken up from sleep using conditional variable. The worker then passes the JSON to the \SC{LSP server}, which looks at the name of the method written in the message and calls the method ``hover'' from \SC{language feature}.
+The request in the \TT{request\_manager} either waits in a queue to be processed, or, if the queue was empty, the worker thread is woken up from sleep using conditional variable. The worker then passes the JSON to the \TT{lsp\_server}, which looks at the name of the method written in the message and calls the method ``hover'' from the language feature.
 
-The hover method unpacks the actual arguments from JSON and converts any URIs to paths using the cpp-netlib URI library. Then, it calls the hover method from the parser library, which returns a string to be shown in the tooltip next to the hovering mouse. The language feature then wraps the return value back in JSON and calls the \SC{respond} method of its \SC{response provider} implemented by the \SC{LSP server}.
+The hover method unpacks the actual arguments from JSON and converts any URIs to paths using the cpp-netlib URI library. Then, it calls the hover method from the parser library, which returns a string to be shown in the tooltip next to the hovering mouse. The language feature then wraps the return value back in JSON and calls the \TT{respond} method of its \TT{response\_provider} implemented by the \TT{lsp\_server}.
 
-The \SC{LSP server} wraps JSON arguments into a LSP response and uses the \SC{send message provider} implemented by \SC{Dispatcher} to send it to the LSP client. The Dispatcher serializes the JSON, adds the header with the length of the JSON and writes the message to a standard output. Finally, all methods return and the worker thread in request manager looks for another request. If there is none, it goes to sleep.
+The \TT{lsp\_server} wraps JSON arguments into a LSP response and uses the \SC{send message provider} implemented by \SC{Dispatcher} to send it to the LSP client. The Dispatcher serializes the JSON, adds the header with the length of the JSON and writes the message to a standard output. Finally, all methods return and the worker thread in request manager looks for another request. If there is none, it goes to sleep.
 
-\section{I/O handling}
-The purpose of the \SC{dispatcher} is to abstract from the complexity of working with raw strings and streams. It executes an infinite loop in which it reads messages from std::iostream and adds them to the request manager as parsed JSON objects. At the same time, it is able to write responses in the correct format.
+%******************** IO HANDLING *************************
+\sectionSrc{I/O handling}
+{language\_server/src/main.cpp,language\_server/src/dispatcher.h,language\_server/src/dap/tcp\_handler.h}
 
-The language server communicates with the LSP client on a standard input and output, so we simply use the \SC{dispatcher} with the standard std::cin and std::cout objects to communicate with the LSP client.
+The purpose of the \TT{dispatcher} is to abstract from the complexity of working with raw strings and streams. It executes an infinite loop in which it reads messages from \TT{std::iostream} and adds them to the request manager as parsed JSON objects. At the same time, it is able to write responses in the correct format.
 
-The DAP communicates using TCP/IP, which is less straightforward. Before the VS Code extension starts the language server, it finds a free TCP port and passes it as an argument to the language server executable. The \SC{TCP handler} then starts listening on that port. Once the user wants to start the macro tracer, the DAP client connects to the port on localhost. The \SC{TCP handler} accepts the TCP client and creates a \SC{dispatcher} and a \SC{DAP server}. Once the DAP communication ends, both the \SC{dispatcher} and the \SC{DAP server} are destroyed and the \SC{TCP handler} starts listening again for the next DAP session. Thanks to the ASIO library implementation of the std::iostream interface, the dispatcher is able to completely abstract from the fact that it is communicating through TCP and not through a standard IO.
+The language server communicates with the LSP client on a standard input and output, so we simply use the \SC{dispatcher} with the standard \TT{std::cin} and \TT{std::cout} objects to communicate with the LSP client.
+
+The DAP communicates using TCP/IP, which is less straightforward. Before the VS Code extension starts the language server, it finds a free TCP port and passes it as an argument to the language server executable. The \TT{TCP handler} then starts listening on that port. Once the user wants to start the macro tracer, the DAP client connects to the port on localhost. The \TT{tcp\_handler} accepts the TCP client and creates a \TT{dispatcher} and a \TT{dap\_server}. Once the DAP communication ends, both the \TT{dispatcher} and the \TT{dap\_server} are destroyed and the \TT{tcp\_handler} starts listening again for the next DAP session. Thanks to the ASIO library (see \cref{3rd_party}) implementation of the \TT{std::iostream} interface, the \TT{dispatcher} is able to completely abstract from the fact that it is communicating through TCP and not through the standard IO.
 
 \afterpage{
 \begin{landscape}
@@ -164,16 +156,18 @@ The DAP communicates using TCP/IP, which is less straightforward. Before the VS 
 \end{landscape}
 }
 
-\section{Servers}
+%******************** SERVERS *************************
+\sectionSrc{LSP and DAP Server}
+{language\_server/src/server.h,language\_server/src/feature.h,language\_server/src/lsp/lsp\_server.h,language\_server/src/dap/dap\_server.h,language\_server/src/dap/dap\_feature.h}
 The servers are able to process incoming LSP and DAP requests. They get the messages in a form of already parsed JSONs. Then they extract the name of the requested method with its parameters from the message and call the corresponding method with the parameters encoded as JSON.
 
-There are two server implementations: \SC{LSP server} and \SC{DAP server}. Both inherit from an abstract class called \SC{server}. They implement protocol-specific processing of messages --- although the protocols are quite similar, each protocol has different initialization and finalization, different message format, etc.
+There are two server implementations: \TT{lsp\_server} and \TT{dap\_server}. Both inherit from an abstract class called \TT{server}. They implement protocol-specific processing of messages --- although the protocols are quite similar, each protocol has different initialization and finalization, different message format, etc.
 
-The implementation of servers' functionality is divided into features. Each feature implements several LSP or DAP methods by unpacking the arguments of the respective method and calling corresponding parser library function. During initialization, each feature adds its methods to the server's list of implemented methods. The \SC{LSP server} uses three features:
+The implementation of servers' functionality is divided into features. Each feature implements several LSP or DAP methods by unpacking the arguments of the respective method and calling corresponding parser library function. During initialization, each feature adds its methods to the server's list of implemented methods. The \TT{lsp\_server} uses three features:
 \begin{itemize}
-	\item \SC{Text synchronization feature}, which handles the notifications about the state of open files in the editor.
-	\item \SC{Workspace folders feature}, which handles the notifications about adding and removing workspaces.
-	\item \SC{Language feature}, which handles requests about HLASM code information.
+	\item \emph{Text synchronization feature}, which handles the notifications about the state of open files in the editor.
+	\item \emph{Workspace folders feature}, which handles the notifications about adding and removing workspaces.
+	\item \emph{Language feature}, which handles requests about HLASM code information.
 \end{itemize}
 The \cref{LSP_methods} shows the list of all implemented LSP methods and the classes where the implementations lie.
 
@@ -182,17 +176,17 @@ The \cref{LSP_methods} shows the list of all implemented LSP methods and the cla
 	\begin{tabular}{ll}
 		\toprule
 		\textbf{LSP Method name}            & \textbf{Component}                              \\ \midrule
-		initialize                          & \multirow{4}{5cm}{LSP server}                   \\
+		initialize                          & \multirow{4}{7cm}{LSP server \\ \srcstyle{language\_server/src/lsp/lsp\_server.h}}                   \\
 		shutdown                            &                                                 \\
 		exit                                &                                                 \\
 		textDocument/publishDiagnostics     &                                                 \\ \midrule
-		textDocument/didOpen                & \multirow{4}{5cm}{Text synchronization feature} \\
+		textDocument/didOpen                & \multirow{4}{7cm}{Text synchronization feature \srcstyle{language\_server/src/lsp/feature\_text\_synchronization.h}} \\
 		textDocument/didChange              &                                                 \\
 		textDocument/didClose               &                                                 \\
 		textDocument/semanticHighlighting   &                                                 \\ \midrule
-		workspace/didChangeWorkspaceFolders & \multirow{2}{5cm}{Workspace folders feature}    \\
+		workspace/didChangeWorkspaceFolders & \multirow{2}{7cm}{Workspace folders feature \srcstyle{language\_server/src/lsp/feature\_workspace\_folders.h}}    \\
 		workspace/didChangeWatchedFiles     &                                                 \\ \midrule
-		textDocument/definition             & \multirow{4}{5cm}{Language feature}             \\
+		textDocument/definition             & \multirow{4}{7cm}{Language feature \srcstyle{language\_server/src/lsp/feature\_language\_features.h}}             \\
 		textDocument/references             &                                                 \\
 		textDocument/hover                  &                                                 \\
 		textDocument/completion             &                                                 \\ \bottomrule
@@ -208,9 +202,11 @@ The DAP server uses only one feature --- the Launch feature, which handles stepp
 	\begin{tabular}{ll}
 		\toprule
 		\textbf{DAP Method name} & \textbf{Component}                 \\ \midrule
-		initialize               & \multirow{2}{3cm}{DAP server}      \\
+		initialize               & \multirow{2}{3cm}{DAP server
+		\srcstyle{language\_server/src/dap/dap\_server.h}}      \\
 		disconnect               &                                    \\ \midrule
-		launch                   & \multirow{13}{3cm}{Launch feature} \\
+		launch                   & \multirow{13}{3cm}{Launch feature
+		\srcstyle{language\_server/src/dap/feature\_launch.h}} \\
 		setBreakpoints           &                                    \\
 		configurationDone        &                                    \\
 		threads                  &                                    \\
@@ -228,21 +224,25 @@ The DAP server uses only one feature --- the Launch feature, which handles stepp
 	\label{DAP_methods}
 \end{table}
 
-\section{Result respond}
+%******************** RESPONSE *************************
+\sectionSrc{Response with result}
+{language\_server/src/feature.h,language\_server/src/server.h}
 
-According to the LSP and the DAP, the server is required to send messages back to the LSP/DAP client either as responses to requests(e.g. hover), notifications (e.g. textDocument/publishDiagnostics notification) or events(e.g. stopped event). Features require reference to an instance of the \SC{response provider} interface that provides methods \SC{respond} and \SC{notify} for sending messages back to the LSP client. Both LSP and DAP server classes implement the \SC{response provider} to form protocol-specific correct JSON with the arguments.
+According to the LSP and the DAP, the server is required to send messages back to the LSP/DAP client either as responses to requests(e.g. hover), notifications (e.g. textDocument/publishDiagnostics notification) or events(e.g. stopped event). Features require reference to an instance of the \TT{response\_provider} interface that provides methods \TT{respond} and \TT{notify} for sending messages back to the LSP client. Both LSP and DAP server classes implement the \TT{response\_provider} to form protocol-specific correct JSON with the arguments.
 
-The servers then send the JSON to the LSP/DAP client using the \SC{send message provider} interface. At this point, the whole JSON is formed. The send message provider then adds the message header and serializes the JSON using the JSON for Modern C++ library. The only implementation of the \SC{send message provider} interface is the \SC{dispatcher}.
+The servers then send the JSON to the LSP/DAP client using the \TT{send\_message\_provider} interface. At this point, the whole JSON is formed. The \TT{send\_message\_provider} then adds the message header and serializes the JSON using the JSON for Modern C++ library (see \cref{3rd_party}). The only implementation of the \TT{send\_message\_provider} interface is the \TT{dispatcher}.
 
-\section{Request Manager}
+%******************** REQUEST MANAGER *************************
+\sectionSrc{Request Manager}
+{language\_server/src/request\_manager.h}
 
 \SC{Request manager} encapsulates a queue of requests with a worker thread that processes them. There may be up to two \SC{dispatcher} instances in the language server: one for LSP and one for DAP. Both of them add the requests they parse into one \SC{request manager}. It is necessary to process the requests one by one, because the parser library cannot process more requests at the same time.
 
 There are three threads running in the language server:
 \begin{itemize}
-	\item LSP read thread --- a thread in which the \SC{dispatcher} reads messages from a standard input.
-	\item DAP read thread --- a thread in which the \SC{TCP handler} listens on a localhost port to initiate a DAP session. After accepting the DAP client, the \SC{dispatcher} reads DAP input on this thread too.
-	\item Worker thread in \SC{request manager} that processes each request using the \SC{LSP server} or the \SC{DAP server} and ultimately the parser library.
+	\item LSP read thread --- a thread in which the \TT{dispatcher} reads messages from a standard input.
+	\item DAP read thread --- a thread in which the \TT{tcp\_handler} listens on a localhost port to initiate a DAP session. After accepting the DAP client, the \TT{dispatcher} reads DAP input on this thread too.
+	\item Worker thread in \TT{request\_manager} that processes each request using the \TT{lsp\_server} or the \TT{dap\_server} and ultimately the parser library.
 \end{itemize}
 
 The threads are synchronized in two ways: firstly, there is a mutex that protects adding to the request queue simultaneously by the LSP and the DAP read threads. Secondly, there is a conditional variable to control the worker thread so it sleeps when there are no requests and wakes up when a new request has been added.
@@ -256,6 +256,6 @@ For example, when a user starts changing a file, every character he writes is pa
 \end{enumerate}
 When more didChange notifications come in succession, their first parts must be executed with all the notifications to keep the internal representation of the file updated. However, the user is interested only in diagnostics and semantic highlighting for the current state of the text, so we need to parse the file only once --- after the last notification.
 
-The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the request manager. When set to true, the results of current request or notification are no longer needed, the parser library should stop all parsing and return as soon as possible.
+The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the \TT{request\_manager}. When set to true, the results of current request or notification are no longer needed, the parser library should stop all parsing and return as soon as possible.
 
 
