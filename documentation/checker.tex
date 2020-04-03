@@ -4,7 +4,7 @@
 \label{checker}
 One of the essential ways to provide results of the parsing to the user is through error messages. Many of these messages are created in \emph{Instruction checker} which validates the usage of different kinds of instructions.
 
-Instruction checker is an abstract class for various types of instructions. Its \emph{check()} method is being called from the instruction processors~\ref{chap:process} to check whether the specific instruction is used with correct parameters. As assembler and machine instructions have different formats, we derive separate \emph{assembler} and \emph{machine} checkers from the instruction checker. CA instructions do not have a derived checker class as they are all being checked during their interpretation.
+Instruction checker is an abstract class for various types of instructions. Its \TT{check} method is being called from the instruction processors~\ref{chap:process} to check whether the specific instruction is used with correct parameters. As assembler and machine instructions have different formats, we derive separate \emph{assembler} and \emph{machine} checkers from the instruction checker. CA instructions do not have a derived checker class as they are all being checked during their interpretation.
 
 The checkers need an access to the definitions of all possible instructions. These instructions are stored statically inside an object called \emph{instruction}. It consists of 4 different containers:
 \begin{itemize}
@@ -16,8 +16,8 @@ The checkers need an access to the definitions of all possible instructions. The
 
 Both assembler and machine checker works in a similar manner:
 \begin{enumerate}
-	\item Either assembler or machine processor calls the check() method of its respective checker. This method accepts the instruction name, the vector of used operands, the range of statement and the diagnostic collector.
-	\item Checker finds the correct instruction based on the provided name and calls the check() method of its instruction class, along with the same parameters as mentioned above.
+	\item Either assembler or machine processor calls the \TT{check} method of its respective checker. This method accepts the instruction name, the vector of used operands, the range of statement and the diagnostic collector.
+	\item Checker finds the correct instruction based on the provided name and calls the \TT{check} method of its instruction class, along with the same parameters as mentioned above.
 	\item The instruction itself compares its possible operands with the used operands.
 	\item More validations may be necessary, based on the instruction.
 	\item In case of mismatch, a diagnostic is added to the passed diagnostic container.
@@ -28,7 +28,7 @@ Both assembler and machine checker works in a similar manner:
 
 All machine instructions have a precisely defined format which makes the validation based on these formats straightforward. Machine instructions checker operates with machine instructions and their mnemonic codes.
 
-The formats are pretty straightforward. They define several basic operands such as register or address and state which combination of these operands are acceptable. For example, instruction LR has format RR, which means it accepts only 2 arbitrary (but correct) registers. 
+The formats are defined by several basic operands such as register or address and state which combination of these operands are acceptable. For example, instruction LR has format RR, which means it accepts only 2 arbitrary (but correct) registers. 
 
 \begin{figure}
 	\centering
@@ -44,7 +44,7 @@ The formats are pretty straightforward. They define several basic operands such 
 
 Validation of assembler instructions is more complicated as there are no pre-defined formats for them. Each of them is described by custom operand diagrams, which demonstrate the dependencies and relations between operands of a specific instruction. An example of such diagram for the ORG instruction is shown in \cref{fig01:check}. As an addition to the basic operands used for machine instructions, each assembler instruction might have its own operands, called keywords.
 
-Due to these irregularities, we derive instruction-specific classes from assembler instruction class. Each of them implements the check() method, to provide the customized checking.
+Due to these irregularities, we derive instruction-specific classes from assembler instruction class. Each of them implements the \TT{check} method, to provide the customized checking.
 
 \subsubsectionSrc{Data Definition checking}
 {parser\_library/src/checking/data\_definition}

@@ -6,8 +6,9 @@ There are several IDEs that currently (natively) support LSP, such as \emph{Ecli
 
 Our IDE choice is \emph{Visual Studio Code}, due to its popularity and lightweight design. Conveniently, \emph{Theia}, a web-based IDE, supports VSCode extensions, therefore our plugin works with \emph{Theia} as well.
 
-\section{Standard LSP Extension}
-
+%******************** Standard LSP Extension *************************
+\sectionSrc{Standard LSP Extension}
+{clients/vscode-hlasmplugin/src/extension.ts}
 The core of the extension is an activation event which starts the plugin for VSCode.
 
 Upon activation, \emph{Language Client} and \emph{Language server}~\ref{chap:lang_server} are started as child processes of VSCode and a pipe is open for their communication. The LSP communication and its features are handled by the \emph{vscodelc} package. 
@@ -20,38 +21,29 @@ To be independent of pipes, we have added an option to use TCP, which assigns a 
 
 \section{Additional implemented features}
 
-Several features are added to the extension to simplify work with HLASM in modern editors. These additions are specific for Visual Studio Code (and Theia) and are not a part of the LSP specification.
+To simplify the work with HLASM in modern editors, several features are added to the extension . These additions are specific for Visual Studio Code (and Theia) and are not a part of the LSP specification.
 
 \subsection{Language Detection}
-
+\label{section:wildcard}
 The usual workflow with the extension begins with downloading HLASM source codes from mainframe. Typically, these files will not have any file extension and even if they do, they might differ across various products.
 
 To cope with this problem, there are several mechanisms that help the user to recognize the file as HLASM automatically.
 
-\subsubsection{Macro Detection}
-
-Each file starting with line \emph{MACRO} (arbitrary number of whitespace before and after) is recognized as HLASM.
-
-\subsubsection{Configuration Files Detection}
-
-Every file either defined as a program or as a part of a processor group is recognized as HLASM.
-
-\subsubsection{Wildcards}
-\label{section:wildcard}
-Configuration file \emph{pgm\_conf.json} contains a field \emph{alwaysRecognize}, which consists of user-defined wildcards. Every file that satisfies at least one of these wildcards is recognized as HLASM.
-
-\subsubsection{Automatic Language Detection}
-
-Whenever a user opens a file, its contents are scanned line by line. If the file has a sufficient ratio of HLASM lines to all lines, it is considered to be HLASM.
-
-The HLASM line recognition is mostly based on a pre-defined set of most used instructions. If a line correctly uses one of these instructions, it is counted as a HLASM line. Continued line of a HLASM line is also a HLASM line.
-Moreover, a HLASM line must not exceed 80 characters.
-
-Comment lines or empty lines are skipped and not counted. 
-
-We tested the detection on 11.000 HLASM files and 9.000 non HLASM files. The best results were observed using 4/10 ratio, with 88\% true positive recognition and 95\% true negative recognition. 
-
-Because of the indeterminate outcomes, this method is meant to be used as a fall-back in case all previous methods do not suffice.
+\begin{description}
+	\item[Macro Detection] Each file starting with line \emph{MACRO} (arbitrary number of whitespace before and after) is recognized as HLASM.
+	\item[Configuration Files Detection] Every file either defined as a program or as a part of a processor group is recognized as HLASM.
+	\item[Wildcards] Configuration file \emph{pgm\_conf.json} contains a field \emph{alwaysRecognize}, which consists of user-defined wildcards. Every file that satisfies at least one of these wildcards is recognized as HLASM.
+	\item[Automatic Language Detection] Whenever a user opens a file, its contents are scanned line by line. If the file has a sufficient ratio of HLASM lines to all lines, it is considered to be HLASM.
+	
+	The HLASM line recognition is mostly based on a pre-defined set of most used instructions. If a line correctly uses one of these instructions, it is counted as a HLASM line. Continued line of a HLASM line is also a HLASM line.
+	Moreover, a HLASM line must not exceed 80 characters.
+	
+	Comment lines or empty lines are skipped and not counted. 
+	
+	We tested the detection on 11.000 HLASM files and 9.000 non HLASM files. The best results were observed using 4/10 ratio, with 88\% true positive recognition and 95\% true negative recognition. 
+	
+	Because of the indeterminate outcomes, this method is meant to be used as a fall-back in case all previous methods do not suffice.
+\end{description}
 
 All detection layers are visualized in \cref{fig08:lang}.
 
@@ -78,15 +70,17 @@ To improve the second problem, the option overrides standard VSCode commands, co
 
 \subsection{Configuration Prompt}
 
-If the workspace contains a HLASM file, but does not have configurations, the user is prompted to create them. The warning message also offers an option to create templates for them.
+If a workspace contains a HLASM file, but does not have the configuration files set, the user is prompted to create them. The warning message also offers an option to create templates for them.
 
-\subsection{HLASM Semantic Highlighting}
+%******************** HLASM Semantic Highlighting *************************
+\subsectionSrc{HLASM Semantic Highlighting}
+{clients/vscode-hlasmplugin/src/semanticHighlighting.ts,clients/vscode-hlasmplugin/src/ASMsemanticHighlighting.ts,clients/vscode-hlasmplugin/src/protocol.semanticHighlighting.ts}
 
-In case of HLASM, a semantic (server-side) highlighting is desired. The multi-layered nature of the language causes that in quite common scenarios, specific parts of the code can be highlighted if and only if some previous part was completely processed (parameters for instructions, skipped code thanks to code generation, defined macros, continuations, etc...).
+In case of HLASM, a semantic (server-side) highlighting is desired. The multi-layered nature of the language causes that in quite common scenarios, specific parts of the code can be properly highlighted if and only if some previous part was completely processed (parameters for instructions, skipped code thanks to code generation, defined macros, continuations, etc...).
 
-Based on the open pull request to the VSCode Language Server \footnote{https://github.com/microsoft/vscode-languageserver-node/pull/367/files}, we added \emph{semanticHighlighting} as an extra feature of LSP. This feature works in a very similar manner, implementing the LSP interfaces that VSCode provides. It works as a notification from the server to the client, containing ranges of code and their respective tokens (e.g. instruction, label, parameter, comment,..). 
+Based on the open pull request to the VSCode Language Server \footnote{https://github.com/microsoft/vscode-languageserver-node/pull/367/files}, we added \emph{semanticHighlighting} as an extra feature of LSP. This feature works in a very similar manner, implementing the LSP interfaces that VSCode provides. It works as a notification from the server to the client, containing ranges inside the document and their respective tokens (e.g. instruction, label, parameter, comment,..). 
 
-On top of that, we extended \emph{semanticHighlighting} to \emph{ASMsemanticHighlighting}, which adds the ability to notify the client about new code layout, specifically start, continuation and continue columns. These fields can be set in the HLASM code (via ICTL instruction) and are required for the \emph{Continuation Handling} feature to work properly. Our client-server communication is shown in \cref{fig08:lsp}.
+On top of that, we extended \emph{semanticHighlighting} to \emph{ASMsemanticHighlighting}, which adds the ability to notify the client about a new code layout, specifically begin, continuation and continue columns. These fields can be set in the HLASM code (via ICTL instruction) and are required for the \emph{Continuation Handling} feature to work properly. Our client-server communication is shown in \cref{fig08:lsp}.
 
 
 \begin{figure}

@@ -2,8 +2,10 @@
 \label{ws_manager}
 Workspace manager encapsulates all functionality of the parser library. It is the access point to all parsing capabilities, keeps the current state of all open files and resolves libraries needed by the analyzer. It also manages when files should be reparsed.
 
-\section{Parser library API}
 
+%******************** Parser library API *************************
+\sectionSrc{Parser library API}
+{parser\_library/include/shared/workspace\_manager.h,parser\_library/src/workspace\_manager\_impl.h}
 First of all, the workspace manager component is the only public interface of the parser library. The API design is based on LSP and DAP, most of the API is just LSP/DAP rewritten in C++. The API uses the observer pattern for DAP events and notifications originating in parser library (e.g. textDocument/publishDiagnostics).
 
 The API can be divided into three categories:
@@ -78,13 +80,64 @@ So the parser library is allowed to load arbitrary files from the disk, and use 
 	\label{parse_results}
 \end{table}
 
-All the methods from the second category are listed in \cref{parse_results}. They get position of caret or mouse cursor in a file and are expected to return information about the place in code. For example method \TT{hover} is called when the user points at some word in the code and waits for a short time. The method returns a string that the editor shows in tooltip window at the position. Typically, the tooltip would show type of a variable and its value, if known.
+All the methods from the second category are listed in \cref{parse_results}. They get position of caret or mouse cursor in a file and are expected to return information about the place in the code. For example, method \TT{hover} is called when the user points at some word in the code and waits for a short time. The method returns a string that the editor shows in the tooltip window at the position. Typically, the tooltip would show type of the variable and its value, if known.
 
 Additionally, the parser library presents its results using the observer pattern. There are two interfaces: highligting and diagnostics consumer. Each of them has method \TT{consume} that gets updated information as parameter whenever there is an update. Any potential user of the library (e.g. the language server component) just has to implement the interfaces to process the results.
 
 \subsection{Macro tracer}
 
 The macro tracer part of the API is again just DAP rewritten in C++. There are methods that are called when the user clicks on buttons to control the macro tracer: launch the tracer, step in, step over, continue and stop. Moreover, there are methods that retrieve information about current state of traced code: stack of macro calls and information about compile time variables. See \cref{macro_tracer} for full description of macro tracer.
+
+\section{Architecture overview}
+The architecture of the workspace manager works as follows.
+
+\begin{description}
+	\item[Workspace manager] The workspace manager provides API for handling various workspace management (e.g. add new workspace), LSP and DAP requests. It may hold multiple workspaces and calls 
+	file manager to handle changes in the workspace files.
+	\item[Workspace] The workspace deals with the relations between its files (dependencies) upon parse request and propagates the parsing further into analyzer. It also retrieves data from the configuration files and it is used for resolving dependency searches by implementing parse library provider.
+	\item[Processor group] \sectionFiles{.43\linewidth}{parser\_library/src/processor\_group.h} 
+	The processor group uses libraries to search for their dependencies. Currently, we only support local libraries, which utilize the file manager for their file information retrieval.
+	\item[File manager] \sectionFiles{.43\linewidth}{parser\_library/src/file\_manager.h}
+	The file manager is used by multiple components to handle file management and file searches. It also distinguishes and does conversions between regular files and processor files, which may be used for parsing.
+	\item[Analyzer] The analyzer does the whole processing part and is further explained in~\cref{chap:analyzer}.
+\end{description}
+
+An overview of the architecture is visualised in~\cref{ws_mngr_arch}.
+
+The technical details of each component are further explained in the following sections.
+
+\afterpage{
+\begin{landscape}
+\begin{figure}
+	\centering
+	\includegraphics[width=16cm]{img/ws_mngr_arch}
+	\caption{Architecture of workspace manager.}
+	\label{ws_mngr_arch}
+\end{figure}
+\end{landscape}
+}
+
+%******************** Workspace *************************
+\sectionSrc{Workspace}
+{parser\_library/src/workspace.h}
+
+The core of the workspace is its \TT{parse\_file} method. As addition to the parsing part, it also ensures that the file to be parsed, its dependencies and depenendants (files that are a dependency of other workspace files) provide consistent results. The method works as follows:
+
+\begin{enumerate}
+	\item It checks whether the parsed file is a configuration file. If so, we reload the configurations and reparse all dependants in the workspace.
+	\item In case the parsed file is not a configuration file, it firstly creates a list of all files to be parsed. This list consists of files depending on the parsed file and the parsed file itself.
+	\item Then, the method reparses the files in this list and creates new dependants, based on the dependencies reported from the parsing.
+	\item Finally, it checks for the files that are no longer in use (former dependencies) and closes them.
+\end{enumerate}
+
+Another important responsibility of the workspace is to ensure the correct closure of a file upon \TT{didClose} request. The method works as follows:
+
+\begin{enumerate}
+	\item If the closed file is a dependency of some other file, it cannot be removed completely from the file manager, as it is still in use. The file manager is rather notified that the file was closed in the editor.
+	\item If it is not a dependency, the method checks for its dependants and closes them. 
+\end{enumerate}                        
+
+The workspace is also used by the analyzer for parsing libraries via implementing parse library provider interface. 
 
 \section{Libraries configuration}
 \label{libs_config}
@@ -108,24 +161,24 @@ From this configuration, the workspace simply remembers the processor group - op
 
 \begin{listing}[t]
 	\begin{verbatim}
-{
-  "pgroups":[
-    {
-      "name":"GROUP1",
-      "libs":[
-        "ASMMAC/",
-        "C:/SYS.ASMMAC"
-      ]
-    },
-    {
-      "name":"GROUP2",
-      "libs":[
-        "G2MAC/",
-        "C:/SYS.ASMMAC"
-      ]
+	{
+	  "pgroups": [
+	    {
+	      "name":"GROUP1",
+	      "libs": [
+	        "ASMMAC/",
+	        "C:/SYS.ASMMAC"
+	      ]
+	    },
+	    {
+	      "name":"GROUP2",
+	      "libs": [
+	        "G2MAC/",
+	        "C:/SYS.ASMMAC"
+	      ]
+	    }
+	  ]
 	}
-  ]
-}
 	\end{verbatim}
 	\caption{A processor group configuration file}
 	\label{lst:proc_grps}
@@ -133,75 +186,26 @@ From this configuration, the workspace simply remembers the processor group - op
 
 \begin{listing}[t]
 	\begin{verbatim}
-{
-  "pgms": [
-    {
-      "program": "source_code",
-      "pgroup": "GROUP1"
-	},
 	{
-	  "program": "second_file",
-	  "pgroup": "GROUP2"
-	},
-  ]
-}
+	  "pgms": [
+	    {
+	      "program": "source_code",
+	      "pgroup": "GROUP1"
+	    },
+	    {
+	      "program": "second_file",
+	      "pgroup": "GROUP2"
+	    },
+	  ]
+	}
 	\end{verbatim}
 	\caption{A program configuration file}
 	\label{lst:pgm_conf}
 \end{listing}
 
-\clearpage
-\section{Architecture overview}
-
-The architecture of the workspace manager works as follows.
-
-The workspace manager provides API for handling various workspace management (e.g. add new workspace), LSP and DAP requests. It may hold multiple workspaces and calls 
-file manager to handle changes in the workspace files.
-
-The workspace deals with the relations between its files (dependencies) upon parse request and propagates the parsing further into analyzer. It also retrieves data from the configuration files and it is used for resolving dependency searches by implementing parse library provider.
-
-The processor group uses libraries to search for their dependencies. Currently, we only support local libraries, which utilize the file manager for their file information retrieval.
-
-The file manager is used by multiple components to handle file management and file searches. It also distinguishes and does conversions between regular files and processor files, which may be used for parsing.
-
-The analyzer does the whole processing part and is further explained in~\cref{chap:analyzer}.
-
-An overview of the architecture is visualised in~\cref{ws_mngr_arch}.
-
-The technical details of each component are further explained in the following sections.
-
-\afterpage{
-\begin{landscape}
-\begin{figure}
-	\centering
-	\includegraphics[width=16cm]{img/ws_mngr_arch}
-	\caption{Architecture of workspace manager.}
-	\label{ws_mngr_arch}
-\end{figure}
-\end{landscape}
-}
-
-\section{Workspace}
-
-The core of the workspace is its \TT{parse\_file} method. As addition to the parsing part, it also ensures that the file to be parsed, its dependencies and depenendants (files that are a dependency of other workspace files) provide consistent results. The method works as follows:
-
-\begin{enumerate}
-	\item It checks whether the parsed file is a configuration file. If so, we reload the configurations and reparse all dependants in the workspace.
-	\item In case the parsed file is not a configuration file, it firstly creates a list of all files to be parsed. This list consists of files depending on the parsed file and the parsed file itself.
-	\item Then, the method reparses the files in this list and creates new dependants, based on the dependencies reported from the parsing.
-	\item Finally, it checks for the files that are no longer in use (former dependencies) and closes them.
-\end{enumerate}
-
-Another important responsibility of the workspace is to ensure the correct closure of a file upon \TT{didClose} request. The method works as follows:
-
-\begin{enumerate}
-	\item If the closed file is a dependency of some other file, it cannot be removed completely from the file manager, as it is still in use. The file manager is rather notified that the file was closed in the editor.
-	\item If it is not a dependency, the method checks for its dependants and closes them. 
-\end{enumerate}                        
-
-The workspace is also used by the analyzer for parsing libraries via implementing parse library provider interface. 
-
-\section{Files}
+%******************** Files *************************
+\sectionSrc{Files}
+{parser\_library/src/file.h,parser\_library/src/file\_impl.h,parser\_library/src/file.h,parser\_library/src/processor.h,parser\_library/src/processor\_file\_impl.h}
 
 Regular files are represented via abstract class \emph{file}. They are capable of providing their file names, their contents and changing their states upon file-oriented LSP requests, i.e didChange, didClose and didOpen.
 
@@ -210,7 +214,9 @@ Those files that can be processed are defined by \emph{processor\_file} class, w
 When the \TT{parse} method is invoked, the processor file initializes new analyzer, uses it for the parsing and rebuilds its dependencies list, closing the unwanted ones. When the parsing is finished, it keeps the instance of the analyzer and provides its parsing results when requested.
 
 
-\section{Libraries resolution}
+%******************** Libraries resolution *************************
+\sectionSrc{Libraries resolution}
+{parser\_library/src/parse\_lib\_provider.h,parser\_library/src/library.h}
 
 The libraries are resolved using a \emph{parse\_lib\_provider} interface. Whenever a component is to be used for dependency handling, it implements this interface and may be used by analyzer for this purpose.
 
@@ -218,7 +224,9 @@ The parse lib provider's \TT{parse\_library} method is passed the name of the li
 
 The workspace is the most important implementation of the \TT{parse\_library\_provider} interface. It provides libraries based on the processor groups configuration described in \cref{libs_config}.
 
-\section{Diagnosable}
+%******************** Diagnosable *************************
+\sectionSrc{Diagnosable}
+{parser\_library/src/diagnosable.h,parser\_library/src/diagnosable\_impl.h,parser\_library/src/diagnostic.h}
 A diagnostic is used to indicate a problem with source files, such as a compiler error or a warning. Some diagnostics are created in almost every component of the parser when it finds a problem with a source code. Diagnostics are also used in workspace to indicate problems with configuration files. After each parsing, we need to collect all the diagnostics from all the instances of all the components and pass them to the language server.
 
 To tackle this problem, there is interface \emph{diagnosable}. Its functionality is simple, it is used to add diagnostics, show his own and collect them from other diagnosable members. Each component that implements the interface is required to collect diagnostics from diagnosable objects it owns. So in the result, the diagnosable components are organised in a tree and with one call of \TT{collect\_diags} from the root of the tree, it is possible to get all diagnostics that were created since last such call.
