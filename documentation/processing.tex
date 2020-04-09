@@ -163,7 +163,7 @@ In HLASM language, it is difficult to parse statements into one common structure
 These providers are activated when COPY instruction copies a file into the source code or when a macro is visited, respectively. They provide a sequence of statements to an arbitrary processor until all statements from the copy or macro definition are provided. After that, if there is no nested invocation, a provider with lower priority is selected.
 
 \subsubsectionSrc{Opencode Provider}
-{parser\_library/src/processing/opencode\_provider.h,parser\_library/src/parser\_impl.h}
+{parser\_library/src/processing/opencode\_provider.h,parser\_library/src/parsing/parser\_impl.h}
 
 Opencode provider is active as long as there are statements in the source file. It retrieves statements from the source code with help of lexer and parser (see \cref{lab06:parser}).
 
@@ -237,8 +237,8 @@ See the current list of processed instruction in \cref{tab06:instr_proc}.
 
 HLASM differentiates two kinds of expressions: \emph{Conditional Assembly} (CA) and \emph{Machine} expressions. CA expressions appear in conditional assembly, which is processed during compilation. Machine expressions are used with assembler and machine instructions.
 
-\subsubsectionSrc{CA Expressions}
-{parser\_library/src/expressions}
+\subsubsectionSrc[0.5\linewidth]{CA Expressions}
+{parser\_library/src/expressions/expression.h,parser\_library/src/expressions/arithmetic\_expression.h,parser\_library/src/expressions/character\_expression.h,parser\_library/src/expressions/keyword\_expression.h,parser\_library/src/expressions/logic\_expression.h,parser\_library/src/expressions/numeric\_wrapper.h}
 \label{ca_expr:logic}
 
 HLASM evaluates CA expressions during assembly generation. For further details, refer to the \cref{ca_instr}.
@@ -257,7 +257,7 @@ HLASM CA expression is conceptually similar to the expressions in other language
 expressions are supported. We implement the logic in the following classes:
 
 \begin{description}
-	\item[\texttt{expression}] A pure virtual class that defines a shared interface, operators, and functions. The class also implements evaluation logic for terms and factors. 
+	\item[\texttt{expression}] A pure virtual class that defines a shared interface, operators, and functions. The class also implements evaluation logic for terms and factors.
 	
 	\item[\texttt{diagnostic\_op}] The concept of \emph{diagnostics} is fundamental. During the evaluation of an expression, an error can occur (syntactic or semantic). Hence, we try to improve the user experience by reporting diagnostics. Each instance of \texttt{expression} has a pointer to \texttt{diagnostic\_op} associated to it. If the pointer is \texttt{null}, it is considered error-free. During the evaluation of a child expression, the parent checks for errors and propagates the error upwards. Checking and propagating of an error is implemented by \texttt{copy\_return\_on\_error} macro, which one should call immediately before the creation of a new expression during evaluation.
 	
@@ -333,8 +333,8 @@ During its work, evaluator substitutes variable and ordinary symbols for their v
 
 Lookahead (see \cref{lab06:look}) is triggered in conditional assembly expressions when evaluation visits yet undefined ordinary symbol. As this can be rather demanding operation, expression evaluator uses \emph{expression analyzer}. It looks for all the undefined symbol references in expression and collects them to a common collection. Then, the lookahead is triggered to look for all references in the collection. Hence, it is triggered once per expression rather than any time an undefined symbol reference is found. 
 
-\subsubsectionSrc{Machine expressions}
-{parser\_library/src/expressions}
+\subsubsectionSrc[0.45\linewidth]{Machine expressions}
+{parser\_library/src/expressions/mach\_expression.h,parser\_library/src/expressions/mach\_expr\_term.h,parser\_library/src/expressions/mach\_operator.h}
 \label{mach_expr}
 
 In HLASM, machine expressions are used as operands of machine and assembler instructions. Their result may be a simple absolute number or an address.

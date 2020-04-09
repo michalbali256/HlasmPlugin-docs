@@ -1,5 +1,5 @@
 \sectionSrc{Instruction format validation}
-{parser\_library/src/checking,parser\_library/src/context/instruction.h}
+{parser\_library/src/context/instruction.h,parser\_library/src/checking/operand.h,parser\_library/src/checking/instr\_operand.h}
 
 \label{checker}
 One of the essential ways to provide results of the parsing to the user is through error messages. Many of these messages are created in \emph{Instruction checker} which validates the usage of different kinds of instructions.
@@ -39,15 +39,15 @@ The formats are defined by several basic operands such as register or address an
 \end{figure}
 
 \subsectionSrc{Assembler instruction checker}
-{parser\_library/src/checking/asm\_instr\_check.h}
+{parser\_library/src/checking/asm\_instr\_class.h,parser\_library/src/checking/asm\_instr\_check.h}
 \label{sub:asm_check}
 
 Validation of assembler instructions is more complicated as there are no pre-defined formats for them. Each of them is described by custom operand diagrams, which demonstrate the dependencies and relations between operands of a specific instruction. An example of such diagram for the ORG instruction is shown in \cref{fig01:check}. As an addition to the basic operands used for machine instructions, each assembler instruction might have its own operands, called keywords.
 
 Due to these irregularities, we derive instruction-specific classes from assembler instruction class. Each of them implements the \TT{check} method, to provide the customized checking.
 
-\subsubsectionSrc{Data Definition checking}
-{parser\_library/src/checking/data\_definition}
+\subsubsectionSrc[0.55\linewidth]{Data Definition checking}
+{parser\_library/src/checking/data\_definition/data\_def\_fields.h,parser\_library/src/checking/data\_definition/data\_def\_type\_base.h,parser\_library/src/checking/data\_definition/data\_def\_types.h,parser\_library/src/checking/data\_definition/data\_definition\_operand.h}
 
 Data definition is a type of operand in HLASM. It represents data that is assembled directly into object code (see \cref{asm_instrs}).
 

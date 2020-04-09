@@ -69,6 +69,9 @@
 \index{\patheach{\texttt}{!}{#1}}%
 \hspace{-1ex}\texttt{\patheach{}{/\-}{#1}}\\}
 
+\def\makefileindexnotext#1{%
+	\index{\patheach{\texttt}{!}{#1}}}
+
 \def\makefileindexes#1{\foreach{\makefileindex}{#1}}
 
 \newcommand{\srcstyle}[1]{\tt\scriptsize\textcolor{gray}{\makefileindexes{#1}}}

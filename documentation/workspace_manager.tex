@@ -5,7 +5,7 @@ Workspace manager encapsulates all functionality of the parser library. It is th
 
 %******************** Parser library API *************************
 \sectionSrc{Parser library API}
-{parser\_library/include/shared/workspace\_manager.h,parser\_library/src/workspace\_manager\_impl.h}
+{parser\_library/include/protocol.h,parser\_library/include/range.h,parser\_library/include/workspace\_manager.h,parser\_library/src/workspace\_manager\_impl.h}
 First of all, the workspace manager component is the only public interface of the parser library. The API design is based on LSP and DAP, most of the API is just LSP/DAP rewritten in C++. The API uses the observer pattern for DAP events and notifications originating in parser library (e.g. textDocument/publishDiagnostics).
 
 The API can be divided into three categories:
@@ -95,9 +95,9 @@ The architecture of the workspace manager works as follows.
 	\item[Workspace manager] The workspace manager provides API for handling various workspace management (e.g. add new workspace), LSP and DAP requests. It may hold multiple workspaces and calls 
 	file manager to handle changes in the workspace files.
 	\item[Workspace] The workspace deals with the relations between its files (dependencies) upon parse request and propagates the parsing further into analyzer. It also retrieves data from the configuration files and it is used for resolving dependency searches by implementing parse library provider.
-	\item[Processor group] \sectionFiles{.43\linewidth}{parser\_library/src/processor\_group.h} 
+	\item[Processor group] \sectionFiles{.45\linewidth}{parser\_library/src/workspaces/processor\_group.h} 
 	The processor group uses libraries to search for their dependencies. Currently, we only support local libraries, which utilize the file manager for their file information retrieval.
-	\item[File manager] \sectionFiles{.43\linewidth}{parser\_library/src/file\_manager.h}
+	\item[File manager] \sectionFiles{.45\linewidth}{parser\_library/src/workspaces/file\_manager.h}
 	The file manager is used by multiple components to handle file management and file searches. It also distinguishes and does conversions between regular files and processor files, which may be used for parsing.
 	\item[Analyzer] The analyzer does the whole processing part and is further explained in~\cref{chap:analyzer}.
 \end{description}
@@ -119,7 +119,7 @@ The technical details of each component are further explained in the following s
 
 %******************** Workspace *************************
 \sectionSrc{Workspace}
-{parser\_library/src/workspace.h}
+{parser\_library/src/workspaces/workspace.h}
 
 The core of the workspace is its \TT{parse\_file} method. As addition to the parsing part, it also ensures that the file to be parsed, its dependencies and depenendants (files that are a dependency of other workspace files) provide consistent results. The method works as follows:
 
@@ -204,8 +204,8 @@ From this configuration, the workspace simply remembers the processor group - op
 \end{listing}
 
 %******************** Files *************************
-\sectionSrc{Files}
-{parser\_library/src/file.h,parser\_library/src/file\_impl.h,parser\_library/src/file.h,parser\_library/src/processor.h,parser\_library/src/processor\_file\_impl.h}
+\sectionSrc[0.45\linewidth]{Files}
+{parser\_library/src/workspaces/file.h,parser\_library/src/workspaces/file\_impl.h,parser\_library/src/workspaces/file.h,parser\_library/src/workspaces/processor.h,parser\_library/src/workspaces/processor\_file\_impl.h}
 
 Regular files are represented via abstract class \emph{file}. They are capable of providing their file names, their contents and changing their states upon file-oriented LSP requests, i.e didChange, didClose and didOpen.
 
@@ -216,7 +216,7 @@ When the \TT{parse} method is invoked, the processor file initializes new analyz
 
 %******************** Libraries resolution *************************
 \sectionSrc{Libraries resolution}
-{parser\_library/src/parse\_lib\_provider.h,parser\_library/src/library.h}
+{parser\_library/src/workspaces/parse\_lib\_provider.h,parser\_library/src/workspaces/library.h}
 
 The libraries are resolved using a \emph{parse\_lib\_provider} interface. Whenever a component is to be used for dependency handling, it implements this interface and may be used by analyzer for this purpose.
 

@@ -86,8 +86,8 @@ It stores the string and retrieves a pointer. It is guaranteed that if two diffe
 
 It simplifies work with IDs and saves space. 
 
-\subsectionSrc{Variable symbols}
-{parser\_library/src/context/variables}
+\subsectionSrc[0.5\linewidth]{Variable symbols}
+{parser\_library/src/context/variables/variable.h,parser\_library/src/context/variables/macro\_param.h,parser\_library/src/context/variables/set\_symbol.h,parser\_library/src/context/variables/system\_variable.h}
 \label{lab06:var_sym}
 
 In HLASM language, variable symbol is general term for symbols beginning with ampersand. However, they can be separated into several structures that capture a common behavior:
@@ -114,7 +114,7 @@ The LSP context serves as the collection point for the data needed to answer the
 
 The LSP data collector stores its values inside the LSP context tables. More about the collection of the data and their values can be found in~\cref{lsp_data}.
 
-\subsectionSrc{Ordinary assembly context}
+\subsectionSrc[0.43\linewidth]{Ordinary assembly context}
 {parser\_library/src/context/ordinary\_assembly/ordinary\_assembly\_context.h}
 
 The above described structures aimed to describe the high-level part of the language (code generation). As we move closer to the resulting object code of the source file, the describing structures get complicated. Therefore, HLASM context contains object storing just this part of the processing.

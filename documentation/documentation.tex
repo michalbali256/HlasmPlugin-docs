@@ -37,6 +37,7 @@
 \usepackage[toc,page]{appendix}
 \usepackage{multirow}
 \usepackage{tocbibind}
+\usepackage{etoolbox}
 
 \lstset{basicstyle=\ttfamily,
 	showstringspaces=false,
@@ -51,6 +52,7 @@
 % links shall be clickable
 \usepackage[unicode]{hyperref}   % Must follow all other packages
 \usepackage{cleveref} % Must follow all other packages including hyperref
+\AtBeginEnvironment{appendices}{\crefalias{chapter}{appendix}}
 
 % indexing
 \usepackage{makeidx}
