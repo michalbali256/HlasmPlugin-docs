@@ -1,6 +1,6 @@
 \sectionSrc[.5\linewidth]{Processing manager}{parser\_library/src/processing/processing\_manager.h}
 \label{chap:process}
-Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is about to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
+Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
 \begin{figure}
 	\centering
@@ -26,7 +26,7 @@ Following objects passed by analyzer serve as an input for the processing manage
 	\item \emph{Processing tracer} for tracing processed statements (see \cref{macro_tracer}).
 \end{itemize}
 
-\subsectionSrc{Statement Processor}{parser\_library/src/processing/statement\_processors/statement\_processor.h}
+\subsectionSrc{Types of statement processors}{parser\_library/src/processing/statement\_processors/statement\_processor.h}
 \label{lab06:sect_proc}
 
 
@@ -72,14 +72,15 @@ Lookahead processor is activated when currently processed conditional assembly s
 \subsubsectionSrc{Opencode Processor}
 {parser\_library/src/processing/statement\_processors/ordinary\_processor.h}
 \label{ord_proc}
-The usage of Opencode processor (in code described as Ordinary processor) can be described in the following points:
+The functionality of Opencode processor (\texttt{ordinary\_processor} class) can be described as follows:
 \begin{enumerate}
 	\item If a model statement is encountered (see \cref{var_sym}), it substitutes the variable symbols and resolves the statement.
-	\item Checks statement for validity.
-	\item Performs instruction by updating HLASM context tables with the help of \emph{instruction processors}.
+	\item It checks statement for validity.
+	\item It performs instruction by updating HLASM context tables with the help of \emph{instruction processors}.
+	\item It is passed \emph{processing tracer} by the manager. Each time a statement is processed by opencode processor, it triggers processing tracer. The tracer serves as a listener pattern used by \emph{Macro tracer} (see \cref{macro_tracer}).
 \end{enumerate}
 
-It is also passed \emph{processing tracer} by the manager. Each time a statement is processed by opencode processor, it triggers processing tracer. The tracer serves as a listener pattern used by \emph{Macro tracer} (see \cref{macro_tracer}).
+
 
 \vspace{0.5cm}
 
@@ -90,9 +91,8 @@ In the \cref{tab06:processor_change}, we can see that it does not have a field t
 Terminal condition can be triggered by a finishing provider. It indicates that the processor needs to finish its work when a specific provider exhausted its statement stream.
 
 \newcommand{\fin}{\textcolor{red}{finish}}
-\newcommand{\strt}[1]{\textcolor{red}{start #1}}
-\definecolor{LightGreen}{HTML}{96F97B}
-\newcommand{\cont}{\textcolor{LightGreen}{continue}}
+\newcommand{\strt}[1]{\textcolor{blue}{start #1}}
+\newcommand{\cont}{\textcolor{green}{continue}}
 
 \begin{table}
 	\centering
@@ -107,9 +107,11 @@ Terminal condition can be triggered by a finishing provider. It indicates that t
 	\label{tab06:processor_change}
 \end{table}
 
-\subsectionSrc{Statement Provider}
+\subsectionSrc{Types of statement providers}
 {parser\_library/src/processing/statement\_providers/statement\_provider.h}
 \label{lab06:sect_prov}
+
+Due to the macro definitions, copy file includes and statement generation, it is difficult to state which statement should be processed next. For this reason, we define abstraction for various sources of statements called \emph{statement providers}.
 
 In contrary to statement processors, statement providers are ordered based on the priority (lower index, greater priority):
 
@@ -135,16 +137,16 @@ In each iteration of processing manager (see \cref{lab06:mngr_loop}), providers 
 	\label{tab06:term_cond}
 \end{table}
 
-For the main loop to be correctly defined, opencode provider's end triggers terminal condition for all statement processors. Hence, when opencode provider finishes then all the processors finish as well and the processing ends (see \cref{tab06:term_cond}).
+For the main loop to be correctly defined, the end of opencode provider triggers terminal condition for all statement processors. Hence, when opencode provider finishes then all the processors finish as well and the processing ends (see \cref{tab06:term_cond}).
 
-\subsubsection{Statement passing}
+\subsubsection{Statement pasing}
 \label{lab06:proc_stat}
 
 In HLASM language, it is difficult to parse statements into one common structure due to major differences in operand field of different instruction formats. Moreover, when parsing statements, the instruction format can be yet unknown. Therefore, operand fields are stored as strings. This means that during statement passing when instruction format is deduced, the provider has responsibility to produce correct statement format. The following steps are applied in the statement passing (also see \cref{fig06:process_next}):
 
 \begin{enumerate}
 	\item Provider retrieves the instruction field part of the statement.
-	\item Provider calls processor's \texttt{get\_processing\_status} method with instruction field as a parameter.
+	\item Provider calls processor method \texttt{get\_processing\_status} with instruction field as a parameter.
 	\item Return value of the call determines the required format of the operand field for the processor; the whole statemement can be retrieved correctly.
 	\item Provider returns statement with correct format to the processor. 
 \end{enumerate}
@@ -198,7 +200,7 @@ Library data contain a file name and an enumeration indicating a kind of the fil
 
 Statement field parser is an interface passed to the statement providers by processing manager. It is implemented by the parser (see \cref{lab06:parser}).
 
-Firstly, it is used during statement passing. In some cases provider is requested a concrete format of a string-stored statement. The string is re-parsed with the according format. Then the field is returned back to the statement provider. 
+At first, it is used during statement passing. In some cases provider is requested a concrete format of a string-stored statement. The string is re-parsed with the according format. Then the field is returned back to the statement provider. 
 
 Another use of field parser is in opencode processor as model statements are resolved there. After variable symbol substitution, the resulting string field is re-parsed with field parser.
 

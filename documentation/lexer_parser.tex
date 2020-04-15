@@ -137,7 +137,7 @@ Each operand format has corresponding \emph{operand structure}. They all inherit
 	\label{fig06:operand_arch}
 \end{figure}
 
-\subsubsectionSrc{Concatenation}
+\subsubsectionSrc{Concatenation structures}
 {parser\_library/src/semantics/concatenation.h}
 
 A model statement is a statement that contains a variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is represented by a concatenation of helper structures. The concatenation can be further evaluated to produce the final string.
@@ -150,10 +150,10 @@ The helper structures are:
 	\item \TT{sublist} -- by parenthesis enclosed recursive concatenation.
 \end{itemize}
 
-\subsectionSrc{Grammar rules}
+\subsectionSrc{Grammar implementation}
 {parser\_library/src/parsing/grammar}
 
-Grammar rules describing parser are separated into several files (see \cref{parser_rules}):
+Grammar rules describing parser are separated into several files (see the figure of all grammar rules in \cref{parser_rules}):
 \begin{itemize}
 	\item \TT{hlasm\_parser.g4} -- Top level rules are stored here.
 	\makefileindexnotext{parser\_library/src/parsing/grammar/hlasm\_parser.g4}
@@ -161,7 +161,7 @@ Grammar rules describing parser are separated into several files (see \cref{pars
 	\item \TT{label\_field\_rules.g4} -- Rules taking care of label field of statement. \makefileindexnotext{parser\_library/src/parsing/grammar/label\_field\_rules.g4}
 	\item \TT{instruction\_field\_rules.g4} -- Rules taking care of instruction field of statement. \makefileindexnotext{parser\_library/src/parsing/grammar/instruction\_field\_rules.g4}
 	\item \TT{operand\_field\_rules.g4} -- Rules taking care of operand field of statement. \makefileindexnotext{parser\_library/src/parsing/grammar/operand\_field\_rules.g4}
-	\item \TT{macro/machine/assembler/ca/model/deferred\_operand\_rules.g4} -- Concrete operand field rules. \makefileindexnotext{parser\_library/src/parsing/grammar/deferred\_operand\_rules.g4}
+	\item \TT{macro/machine/assembler/ca/model/deferred\_operand\_rules.g4} -- Various operand field rules. \makefileindexnotext{parser\_library/src/parsing/grammar/deferred\_operand\_rules.g4}
 	\makefileindexnotext{parser\_library/src/parsing/grammar/model\_operand\_rules.g4}
 	\makefileindexnotext{parser\_library/src/parsing/grammar/ca\_operand\_rules.g4}
 	\makefileindexnotext{parser\_library/src/parsing/grammar/assembler\_operand\_rules.g4}

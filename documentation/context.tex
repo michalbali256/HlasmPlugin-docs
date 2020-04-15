@@ -16,7 +16,7 @@ It is composed of:
 	\item \emph{Ordinary assembly context} -- encapsulates structures describing Ordinary assembly.
 \end{itemize}
 
-\subsectionSrc{Macros}
+\subsectionSrc{Macro definition}
 {parser\_library/src/context/macro.h}
 
 HLASM context stores visited macro definitions in the \emph{macro strorage}. 
@@ -37,10 +37,10 @@ The macro invocation is stored in the context's \emph{scope stack}.
 \subsectionSrc{Scope stack}
 {parser\_library/src/context/code\_scope.h}
 
-This stack holds information about the scope of variable symbols (see \cref{lab06:var_sym}). The scope changes when macro is visited. The initial scope is the open-code. 
+This stack (stack of \TT{code\_scope} objects) holds information about the scope of variable symbols (see \cref{lab06:var_sym}). The scope changes when macro is visited. The initial scope is the open-code. 
 
 
-The stack contains:
+The stack elements contain:
 \begin{itemize}
 	\item In-scope variable symbols.
 	\item In-scope sequence symbols.
@@ -98,7 +98,7 @@ In HLASM language, variable symbol is general term for symbols beginning with am
 	\item \emph{Macro parameters} -- represent HLASM macro parameters.
 \end{itemize}
 
-They inherit common abstract ancestor \emph{variable symbol}. SET symbols are further divided into \emph{SETA}, \emph{SETB} and \emph{SETC} symbols. Macro parameters are divided into \emph{keyword} and \emph{positional} parameters (see \cref{fig06:var}).
+They inherit common abstract ancestor \emph{variable symbol}. SET symbols are further divided into \emph{SETA}, \emph{SETB} and \emph{SETC} symbols. Macro parameters are divided into \emph{keyword} and \emph{positional} parameters (see \cref{fig06:var}). They are stored in respective storage (global storage, scope stack, macro definition) that determines their scope.
 
 \begin{figure}
 	\centering
