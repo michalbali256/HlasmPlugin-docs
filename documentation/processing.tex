@@ -175,7 +175,7 @@ In each iteration of processing manager (see \cref{lab06:mngr_loop}), providers 
 
 For the main loop to be correctly defined, the end of opencode provider triggers terminal condition for all statement processors. Hence, when opencode provider finishes then all the processors finish as well and the processing ends (see \cref{tab06:term_cond}).
 
-\subsubsection{Statement pasing}
+\subsubsection{Statement passing}
 \label{lab06:proc_stat}
 
 In HLASM language, it is difficult to parse statements into one common structure due to its \emph{representational ambiguity}; the major difference between operand fields of different instruction formats. Moreover, when parsing statements, the instruction format can be yet unknown. Therefore, operand fields are stored as strings. This means that during statement passing when instruction format is deduced, the provider has responsibility to produce correct statement format. The following steps are applied in the statement passing (also see \cref{fig06:process_next}):
