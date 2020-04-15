@@ -249,7 +249,7 @@ The threads are synchronized in two ways: First, there is a mutex that prevents 
 
 Request manager additionally incorporates a mechanism for invalidating requests that have been obsoleted by new requests. The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the \TT{request\_manager}. When set to true, the results of current request or notification are no longer needed, the parser library stops all parsing and return as soon as possible.
 
-When a new request arrives, all previous requests (including the currently processed one) that concern the same file are invalidated. However, they cannot be simply removed from the queue. They still have to be processed as they may carry information that must not be discarded. The parser library processes the request but does not reparse any source files.
+When a new request arrives, all previous requests (including the currently processed one) that concern the same file are invalidated. However, they cannot be simply removed from the queue. They still have to be processed as they may carry information that must not be discarded (e.g. changes to contents of a file). The parser library processes the request but does not reparse any source files.
 
 \subsection{Example of request invalidating}
 
