@@ -25,16 +25,16 @@ Following objects passed by analyzer serve as an input for the processing manage
 
 \subsection{Composition}
 
-As the processing of the HLASM source file is rather complicated, we define a complex set of abstraction objects over the Gordian assembling of HLASM language:
+As the processing of the HLASM source file is rather complicated, we define a complex set of abstraction objects over the complicated assembling of HLASM language:
 
 \begin{description}
-	\item[Statement provider] (see \cref{lab06:sect_prov}) is able to produce \TT{statement} structures. Its functionality is to provide statements from its finite statement stream.
+	\item[Statement provider] (see \cref{lab06:sect_prov}) is able to produce \TT{statement} structures. Its functionality is to provide statements from its various statement sources (e.g., a source file for Opencode provider, a macro/copy definition for Macro/Copy provider).
 	
 	\item[Statement processor] (see \cref{lab06:sect_proc}) is an object that takes statement structures from a provider. Then, it performs a specific action with the acquired statement; namely, stores it into macro/copy definition (\emph{Macro/Copy processor}) or looks for sequence symbol (\emph{Lookahed processor}) or performs contained instruction (\emph{Opencode processor}).
 	
-	\item[Instruction processors] (see \cref{lab06:instr_proc}) help opencode statement processor in performing actions with the instructions contained in a statement. Each one of four instruction processors (Macro, Assembler, Machine and Conditional Assembly IP) process separate sub-set of a broad set of HLASM instructions. 
+	\item[Instruction processors] (see \cref{lab06:instr_proc}) help opencode statement processor in performing actions with the instructions contained in a statement. Each one of four instruction processors (Macro, Assembler, Machine and Conditional Assembly IP) processes separate sub-set of a broad set of HLASM instructions. 
 	
-	\item[Instruction format validators] (see \cref{checker}) are helper objects used by instruction processors. They are provided operands of an instruction and serve to validate their correctness prior to the instruction. 
+	\item[Instruction format validators] (see \cref{checker}) are used by instruction processors. They are provided evaluated operands of an instruction and serve to validate their correctness. 
 	
 \end{description}
 
@@ -44,9 +44,9 @@ Processing manager encapsulates above mentioned objects and determines which pro
 \subsection{The main loop of manager}
 \label{lab06:mngr_loop}
 
-Processing manager contains an array of active statement processors and an array of active statement providers. It is in the control of which processor--provider pair currently operates. Moreover, it implements interfaces that swap these objects.
+Processing manager contains an array of active statement processors and an array of active statement providers. It is in the control of which processor--provider pair currently operates.
 
-The main processing loop works with the currently operating processor and provider. In the loop body, statement provider provides next statement for statement processor that processes it accordingly. The loop breaks when the last processor finishes work.
+The main processing loop works with the currently operating processor and provider. In the loop body, statement provider provides next statement for statement processor that processes it accordingly. The loop breaks when all processors finish work and none of them is active.
 
 When provider ends its statement stream or processor finishes its work, it is replaced with another. The following rules apply:
 
@@ -58,13 +58,13 @@ When provider ends its statement stream or processor finishes its work, it is re
 \subsection{Initial state of manager}
 \label{lab06:lib_data}
 
-It is important which statement provider and processor is assigned to the manager as a default. The manager determines this from library data passed by analyzer.
+It is important which statement provider and processor is assigned to the manager as a default. The manager determines this from \emph{library data} passed by analyzer.
 
 Library data contain a file name and an enumeration indicating a kind of the file that is being parsed --- \emph{processing kind}.
 
-\emph{Ordinary} processing kind states that the file being processed is the main source file (in HLASM called open-code). It is the first file to be processed. With this information, manager initializes all statement providers in respective order and \emph{only} opencode processor. This enumeration is passed when analyzer has owner semantics.
+\emph{Ordinary} processing kind states that the file being processed is the main source file (in HLASM called open-code). It is the first file to be processed. With this information, manager initializes all statement providers and \emph{only} opencode processor. This initial state is applied when analyzer has owner semantics.
 
-\emph{Copy} and \emph{Macro} processing kinds state that manager will process source code that contains copy or macro definition respectively. Hence, \emph{only} copy definition processor or macro definition processor is initialized. Also, all but macro statement provider are initialized. That is because macro definitions would pollute statement sources (i.e. when parse library provider is called within macro call). Also, no macros will be visited nor needed as a statement source when processing new source code. The library data is passed when analyzer has reference semantics.
+\emph{Copy} and \emph{Macro} processing kinds state that manager will process source code that contains copy or macro definition respectively. Hence, \emph{only} copy definition processor or macro definition processor is initialized. Also, all statement providers but the macro statement provider are initialized as no macros will be visited nor needed as a statement source when processing new source code. The library data is passed when analyzer has reference semantics.
 
 
 
