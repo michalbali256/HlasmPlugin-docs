@@ -6,57 +6,57 @@ The data collection is necessary to be able to reply to the LSP requests without
 
 \emph{LSP info processor} is invoked after each parsed and processed statement to collect and store the information it needs inside the \emph{LSP context} (part of HLASM context). 
 
-We will describe the component in better detail as a cross product of distinct symbols and the LSP features. Possible LSP features are:
-\begin{itemize}
-	\item \emph{hover}
-	\item \emph{complete}
-	\item \emph{go\_to\_definition}
-	\item \emph{references}
-\end{itemize}
-The symbols, on which the user might call mentioned LSP features, are:
-\begin{itemize}
-	\item \emph{instructions}
-	\item \emph{variable symbols}
-	\item \emph{sequence symbols}
-	\item \emph{ordinary symbols}
-\end{itemize}
+\subsection{Supported LSP language features}
+The plugin implements four LSP language features:
+\begin{description}
+	\item[hover] The \emph{hover} feature is invoked whenever a user moves his mouse cursor over a symbol for a short period of time. Typically a box with the information about the selected symbol appears right next to it.
+	\item[complete] The \emph{complete} feature may be triggered by a custom set of events such as typing a specific character. The server responds with a list of possible correct options that can be inserted into the particular position.
+	\item[go\_to\_definition] The \emph{go\_to\_definition} feature is invoked manually from the editor by selecting a symbol and consequently invoking the \TT{go\_to\_definition} command. The editor "jumps" to the location of the currently selected symbol's definition by moving the cursor to that location.
+	\item[references] The \emph{references} feature is invoked in a similar manner as the \emph{go\_to\_definition} feature. But the results of the \emph{references} feature are displayed as a list of all references to the selected symbol in the project, not just the definition of it. 
+\end{description}
 
-The \emph{references} feature uses the same symbols as \emph{go\_to\_definition}, its usage is straightforward and therefore does nothing that needs to be further explained.
+\subsection{Supported HLASM symbols}
+The symbols, on which the user might call mentioned LSP features, are \emph{instruction symbols}, \emph{variable symbols}, \emph{sequence symbols} and \emph{ordinary symbols}.
 
-\subsection{Instructions}
+The \emph{references} and the \emph{go\_to\_definition} features are very similar for each symbol type and in most cases work as described above. 
 
-The most complex symbols are instructions. To be able to provide information about each built-in instruction, we extract its type and parameters from the checker component (\cref{checker}).
+However, there are two exceptions to the standard behavior of the \emph{go\_to\_definition} feature.
+First, the command jumps to the definition of an instruction symbol only for macros (to the macro definition file). For the built-in instructions, the feature simply jumps to the first occurrence of the instruction. Second, the command used on an ordinary COPY symbol jumps to the corresponding copy file.
 
-As we know, user-defined macros are instructions as well. These are added to the list of all instructions after their first use in the open code. Macros can also be redefined in the open code, resulting in distinct macros with same name being used across the open code.
+On the other hand, the responses to the \emph{hover} and the \emph{complete} features vary for each symbol type and are described in the following tables:
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ll}
+		\toprule
+		\textbf{Symbol Type}            & \textbf{Hover contents}                              \\ \midrule
+		\multirow{2}{4cm}{instruction}  & the type of the instruction, the syntax of its parameters \\ 
+		                                & the version (macros only), the documentation \\ \midrule
+		variable                        & the type of the variable --- bool/string/number       \\ \midrule
+		sequence                        & the position of the definition                \\ \midrule
+		ordinary                        & absolute/relocatable, the value, the values of attributes \\
+		(COPY)                          & the name of the copy file                               \\  
+		\bottomrule
+	\end{tabular}
+	\caption{The contents of the \emph{hover} feature for each symbol type.}
+\end{table}
 
-The \emph{hover} feature displays the instruction's type, the syntax of its parameters and, in case of macros, its version and documentation. The \emph{go\_to\_definition} works only in case of macros and goes to the definition of the macro.
-
-Whenever a user types an A-Z character after arbitrary number of whitespaces from the left side, the \emph{complete} request for instructions is issued. This rolls out a list of all possible instructions with the information about them similar to the \emph{hover}.
-
-\subsection{Variable Symbols}
-
-Variable symbols are used in substitutions and begin with \& (\cref{var_sym}). Based on the instruction that has set the variable symbol, it may be of type \emph{number}, \emph{string} or \emph{bool}, which is displayed on both \emph{hover} and \emph{complete}. The variable symbols that are declared as macro parameters (and therefore have no type) are labeled as \emph{Macro Param}.
-
-The \emph{complete} is triggered whenever user types \&. It responds with a list of variable symbols that have been defined so far.
-
-The \emph{go\_to\_definition} jumps to the first occurrence of the symbol.
-
-\subsection{Sequence Symbols}
-
-Probably the most interesting information about the sequence symbols is their position, which is also the displayed information for both \emph{hover} and \emph{complete}.
-
-The \emph{complete} is triggered whenever user types . and responds with list of sequence symbols that have been defined so far.
-
-The \emph{go\_to\_definition} jumps to the target destination of the sequence symbol, i.e. the location where the code generation continues.
-
-\subsection{Ordinary Symbols}
-
-Ordinary symbols have the capability to hand over various information about the code. They are also the only symbols for which only the name placeholders with their positions are collected after each processed statement. After the parsing, these placeholders are matched with their values according to the ordinary processor (\cref{ord_proc}). \emph{COPY} instruction's parameter is also considered an ordinary symbol in the LSP context.  
-
-The \emph{go\_to\_definition} either jumps to the definition of the ordinary symbol which is a label or, in case of a COPY parameter, to the file where the COPY is defined.
-
-The \emph{hover} gives information whether the symbol is absolute or not, its value and its attributes' values. 
-
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Symbol Type}            & \textbf{Trigger Characters, Events}     & \textbf{Response}  \\ \midrule
+		\multirow{2}{3cm}{instruction}  &  A-Z,@,\$,\# after any number of spaces & built-in HLASM instructions\\ 
+	                                   	& from the start of the line              & + already used macros     \\ \midrule
+		\multirow{3}{3cm}{variable}     & \multirow{3}{4cm}{\&}                   & variable symbols defined \\ 
+	 	                                &                                         & before the current line  \\ 
+	 	                                &                                         & in the current scope \\ \midrule
+		\multirow{2}{3cm}{sequence}     & \multirow{2}{4cm}{.}                    & sequence symbols defined \\ 
+										&                                         & before the current line  \\ \midrule
+		ordinary                        & \textit{not implemented}                & \textit{not implemented} \\
+		\bottomrule
+	\end{tabular}
+	\caption{The trigger event and the reponse to the \emph{complete} feature for each symbol type.}
+\end{table}
 
 
 
