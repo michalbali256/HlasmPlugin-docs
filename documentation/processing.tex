@@ -81,13 +81,13 @@ Statement consists of \emph{statement fields} --- \emph{label field}, \emph{inst
 The abstract class \emph{HLASM statement} is the ancestor for all statement related classes. Then, there are abstract classes \emph{deferred statement} and \emph{resolved statement}. Deferred statement has its operand field stored in uresolved --- deferred --- format (in code stored as string). This statement is created when actual instruction is not yet known prior to the statement creation (see \cref{lst:def_stmt}). Resolved statements are complementary to the deferred statements as their instruction --- as well as operand format --- is known prior to the statement creation.
 
 \begin{listing}[t]
-	\begin{verbatim}
+	\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`$=3}]
 *VALUE OF INSTRUCTION IN DEFERRED STATEMENT IS PARAMETER OF MACRO MAC
      MACRO
      MAC      &INSTR
-     &INSTR   3(2,0),13      < DEFERRED STATEMENT
+     &INSTR   3(2,0),13      $\leftarrow\normalfont\text{deferred statement}$
      MEND
-	\end{verbatim}
+	\end{Verbatim}
 	\caption{An example of deferred statement in code.}
 	\label{lst:def_stmt}
 \end{listing}
@@ -219,7 +219,7 @@ Another use of field parser is in opencode processor as model statements are res
 {parser\_library/src/processing/instruction\_sets}
 \label{lab06:instr_proc}
 
-Ordinary processor divides processing of HLASM instruction types into several \emph{instruction processors}. Each processor is responsible for processing instructions that belong to one instruction type.
+Opencode processor divides processing of HLASM instruction types into several \emph{instruction processors}. Each processor is responsible for processing instructions that belong to one instruction type.
 
 As a format of some instruction kinds can be rather complicated, instruction processors contain \emph{Instruction format validators} (see \cref{checker}). They check the statement to validate the correctness of used operand format as well as the correctness of the actual operand values.
 
