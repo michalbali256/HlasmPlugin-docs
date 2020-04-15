@@ -226,7 +226,7 @@ The DAP server uses only one feature --- the Launch feature, which handles stepp
 \sectionSrc{Response with result}
 {language\_server/src/feature.h,language\_server/src/server.h}
 
-According to the LSP and the DAP, the server is required to send messages back to the LSP/DAP client either as responses to requests (e.g. \TT{hover}), notifications (e.g. textDocument/publishDiagnostics notification) or events (e.g. stopped event). Features require reference to an instance of the \TT{response\_provider} interface that provides methods \TT{respond} and \TT{notify} for sending messages back to the LSP client. Both LSP and DAP server classes implement the \TT{response\_provider} to form protocol-specific correct JSON with the arguments.
+According to the LSP and the DAP, the server is required to send messages back to the LSP/DAP client either as responses to requests (e.g. \TT{hover}), notifications (e.g. textDocument/publishDiagnostics notification) or events (e.g. stopped event). Features require reference to an instance of the \TT{response\_provider} interface that provides methods \TT{respond} and \TT{notify} for sending messages back to the LSP client. Both LSP and DAP server classes implement the \TT{response\_provider} to form protocol-specific JSON with the arguments.
 
 The servers then send the JSON to the LSP/DAP client using the \TT{send\_message\_provider} interface. At this point, the final complete JSON response is formed. The \TT{send\_message\_provider} then adds the message header and serializes the JSON using the JSON for Modern C++ library (see \cref{3rd_party}).
 
@@ -245,7 +245,7 @@ There are three threads running in the language server:
 	\item Worker thread in \TT{request\_manager} that processes each request using the \TT{lsp\_server} or the \TT{dap\_server} and ultimately the parser library.
 \end{itemize}
 
-The threads are synchronized in two ways: First, there is a mutex that protects adding to the request queue simultaneously by the LSP and the DAP read threads. Second, there is a conditional variable to control the worker thread.
+The threads are synchronized in two ways: First, there is a mutex that prevents the LSP and the DAP threads from adding to the request queue simultaneously. Second, there is a conditional variable to control the worker thread.
 
 Request manager additionally incorporates a mechanism for invalidating requests that have been obsoleted by new requests. The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the \TT{request\_manager}. When set to true, the results of current request or notification are no longer needed, the parser library stops all parsing and return as soon as possible.
 
