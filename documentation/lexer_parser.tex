@@ -12,7 +12,7 @@ As previously mentioned, we designed a custom lexer for HLASM. We had a number o
 
 Conventional lexing tools are most often based on regular expressions. As discussed above, there are several difficulties that one must consider while designing lexer for this particular language. A regular expression-based lexer would be too difficult or even impossible to design\footnote{One could match separate characters from the input and let the parser or semantic analysis deal with some of the described problems. This drastic solution would cost performance, as parsers are usually more performance demanding.}.
 
-\subsection{Encodings}
+\subsection{Source file encodings}
 Source code encodings differ for the used libraries. All strings are encoded in \texttt{UTF} as follows:
 
 \begin{description}
@@ -21,7 +21,7 @@ Source code encodings differ for the used libraries. All strings are encoded in 
 	\item[\texttt{UTF-32}] ANTLR 4 source code representation.
 \end{description}
 
-\subsectionSrc{Architecture}
+\subsectionSrc{Lexer components}
 {parser\_library/src/lexing/input\_source.h,parser\_library/src/lexing/token.h,parser\_library/src/lexing/token\_factory.h}
 
 Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{TokenFactory} and \texttt{ANTLRInputStream} (see \cref{antlr}). The reason was to add custom attributes to token that are vital for later stages of the HLASM code analysis (parsing, semantic analyses, etc.). Lexer functionality is implemented in following classes (see \cref{lexer_arch}):
