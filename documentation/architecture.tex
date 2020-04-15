@@ -71,7 +71,7 @@ The analysis of HLASM code includes:
  \item providing highlighting and LSP information
 \end{itemize}
 
-A HLASM source files have dependencies --- other files that define macros or files brought in by the COPY instruction. Dependencies are only discovered during the processing of files, so it is not possible to provide the files with macro definitions beforehand. The analyzer gets a callback that finds a file with specified name, parse its contents and return it as list of parsed statements. 
+A HLASM source files have dependencies --- other files that define macros or files brought in by the COPY instruction. Dependencies are only discovered during the processing of files, so it is not possible to provide the files with macro definitions beforehand. The analyzer gets a callback that finds a file with specified name, parse its contents and return it as a list of parsed statements. 
 
 \section{Client-side VS Code extension}
 \label{arch:client}
