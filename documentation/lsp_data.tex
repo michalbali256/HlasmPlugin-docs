@@ -20,9 +20,8 @@ The symbols, on which the user might call mentioned LSP features, are \emph{inst
 
 The \emph{references} and the \emph{go\_to\_definition} features are very similar for each symbol type and in most cases work as described above. 
 
-One of the two exceptions to the standard behavior of the \emph{go\_to\_definition} feature is for instructions, where the command works properly only for macros, jumping to the macro definition file. For the built-in instructions, the feature simply jumps to the first occurrence of the instruction.
-
-The second exception is for ordinary COPY symbols, where the \emph{go\_to\_definition} feature jumps to the copy file.
+However, there are two exceptions to the standard behavior of the \emph{go\_to\_definition} feature.
+First, the command jumps to the definition of an instruction symbol only for macros (to the macro definition file). For the built-in instructions, the feature simply jumps to the first occurrence of the instruction. Second, the command used on an ordinary COPY symbol jumps to the corresponding copy file.
 
 On the other hand, the responses to the \emph{hover} and the \emph{complete} features vary for each symbol type and are described in the following tables:
 \begin{table}[h]
@@ -32,7 +31,7 @@ On the other hand, the responses to the \emph{hover} and the \emph{complete} fea
 		\textbf{Symbol Type}            & \textbf{Hover contents}                              \\ \midrule
 		\multirow{2}{4cm}{instruction}  & the type of the instruction, the syntax of its parameters \\ 
 		                                & the version (macros only), the documentation \\ \midrule
-		variable                        & bool/string/number                           \\ \midrule
+		variable                        & the type of the variable - bool/string/number       \\ \midrule
 		sequence                        & the position of the definition                \\ \midrule
 		ordinary                        & absolute/relocatable, the value, the values of attributes \\
 		(COPY)                          & the name of the copy file                               \\  

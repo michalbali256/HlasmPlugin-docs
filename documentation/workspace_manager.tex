@@ -90,7 +90,7 @@ The macro tracer part of the API is again just DAP rewritten in C++. There are m
 
 \section{Libraries configuration}
 \label{libs_config}
-The parser library adapts the mainframe's approach to the dependency resolution. On mainframe, you would have to define the locations of your dependencies in a JCL file \footnote{\url{https://www.ibm.com/support/knowledgecenter/zosbasics/com.ibm.zos.zjcl/zjclc_basicjclconcepts.htm}}. As the user may want to include tens of dependencies for multiple open codes, a source code management tool called Endevor\footnote{\url{https://en.wikipedia.org/wiki/Endevor}} groups these dependencies into so-called \emph{processor groups}. Then, the user only has to assign a processor group to the open code and the Endevor does the dependency resolution for him.
+The parser library approaches the dependency resolution in a way similar to the mainframe. On mainframe, you would have to define the locations of your dependencies in a JCL file \footnote{\url{https://www.ibm.com/support/knowledgecenter/zosbasics/com.ibm.zos.zjcl/zjclc_basicjclconcepts.htm}}. As the user may want to include tens of dependencies for multiple open codes, a source code management tool called Endevor\footnote{\url{https://en.wikipedia.org/wiki/Endevor}} groups these dependencies into so-called \emph{processor groups}. Then, the user only has to assign a processor group to the open code and the Endevor does the dependency resolution for him.
 
 To provide similar experience with local files, the parser library simulates this behavior. If the user wants to include dependencies in his project, he has to define 2 configuration files inside his workspace: \emph{pgm\_conf.json} and \emph{proc\_grps.json}. The workspace component of the parser library then processes the configurations, retrieving their values upon initialization. Moreover, each time a save command is issued on any configuration file, the configuration values are reloaded via \TT{load\_config} method.
 
@@ -98,11 +98,11 @@ To provide similar experience with local files, the parser library simulates thi
 
 The proc\_grps configuration file contains a JSON array of possible processor groups, which consist of a name and an array of folder paths (may be relative to the root of the workspace). An example can be found in \cref{lst:proc_grps}.
 
-Whenever \TT{load\_config} is called, the workspace retrieves these processor groups from the configuration file and creates libraries. The libraries provide information about paths to their dependency files. During the parsing, the analyzer retrieves the library corresponding to the provided processor group name and uses it to search for a wanted macro or copy file. 
+Whenever \TT{load\_config} is called, the workspace retrieves these processor groups from the configuration file and creates libraries. The libraries provide information about paths to their dependency files. During the parsing, the workspace retrieves the library corresponding to the provided processor group name and uses it to search for a wanted macro or copy file. 
 
 \subsection{Program configuration}
 
-The pgm\_conf configuration file contains a JSON array of program names (or wildcards~\ref{section:wildcard}), matched to their processor groups. It serves as a list of the HLASM open code files and states the libraries (in form of processor groups) that contain their dependencies. An example can be found in \cref{lst:pgm_conf}.
+The pgm\_conf configuration file contains a JSON array of program names (or wildcards~\ref{section:wildcard}), matched to their processor groups. It serves as a list of the HLASM open code files and states the libraries (in form of processor groups) that contain the dependencies of each open code. An example can be found in \cref{lst:pgm_conf}.
 
 
 From this configuration, the workspace simply remembers the processor group - open code mapping.
@@ -187,7 +187,7 @@ The technical details of each component are further explained in the following s
 
 The representation of workspace is used by the workspace manager to handle various changes in the workspace. The workspace manager propagates LSP requests and notifications coming from the language server to the corresponding workspace and retrieves the results from it via the registered observers.
 
-The workspace component uses the file manager for the file searches, retrieves the values from the configuration files and creates processor groups and implements the parse library provider interface to be later used by the analyzer for the dependency resolution.
+The workspace component uses the file manager for the file searches, retrieves the values from the configuration files and creates processor groups and is capable of resolving dependencies.
 
 Due to the possibility to include files, the workspace maintains a list of dependants, which are  active dependencies of another workspace files. The list of dependants is needed, for example, in case the user changes contents of a macro that is used by multiple open code files, as all of them would have to be reparsed.
 
