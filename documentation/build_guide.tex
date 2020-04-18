@@ -2,12 +2,7 @@
 \label{build}
 In this chapter, we describe how to build the project on different platforms. We only describe methods that we use and are guaranteed to work, but other platforms and versions may work as well.
 
-The results of a build are:
-\begin{itemize}
-	\item executables \TT{library\_test} and  \TT{server\_test} that can be executed to test the build
-	\item a Visual Studio Code extension packed into a VSIX file
-\end{itemize}
-After the project has been built, the results can be found in bin subdirectory of the build folder.
+The result of a build is the Visual Studio Code extension packed into a VSIX file, which can be found in the \TT{bin/} subdirectory of the build folder.
 
 \section{Prerequisites}
 \label{prereq}
@@ -16,13 +11,11 @@ In order to build the project on any platform, following software needs to be in
 \begin{itemize}
 	\item CMake 3.10 or higher
 	\item C++ compiler with support for C++17
-	\item Java Development Kit (JDK) 8 or higher 
-	\item Maven
-	\item Git 
-	\item npm
+	\item Java Development Kit (JDK) 8 or higher (the ANTLR project written in Java is built from sources)
+	\item Maven (the build system of ANTLR)
+	\item Git (needed to download sources of the third party software)
+	\item npm (for compiling the typescript parts of the VS Code extension)
 \end{itemize}
-
-CMake is the build system we use, we use also the C++17 standard. JDK and Maven are needed because of ANTLR4, since we build it from source. Git is needed to download those sources. Npm handles the typescript part of our project.
 
 \section{Windows}
 
@@ -81,3 +74,6 @@ cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 cmake --build .
 \end{verbatim}
 For instance, a possible path to LLVM is \TT{/usr/local/opt/llvm\@8}
+
+\section{Running tests}
+Once the project is built, there are two test executables in the \TT{bin/} subdirectory of the build folder: \TT{library\_test} and \TT{server\_test}. Just run both of them to verify the build.
