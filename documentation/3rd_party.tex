@@ -11,7 +11,7 @@ The project uses several third party libraries. Some of them are needed by langu
 	\item [cpp-netlib URI]\hspace{-4px}\footnote{\url{https://github.com/cpp-netlib/uri}} Cpp-netlib URI library is used for parsing URI specified by the RFC3986\footnote{\url{https://tools.ietf.org/html/rfc3986}}, which is used by the LSP and DAP protocols to transfer paths to files. It is the responsibility of the language server to parse the URIs and convert them to file paths, so it is easier to work with them in the parser library. 
 \end{description}
 
-\section{ANTLR 4}
+\section{Usage of ANTLR4 within the project}
 \label{antlr}
 We have based part of our analyzer on ANTLR 4 parser generator. ANLTR 4 implements Adaptive $LL(*)$ \cite{parr2014adaptive} parsing strategy.
 
@@ -25,7 +25,7 @@ Despite the theoretical $O(n^4)$ time complexity, it appears that the $ALL(*)$ b
 
 \subsection{ANTLR 4 pipeline}
 
-ANTLR 4, similar to any other conventional parser generator, processes the inputted code as follows: (1) breaks down the source string into tokens using \textit{lexer} (2) \textit{parser} build parse trees. 
+ANTLR 4, similarly to any other conventional parser generator, processes the inputted code as follows: (1) breaks down the source string into tokens using \textit{lexer} (2) builds parse trees using \textit{parser} . 
 
 This pipeline in ANTLR 4 is broken into following classes: 
 
@@ -48,15 +48,13 @@ This pipeline in ANTLR 4 is broken into following classes:
 
 \subsection{ANTLR Parser}
 
-The input to ANTLR is a grammar written in antlr-specific language that specifies the syntax of HLASM language. The framework takes grammar and generates source code (in C++) for a recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code and produce helper structures (statements).
+The input to ANTLR is a grammar written in antlr-specific language that specifies the syntax of HLASM language (see the 193 grammar rules in the \cref{parser_rules}). The framework takes grammar and generates source code (in C++) for a recognizer, which is able to tell whether input source code is valid or not. Moreover, it is possible to assign a piece of code that executes every time a grammar rule is matched by the recognizer to further process the matched piece of code and produce helper structures (statements).
 
 \subsection{Parse-Tree walking}
 
-We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. As the tree-walker encounters a rule, it triggers a \emph{start} function. Similarly, when the walker visits all children of the node, it calls the \emph{finish} function.  The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children. We picked the latter approach because we need to have ampler control over the evaluation (such as operator priority).
+ANTLR 4 offers two mechanisms for tree-walking: the parse-tree listeners and parse-tree visitors. The second mechanism is the parse-tree visitor. The visitor lets the programmer control the walk by explicitly calling methods to visit children.
 
-\subsection{Visitor}
-
-We employ ANTLR \emph{visitor} feature during evaluation of CA expressions. 
+We employ the latter approach (\emph{visitor}) during evaluation of CA expressions. We picked the this approach because we need to have ampler control over the evaluation (such as operator priority).
 
 The ANTLR 4 first generates \texttt{hlasmparserVisitor} and \texttt{hlasmparserBaseVisitor}. The former is a abstract class, the latter is a simple implementation of the former. Both classes define ``visit'' functions for every grammar rule. A visit function has exactly one argument --- the context of the rule. The simple implementation executes \texttt{visitChildren()}. Our parse-tree visitor --- the \texttt{expression\_evaluator} --- overrides \texttt{hlasmparserBaseVisitor}. In order to evaluate a sub-rule, we call \texttt{visit(ctx->sub\_rule())}, where \texttt{ctx->sub\_rule()} returns the context of the sub-rule. The \texttt{visit()} function matches appropriate function of the visitor based on the context type (for example, \texttt{visit(ctx->sub\_rule())} would call \texttt{visiSub\_rule(..)}).
 

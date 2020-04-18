@@ -30,7 +30,8 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 	\centering
 	\includegraphics{img/lexer_arch}
 	\caption{Lexer architecture overview. Note, there are two \texttt{input\_source}s and there are many \texttt{token}s
-		\label{lexer_arch} generated.}
+		 generated. The \emph{AINSERT buffer} has higher priority. Specifically, if the buffer is non-empty, lexer consumes the input from this buffer. }
+	 \label{lexer_arch}
 \end{figure}
 
 \begin{description}
@@ -63,11 +64,11 @@ Beside of the custom lexer, we altered ANTLR's classes \texttt{Token}, \texttt{T
 	
 	\item[\texttt{token\_factory}] produces tokens of previously described custom type \texttt{token}.
 	
-	\item[\texttt{input\_source}] implements \texttt{ANTLRInputStream} which encapsulates source code. This implementation adds API for resetting, rewinding and rewriting input. 
+	\item[\texttt{input\_source}] implements \texttt{ANTLRInputStream}\footnote{\url{https://www.antlr.org/api/Java/org/antlr/v4/runtime/ANTLRInputStream.html}} which encapsulates source code. This implementation adds API for resetting, rewinding and rewriting input. 
 	
-	Beware of the usage of \texttt{UTF} encodings: \texttt{\_data} (source code string) and positions/indices in API are in \texttt{UTF-32}; \texttt{getText} returns \texttt{UTF-8} string.
+	Note the usage of \texttt{UTF} encodings: \texttt{\_data} (source code string) and positions/indices in API are in \texttt{UTF-32}; \texttt{getText} returns \texttt{UTF-8} string.
 	
-	\item[\texttt{lexer}] is based on ANTLR's \texttt{TokenSource} class. As most lexers, it is also, in principle, a finite state machine. The most important difference compared to conventional FSMs and other lexers is added communication interface that connects the parser and the instruction interpreter with the lexer. Unusual is also input rewinding (to support \texttt{AREAD}, for example), lexing from parallel sources (\texttt{AINSERT} buffer) and some helper API for subsequent processing stages.
+	\item[\texttt{lexer}] is based on ANTLR's \texttt{TokenSource}\footnote{\url{https://www.antlr.org/api/Java/org/antlr/v4/runtime/TokenSource.html}} class. As most lexers, it is also, in principle, a finite state machine. The most important difference compared to conventional FSMs and other lexers is added communication interface that connects the parser and the instruction interpreter with the lexer. Unusual is also input rewinding (to support \texttt{AREAD}, for example), lexing from parallel sources (\texttt{AINSERT} buffer) and some helper API for subsequent processing stages.
 	
 	Important functions:
 	

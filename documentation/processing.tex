@@ -262,14 +262,7 @@ We employ the ANTLR 4 Parse-Tree Visitors during the expression evaluation. For 
 
 In this section, we address the representation and functionality of the expressions themselves. Coupling the expressions with grammar and their evaluation in context is further discussed in \cref{ca_expr:eval}.
 
-HLASM CA expression is conceptually similar to the expressions in other languages: they support unary and binary operators, functions, variables and literals. Evaluation of expressions is further reviewed in \cref{ca_expr:eval}. In HLASM, each expression has a type.
-
-\begin{itemize}
-	\item  \emph{Arithmetic},
-	\item  \emph{Logic},
-	\item  \emph{Character}
-\end{itemize}
-expressions are supported. We implement the logic in the following classes:
+HLASM CA expression is conceptually similar to the expressions in other languages: they support unary and binary operators, functions, variables and literals. Evaluation of expressions is further reviewed in \cref{ca_expr:eval}. In HLASM, each expression has a type. \emph{Arithmetic}, \emph{Logic}, \emph{Character} expressions are supported. We implement the logic in the following classes:
 
 \begin{description}
 	\item[\texttt{expression}] A pure virtual class that defines a shared interface, operators, and functions. The class also implements evaluation logic for terms and factors.
