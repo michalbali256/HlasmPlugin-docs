@@ -215,7 +215,7 @@ The workspace also ensures the correct closure of the file via \TT{didClose} met
 \sectionSrc[0.45\linewidth]{File Representation}
 {parser\_library/src/workspaces/file.h,parser\_library/src/workspaces/file\_impl.h,parser\_library/src/workspaces/file.h,parser\_library/src/workspaces/processor.h,parser\_library/src/workspaces/processor\_file\_impl.h}
 
-The file manager maintains all files across different workspaces. It distinguishes between regular, non-HLASM files and processable, HLASM files by using different representations.
+The file manager handles all file-related requests across different workspaces. It distinguishes between regular, non-HLASM files and processable, HLASM files by using different representations.
 
 The representation of a regular file (called \emph{file}) is capable of providing its file names, its contents and changing its state upon file-oriented LSP requests, i.e didChange, didClose and didOpen.
 
