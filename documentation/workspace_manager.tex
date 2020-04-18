@@ -8,7 +8,7 @@ Workspace manager encapsulates all functionality of the parser library. It is th
 {parser\_library/include/protocol.h,parser\_library/include/range.h,parser\_library/include/workspace\_manager.h,parser\_library/src/workspace\_manager\_impl.h}
 First of all, the workspace manager component is the only public interface of the parser library. The API design is based on LSP and DAP, most of the API is just LSP/DAP rewritten in C++. The API uses the observer pattern for DAP events and notifications originating in parser library (e.g. textDocument/publishDiagnostics).
 
-The API can be divided into three categories:
+The API methods can be divided into three categories:
 \begin{itemize}
 	\item Editor state and file content synchronization (\cref{text_sync_methods})
 	\item Parsing results presentation 
@@ -23,16 +23,16 @@ The API can be divided into three categories:
 		
 		\toprule
 		Method & Description \\ \midrule
-		did\_open (file name, file content) & \multirow{3}{8cm}{Three methods that are called whenever the user opens a file, changes contents of an already opened file or closes a file in the editor.} \\
-		did\_change (file name, changes)& \\
-		did\_close (file name)& \\
+		\TT{did\_open (file name, file content)} & \multirow{3}{8cm}{Three methods that are called whenever the user opens a file, changes contents of an already opened file or closes a file in the editor.} \\
+		\TT{did\_change (file name, changes)}& \\
+		\TT{did\_close (file name)}& \\
 		& \\
-		\multirow{3}{5cm}{did\_change\_watched\_files(file paths)} &\multirow{3}{8cm}{Method, that is called when a file from a workspace has been changed outsize of the editor} \\
+		\multirow{3}{5cm}{\TT{did\_change\_watched\_files (file paths)}} &\multirow{3}{8cm}{Method, that is called when a file from a workspace has been changed outsize of the editor} \\
 		& \\
 		& \\
 		& \\
-		add\_workspace (ws name, ws path) & \multirow{2}{8cm}{Methods that are called when the user opens or closes a workspace in the editor} \\
-		remove\_workspace (ws path) & \\ \bottomrule
+		\TT{add\_workspace (ws name, ws path)} & \multirow{2}{8cm}{Methods that are called when the user opens or closes a workspace in the editor} \\
+		\TT{remove\_workspace (ws path)} & \\ \bottomrule
 	\end{tabular}
 	
 	\caption{List of all Editor state and text synchronization methods}
@@ -58,20 +58,20 @@ So the parser library is allowed to load arbitrary files from the disk, and use 
 		\toprule
 		Method & Description \\ \midrule
 		& \multirow{3}{8cm}{The method gets a position in an opened file. If there is a symbol, the method returns position of definition of that symbol} \\
-		definition(file name, caret position) &  \\
+		\TT{definition(file name, caret position)} &  \\
 		& \\
 		& \\
 		& \multirow{3}{8cm}{The method gets a position in an opened file. If there is a symbol, the method returns list of positions where the symbol is used}\\
-		references(file name, caret position) & \\
+		\TT{references(file name, caret position)} & \\
 		& \\
 		& \\
 		& \multirow{3}{8cm}{The method gets a position in an opened file where the user points with cursor. Returns list of strings to be shown in a tooltip window}\\
-		hover(file name, mouse position)& \\
+		\TT{hover(file name, mouse position)}& \\
 		& \\
 		& \\
 		& \multirow{3}{8cm}{The method gets a position in an opened file and how the completion box was triggered (i. e. with what key, automatically/manually). Returns list of strings suggested for completion at the position}\\
-		completion(file name,& \\
-		mouse position, trigger info)& \\
+		\TT{completion(file name,}& \\
+		\TT{mouse position, trigger info)}& \\
 		& \\
 		& \\ \bottomrule
 	\end{tabular}

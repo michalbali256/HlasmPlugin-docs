@@ -117,7 +117,7 @@ The main purpose of the class \TT{dispatcher} is to provide abstraction for the 
 
 A \TT{request} encapsulates one message that came from the client and is basically represented only by raw (but parsed) JSON.
 
-\TT{request\_manager} stores \TT{requests} in a queue and runs a worker thread that serves the requests one by one. As there is only one instance of request manager running in the language server, it serializes requests from DAP and LSP (which come asynchronously from separate sources) into one queue.
+\TT{request\_manager} stores \TT{requests} in a queue and runs a worker thread that serves the requests one by one. As there is only one instance of \TT{request\_manager} running in the language server, it serializes requests from DAP and LSP (which come asynchronously from separate sources) into one queue.
 
 \TT{server} is an abstract class that implements protocol behavior that is common for both DAP and LSP --- it basically implements Remote Procedure Call. Actual handling of LSP and DAP requests is implemented in \TT{features}. Each \TT{feature} contains implementation of several protocol requests or notifications. The features unwrap the arguments from JSON and call corresponding parser library methods.
 
@@ -144,13 +144,13 @@ The request in the \TT{request\_manager} either waits in a queue to be processed
 
 The hover method unpacks the actual arguments from JSON and converts any URIs to paths using the cpp-netlib URI library. Then, it calls the hover method from the parser library, which returns a string to be shown in the tooltip next to the hovering mouse. The language feature then wraps the return value back in JSON and calls the \TT{respond} method of its \TT{response\_provider} implemented by the \TT{lsp\_server}.
 
-The \TT{lsp\_server} wraps JSON arguments into a LSP response and uses the \TT{send message provider} implemented by \TT{dispatcher} to send it to the LSP client. The \TT{dispatcher} serializes the JSON, adds the header with the length of the JSON and writes the message to a standard output. Finally, all methods return and the worker thread in request manager looks for another request. If there is none, it goes to sleep.
+The \TT{lsp\_server} wraps JSON arguments into a LSP response and uses the \TT{send message provider} implemented by \TT{dispatcher} to send it to the LSP client. The \TT{dispatcher} serializes the JSON, adds the header with the length of the JSON and writes the message to a standard output. Finally, all methods return and the worker thread in \TT{request\_manager} looks for another request. If there is none, it goes to sleep.
 
 %******************** IO HANDLING *************************
 \sectionSrc{I/O handling}
 {language\_server/src/main.cpp,language\_server/src/dispatcher.h,language\_server/src/dap/tcp\_handler.h}
 
-The purpose of the \TT{dispatcher} is to abstract from the complexity of working with raw strings and streams. It executes an infinite loop in which it reads messages from \TT{std::iostream} and adds them to the request manager as parsed JSON objects. At the same time, it is able to write responses in the correct format.
+The purpose of the \TT{dispatcher} is to abstract from the complexity of working with raw strings and streams. It executes an infinite loop in which it reads messages from \TT{std::iostream} and adds them to the \TT{request\_manager} as parsed JSON objects. At the same time, it is able to write responses in the correct format.
 
 The language server communicates with the LSP client on a standard input and output, so we simply use the \TT{dispatcher} with the standard \TT{std::cin} and \TT{std::cout} objects to communicate with the LSP client.
 
@@ -202,9 +202,9 @@ The DAP server uses only one feature --- the Launch feature, which handles stepp
 	\begin{tabular}{lll}
 		\toprule
 		\textbf{Class}                          & \textbf{Source file}                                                      & \textbf{DAP Method name} \\ \midrule
-		\multirow{2}{3cm}{\TT{DAP server}}      & \multirow{2}{3cm}{\srcstyle{language\_server/src/dap/dap\_server.h}}      & \TT{initialize}          \\
+		\multirow{2}{3cm}{\TT{dap\_server}}      & \multirow{2}{3cm}{\srcstyle{language\_server/src/dap/dap\_server.h}}      & \TT{initialize}          \\
 		                                        &                                                                           & \TT{disconnect}          \\ \midrule
-		\multirow{13}{3cm}{\TT{Launch feature}} & \multirow{13}{3cm}{\srcstyle{language\_server/src/dap/feature\_launch.h}} & \TT{launch}              \\
+		\multirow{13}{3cm}{\TT{launch\_feature}} & \multirow{13}{3cm}{\srcstyle{language\_server/src/dap/feature\_launch.h}} & \TT{launch}              \\
 		                                        &                                                                           & \TT{setBreakpoints}      \\
 		                                        &                                                                           & \TT{configurationDone}   \\
 		                                        &                                                                           & \TT{threads}             \\
@@ -236,9 +236,9 @@ The only implementation of the \TT{send\_message\_provider} interface is the \TT
 \sectionSrc{Request Manager}
 {language\_server/src/request\_manager.h}
 
-\TT{Request manager} encapsulates a queue of requests with a worker thread that processes them. There may be up to two \TT{dispatcher} instances in the language server: one for LSP and one for DAP. Both of them add the requests they parse into one \TT{request manager}. It is necessary to process the requests one by one, because the parser library cannot process more requests at the same time.
+\TT{request\_manager} encapsulates a queue of requests with a worker thread that processes them. There may be up to two \TT{dispatcher} instances in the language server: one for LSP and one for DAP. Both of them add the requests they parse into one \TT{request\_manager}. It is necessary to process the requests one by one, because the parser library cannot process more requests at the same time.
 
-There are three threads running in the language server:
+Asynchronous communication is handled by separating the communication into threads:
 \begin{itemize}
 	\item LSP read thread --- a thread in which the \TT{dispatcher} reads messages from the standard input.
 	\item DAP read thread --- a thread in which the \TT{tcp\_handler} listens on a localhost port to initiate a DAP session. After accepting the DAP client, the \TT{dispatcher} reads DAP input on this thread too.
@@ -247,7 +247,7 @@ There are three threads running in the language server:
 
 The threads are synchronized in two ways: First, there is a mutex that prevents the LSP and the DAP threads from adding to the request queue simultaneously. Second, there is a conditional variable to control the worker thread.
 
-Request manager additionally incorporates a mechanism for invalidating requests that have been obsoleted by new requests. The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the \TT{request\_manager}. When set to true, the results of current request or notification are no longer needed, the parser library stops all parsing and return as soon as possible.
+\TT{request\_manager} additionally incorporates a mechanism for invalidating requests that have been obsoleted by new requests. The obsoleting of requests is done by a cancellation token. It is shared between the parser library and the \TT{request\_manager}. When set to true, the results of current request or notification are no longer needed, the parser library stops all parsing and return as soon as possible.
 
 When a new request arrives, all previous requests (including the currently processed one) that concern the same file are invalidated. However, they cannot be simply removed from the queue. They still have to be processed as they may carry information that must not be discarded (e.g. changes to contents of a file). The parser library processes the request but does not reparse any source files.
 
