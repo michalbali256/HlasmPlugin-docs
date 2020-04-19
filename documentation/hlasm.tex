@@ -37,15 +37,15 @@ name    instruction     operands             remark
 In HLASM, symbols are used to represent source location or arbitrary value. They are defined in name field; then, they can be used in operand field. There are three types of symbols recognized by the assembler each having different syntax rules:
 
 \begin{itemize}
-	\item Ordinary symbol -- Consists of at most 63 alphanumeric characters. The first character must be an alphabetic character (being one from \TT{a-z}, \TT{A-Z}, \TT{@}, \TT{\#}, \TT{\$}, \TT{\_}).
+	\item Ordinary symbol --- consists of at most 63 alphanumeric characters. The first character must be an alphabetic character (being one from \TT{a-z}, \TT{A-Z}, \TT{@}, \TT{\#}, \TT{\$}, \TT{\_}).
 	
 	\TT{REG11}
 	
-	\item Variable symbol -- Must start with ampersand (\TT{\&}). The second character must be alphabetic followed by up to 61 alphanumeric characters. 
+	\item Variable symbol --- must start with ampersand (\TT{\&}). The second character must be alphabetic followed by up to 61 alphanumeric characters. 
 	
 	\TT{\&DB\_VER}
 	
-	\item Sequence symbol -- Follows the same rules as the variable symbol but the leading character is dot (\TT{.}).
+	\item Sequence symbol --- follows the same rules as the variable symbol but the leading character is dot (\TT{.}).
 	
 	\TT{.NOMOV}
 \end{itemize}
