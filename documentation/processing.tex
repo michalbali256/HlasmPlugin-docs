@@ -2,7 +2,7 @@
 \label{chap:process}
 Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
-Nature of the HLASM source interpretation requires that the execution of various parsers and code generators runs in parallel. Processing manager performs this by maintaining 2 sets of active generators ("providers") and consumers (parsers, "processors") and executing them on demand, in an interleaved manner.
+Nature of the HLASM source interpretation requires that various parsers and code generators interlace to implement semantics of all instructions. Processing manager performs this by maintaining 2 sets of active generators ("providers") and consumers (parsers, "processors") and executing them on demand, in an interleaved manner.
 
 \begin{figure}
 	\centering
