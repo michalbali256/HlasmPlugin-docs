@@ -54,7 +54,7 @@ When provider ends its statement stream or processor finishes its work, it is re
 
 \begin{enumerate}
 	\item When a processor finishes its work, the next processor is selected from the array.
-	\item When a provider finishes --- before the next provider is selected from the array --- manager checks whether it triggers the termination of the current processor as well (see \emph{terminal condition} in \cref{lab06:sect_proc}). Only if true, perform rule 1.
+	\item When a provider finishes --- before the next provider is selected from the array~--- manager checks whether it triggers the termination of the current processor as well (see \emph{terminal condition} in \cref{lab06:sect_proc}). If true, perform rule 1, otherwise the current processor stays active.
 \end{enumerate}
 
 \subsection{Initial state of manager}
