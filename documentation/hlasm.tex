@@ -32,6 +32,26 @@ name    instruction     operands             remark
 
 \Cref{lst:small_example} shows an example of a basic statement containing all fields.
 
+\subsection{Symbols}
+
+In HLASM, symbols are used to represent source location or arbitrary value. They are defined in name field; then, they can be used in operand field. There are three types of symbols recognized by the assembler each having different syntax rules:
+
+\begin{itemize}
+	\item Ordinary symbol --- consists of at most 63 alphanumeric characters. The first character must be an alphabetic character (being one from \TT{a-z}, \TT{A-Z}, \TT{@}, \TT{\#}, \TT{\$}, \TT{\_}).
+	
+	\TT{REG11}
+	
+	\item Variable symbol --- must start with ampersand (\TT{\&}). The second character must be alphabetic followed by up to 61 alphanumeric characters. 
+	
+	\TT{\&DB\_VER}
+	
+	\item Sequence symbol --- follows the same rules as the variable symbol but the leading character is dot (\TT{.}).
+	
+	\TT{.NOMOV}
+\end{itemize}
+
+Semantic meaning of each symbol is further described in the following sections.
+
 \subsection{Continuations}
 \label{Continuation}
 
@@ -124,15 +144,15 @@ In addition to machine instructions, HLASM assembler also provides \emph{assembl
 
 Following are examples of assembler instructions:
 \begin{itemize}
-	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
+	\item \textbf{ICTL} --- changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
 	
-	\item \textbf{DC}, \textbf{DS} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.). These instructions take \emph{data definition} as operands. \Cref{data_def_example} shows examples of data definition.
+	\item \textbf{DC}, \textbf{DS} --- reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.). These instructions take \emph{data definition} as operands. \Cref{data_def_example} shows examples of data definition.
 	
-	\item \textbf{EQU} --- Defines ordinary symbols.
+	\item \textbf{EQU} --- defines ordinary symbols.
 	
-	\item \textbf{COPY} --- Copies text from a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} (called \emph{copy member}) and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
+	\item \textbf{COPY} --- copies text from a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} (called \emph{copy member}) and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
 	
-	\item \textbf{CSECT} --- Creates an executable control section, which serves as the start of relative addressing. It is followed by sequence of machine instructions.
+	\item \textbf{CSECT} --- creates an executable control section, which serves as the start of relative addressing. It is followed by sequence of machine instructions.
 \end{itemize}
 
 \begin{figure}[t]
@@ -206,12 +226,16 @@ Conditional assembly is another feature provided by HLASM. It is essentially a m
 User may use conditional assembly instructions to either define \emph{variable symbols}, which can be used in any statement to alter its meaning, or to define \emph{macros} --- reusable pieces of code with parameters. Based on these instructions, conditional assembly then alters the textual representation of the source code and selects which lines will be processed next.
 
 \subsubsection{Variable symbols}
-\label{var_sym}`
+\label{var_sym}
 Variable symbols serve as compile-time variables. Statements that contain them are called \emph{model statements}.
 
 During conditional assembly, variable symbols are substituted for their value to create a statement processable by ordinary assembly. For example, a user can write a variable symbol in the operation field and generate any instruction that can be a result of a substitution.
 
 Variable symbols also have notion of their type --- they can be defined either as integer, boolean or string. CA instructions gather this information for different sorts of conditional branching.
+
+\subsubsection{Sequence symbols}
+
+A sequence symbol is important in compile-time branching. When written in a name field of a specific statement, branching instructions can use the symbol as a label to jump to the specified statement; hence, alter the further code generation.   
 
 \subsubsection{CA instructions}
 \label{ca_instr}
@@ -226,9 +250,10 @@ Another subset of CA instructions operates on variable symbols. These can be use
 
 A \emph{macro} is a structure consisting of a \emph{name}, \emph{input parameters} and a \emph{body}, which is a sequence of statements. When a macro is called in a HLASM program, each statement in its body is executed. Both nested and recursive calls of macros are allowed. Macro body can also contain CA instructions, or even a sequence of instructions generating another macro definition. With the help of variable symbols, HLASM has the power to create custom, task specific macros.
 
-\vspace{5mm}
+\subsubsection{Description of a HLASM code example}
+\label{hlasm_ex}
 
-An example of a simple HLASM program with the description of its statements is shown in \cref{lst:example}.
+The current section contains description of the example shown in  \cref{lst:example}.
 
 On lines \verb|01-04|, we see a \emph{macro definition}. It is defined with name \verb|GEN_LABEL|, variable \verb|NAME| and contains one instruction in its body, which assigns the current address to the label in \verb|NAME|.
 
@@ -277,7 +302,7 @@ DOUBLE      DC          H'-3.729'
 .END        ANOP
             END
 	\end{Verbatim} 
-	\caption{An example of an artificial HLASM program.}
+	\caption{An example of an artificial HLASM program (see \cref{hlasm_ex} for code description).}
 	\label{lst:example}
 \end{listing}
 
