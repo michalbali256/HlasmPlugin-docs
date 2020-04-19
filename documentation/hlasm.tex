@@ -135,7 +135,7 @@ Following are examples of assembler instructions:
 	\item \textbf{CSECT} --- Creates an executable control section, which serves as the start of relative addressing. It is followed by sequence of machine instructions.
 \end{itemize}
 
-\begin{listing}[t]
+\begin{figure}[t]
 	\begin{verbatim}
 CL8'ABC'
     C is type of data definition - array of characters
@@ -155,23 +155,21 @@ CL8'ABC'
 	\end{verbatim}
 	\caption{Examples of data definition}
 	\label{data_def_example}
-\end{listing}
+\end{figure}
 
 \subsubsection{Ordinary symbols resolution}
 \label{ordinary_resolution}
 All the assembler instructions and ordinary symbols must be resolved before the assembler creates the final object file. However, as the HLASM language supports forward declaration of ordinary symbols, the assembly may be quite complicated. Consider an example in \cref{lst:ordinary_assembly}. When the instruction on line 1 is seen for the first time, it is impossible to determine its length, because the symbol \verb|LEN| is not defined yet \footnote{Character L with an expression in parentheses in DS operand of type C specifies how many bytes should be reserved in the program.}. The same applies to the length of the instruction on the second line. Furthermore, it is also impossible to determine the exact value of relocatable symbols \verb|ADDR| and \verb|HERE| because of the unknown length of the preceding instructions.
 
 \begin{listing}[t]
-	\begin{verbatim}
-	
-	[01]              DS    CL(LEN)
-	[02]   ADDR       DS    CL(SIZE)
-	[03]
-	[04]   HERE       DS    0H
-	[05]   LEN        EQU   HERE-ADDR
-	[06]   SIZE       EQU   1
-	
-	\end{verbatim}
+	\begin{Verbatim}[numbers=left]
+           DS    CL(LEN)
+ADDR       DS    CL(SIZE)
+
+HERE       DS    0H
+LEN        EQU   HERE-ADDR
+SIZE       EQU   1
+	\end{Verbatim}
 	\caption{A sample program that shows that symbols can be used prior to their definition.}
 	\label{lst:ordinary_assembly}
 \end{listing}
@@ -248,30 +246,37 @@ Instruction \verb|DC| on line \verb|17| creates value of type double and assigns
 
 \verb|ANOP| is an empty assembler action which defines the \verb|.END| symbol and line \verb|19| ends the assembling of the program. 
 
+%\let\oldv\verbatim
+%\let\oldendv\endverbatim
+
+%\def\verbatim{\par\hspace{1cm}\setbox0\vbox\bgroup\oldv}
+%\def\endverbatim{\oldendv\egroup\fboxsep0pt \colorbox[gray]{0.8}{\usebox0}\par}
+
 \begin{listing}[t]
-	\begin{verbatim}
-	name        operation   operands
-	
-	[01]                 MACRO                   
-	[02]     &NAME       GEN_LABEL
-	[03]     &NAME       EQU         *
-	[04]                 MEND
-	[05]             
-	[06]                 COPY        REGS
-	[07]             
-	[08]     TEST        CSECT
-	[09]     &VAR        SETA        L'DOUBLE
-	[10]                 AIF         (&VAR EQ 4).END
-	[11]     LBL1        GEN_LABEL
-	[12]                 LR          3,2
-	[13]                 L           8
-	[14]     LBL2        GEN_LABEL
-	[15]     LEN         EQU         LBL2-LBL1
-	[16]                 DC          (LEN)C'HELLO'
-	[17]     DOUBLE      DC          H'-3.729'
-	[18]     .END        ANOP
-	[19]                 END
-	\end{verbatim} 
+    \begin{verbatim}
+name        operation   operands
+    \end{verbatim}
+	\begin{Verbatim}[numbers=left]
+            MACRO                   
+&NAME       GEN_LABEL
+&NAME       EQU         *
+            MEND
+        
+            COPY        REGS
+        
+TEST        CSECT
+&VAR        SETA        L'DOUBLE
+            AIF         (&VAR EQ 4).END
+LBL1        GEN_LABEL
+            LR          3,2
+            L           8
+LBL2        GEN_LABEL
+LEN         EQU         LBL2-LBL1
+            DC          (LEN)C'HELLO'
+DOUBLE      DC          H'-3.729'
+.END        ANOP
+            END
+	\end{Verbatim} 
 	\caption{An example of an artificial HLASM program.}
 	\label{lst:example}
 \end{listing}
