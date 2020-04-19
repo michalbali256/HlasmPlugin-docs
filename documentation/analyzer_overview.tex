@@ -3,6 +3,10 @@
 
 The role of the analyzer is to provide a facade over objects and methods to create a simple interface for lexical and semantic processing (analyzing) of a single HLASM source file. The output of the analysis is the basic input of the LSP server.
 
+
+After the analyzer is constructed, it analyzes the provided source file. As a result, it updates HLASM context tables and provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.
+
+
 \sectionSrc{Overview}
 {parser\_library/src/analyzer.h}
 
@@ -37,6 +41,3 @@ The analyzer provides \emph{reference semantics} as well (holding just a referen
 
 This constructor is called within open-code analyzer by its sub-components when they use the \emph{Parse library provider}.
 
-\vspace{0.5cm}
-
-To sum up, after the analyzer is constructed, it analyzes the provided source file. As a result, it updates HLASM context tables and provides a list of diagnostics linked to the file, highlighting, list of symbol definitions, etc.

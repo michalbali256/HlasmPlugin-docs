@@ -124,7 +124,7 @@ Label and instruction structures can contain either identifier of a symbol or --
 
 The statement processor can request parser to retrieve statements with this operand formats:
 \begin{itemize}
-	\item \emph{machine/assembler/conditional assembly/macro} -- instruction operands. Each type of instruction has it's specific format.
+	\item \emph{machine/assembler/conditional assembly/macro} -- instruction operands. Each type of instruction has its specific format.
 	\item \emph{model} -- operands for model statements. It is a chain of strings and variable symbols.
 	\item \emph{deferred} -- operands with not yet known format. Stored as a string.
 \end{itemize}
@@ -141,14 +141,14 @@ Each operand format has corresponding \emph{operand structure}. They all inherit
 \subsubsectionSrc{Concatenation structures}
 {parser\_library/src/semantics/concatenation.h}
 
-A model statement is a statement that contains a variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is represented by a concatenation of helper structures. The concatenation can be further evaluated to produce the final string.
+A model statement is a statement that contains a variable symbol in any of the statement fields. This variable symbol is further to be substituted by an arbitrary string and then re-parsed. Hence, the field is formed by concatenating individual sub-fields, which are represented by specialized structures. The concatenation can be further evaluated to produce the final string.
 
 The helper structures are:
 \begin{itemize}
-	\item \TT{char\_str} -- character string.
-	\item \TT{var\_sym} -- substitutable variable symbol.
+	\item \TT{char\_str} -- a character string.
+	\item \TT{var\_sym} -- a substitutable variable symbol.
 	\item \TT{dot}, \TT{equals} -- characters with special meaning.
-	\item \TT{sublist} -- by parenthesis enclosed recursive concatenation.
+	\item \TT{sublist} -- a recursive concatenation enclosed in parentheses.
 \end{itemize}
 
 \subsectionSrc{Grammar implementation}

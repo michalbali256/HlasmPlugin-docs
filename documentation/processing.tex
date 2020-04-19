@@ -2,6 +2,8 @@
 \label{chap:process}
 Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
+Nature of the HLASM source interpretation requires that various parsers and code generators interlace to implement semantics of all instructions. Processing manager performs this by maintaining 2 sets of active generators ("providers") and consumers (parsers, "processors") and executing them on demand, in an interleaved manner.
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{img/processing_manager_arch}
@@ -34,7 +36,7 @@ As the processing of the HLASM source file is rather complicated, we define a co
 	
 	\item[Instruction processors] (see \cref{lab06:instr_proc}) help opencode statement processor in performing actions with the instructions contained in a statement. Each one of four instruction processors (Macro, Assembler, Machine and Conditional Assembly IP) processes separate sub-set of a broad set of HLASM instructions. 
 	
-	\item[Instruction format validators] (see \cref{checker}) are used by instruction processors. They are provided evaluated operands of an instruction and serve to validate their correctness. 
+	\item[Instruction format validators] (see \cref{checker}) are used by instruction processors. As an input, they take operands of an instruction and serve to validate their correctness. 
 	
 \end{description}
 
@@ -52,13 +54,13 @@ When provider ends its statement stream or processor finishes its work, it is re
 
 \begin{enumerate}
 	\item When a processor finishes its work, the next processor is selected from the array.
-	\item When a provider finishes --- before the next provider is selected from the array --- manager checks whether it triggers the termination of the current processor as well (see \emph{terminal condition} in \cref{lab06:sect_proc}). If true, perform rule 1.
+	\item When a provider finishes --- before the next provider is selected from the array~--- manager checks whether it triggers the termination of the current processor as well (see \emph{terminal condition} in \cref{lab06:sect_proc}). If true, perform rule 1, otherwise the current processor stays active.
 \end{enumerate}
 
 \subsection{Initial state of manager}
 \label{lab06:lib_data}
 
-It is important which statement provider and processor is assigned to the manager as a default. The manager determines this from \emph{library data} passed by analyzer.
+During initialization, the manager sets various statement providers and processors as a default. It is very important as it determines the way how the source is processed. The manager determines this from \emph{library data} passed by analyzer.
 
 Library data contain a file name and an enumeration indicating a kind of the file that is being parsed --- \emph{processing kind}.
 
@@ -71,7 +73,7 @@ Library data contain a file name and an enumeration indicating a kind of the fil
 \subsectionSrc{Statement Processors}{parser\_library/src/processing/statement\_processors/statement\_processor.h}
 \label{lab06:sect_proc}
 
-The motivation in distinguishing different statement processors was the complexity of HLASM language. There are many cases when the same statements require different processing under different circumstances (e.g. COPY instruction in macro is handled differently than in opencode, or lookahead mode can accept statements that would fail when processed by ordinary processing).
+The motivation for distinguishing different statement processors was the complexity of HLASM language. There are many cases when the same statements require different processing under different circumstances (e.g. COPY instruction in macro is handled differently than in opencode, or lookahead mode can accept statements that would fail when processed by ordinary processing).
 
 During processing, statement processing kinds can be nested. Hence, statement processors are dynamically assigned to the manager when needed and removed from it when they finish. This happens when the processor encounters specific statement (e.g. statement with a special instruction or non previously defined sequence symbol, see \cref{tab06:processor_change}). For this purpose, they use \emph{processing state listener} interface (implemented by processing manager) that tells the manager to change the current processor.
 
@@ -199,6 +201,10 @@ In HLASM language, it is difficult to parse statements into one common structure
 {parser\_library/src/processing/statement\_providers/copy\_statement\_provider.h,parser\_library/src/processing/statement\_providers/macro\_statement\_provider.h}
 
 These providers are activated when COPY instruction copies a file into the source code or when a macro is visited, respectively. They provide a sequence of statements to an arbitrary processor until all statements from the copy or macro definition are provided. After that, if there is no nested invocation, a provider with lower priority is selected.
+
+To avoid infinite macro recursion, HLASM language itself has a restriction for the level of nested macro invocation depending on the complexity of nested macros. We set the limit to 100 as it suffices in all tested code.
+
+For COPY members, recursion is forbidden.
 
 \subsubsectionSrc{Opencode Provider}
 {parser\_library/src/processing/opencode\_provider.h,parser\_library/src/parsing/parser\_impl.h}
