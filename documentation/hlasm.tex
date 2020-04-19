@@ -144,15 +144,15 @@ In addition to machine instructions, HLASM assembler also provides \emph{assembl
 
 Following are examples of assembler instructions:
 \begin{itemize}
-	\item \textbf{ICTL} --- Changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
+	\item \textbf{ICTL} --- changes values of the previously described line columns (i.e. begin column may begin at column 2 etc.).
 	
-	\item \textbf{DC}, \textbf{DS} --- Reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.). These instructions take \emph{data definition} as operands. \Cref{data_def_example} shows examples of data definition.
+	\item \textbf{DC}, \textbf{DS} --- reserves space in object code for data described in operands field and assembles them in place (i.e. assembles float, double, character array, address etc.). These instructions take \emph{data definition} as operands. \Cref{data_def_example} shows examples of data definition.
 	
-	\item \textbf{EQU} --- Defines ordinary symbols.
+	\item \textbf{EQU} --- defines ordinary symbols.
 	
-	\item \textbf{COPY} --- Copies text from a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} (called \emph{copy member}) and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
+	\item \textbf{COPY} --- copies text from a specified file\footnote{Path to the folder of the file is passed to assembler before the start of assembly} (called \emph{copy member}) and pastes it in place of the instruction. It is very similar to the C preprocessor \texttt{\#include} directive.
 	
-	\item \textbf{CSECT} --- Creates an executable control section, which serves as the start of relative addressing. It is followed by sequence of machine instructions.
+	\item \textbf{CSECT} --- creates an executable control section, which serves as the start of relative addressing. It is followed by sequence of machine instructions.
 \end{itemize}
 
 \begin{figure}[t]
