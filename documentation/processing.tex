@@ -2,7 +2,7 @@
 \label{chap:process}
 Processing manager is a major component in the processing of a HLASM source file. It decides which stream of statements is to be processed and how statements are going to be processed. It contains components responsible for instruction interpretation as well as instruction format validation. 
 
-Nature of the HLASM source interpretation requires that the execution of various parsers and code generators runs in parallel. Processing manager performs this by maintaining 2 sets of active generators ("providers") and consumers (parsers, "processors") and executing them on demand, in an interleaved manner.
+Nature of the HLASM source interpretation requires that various parsers and code generators interlace to implement semantics of all instructions. Processing manager performs this by maintaining 2 sets of active generators ("providers") and consumers (parsers, "processors") and executing them on demand, in an interleaved manner.
 
 \begin{figure}
 	\centering
@@ -202,7 +202,7 @@ In HLASM language, it is difficult to parse statements into one common structure
 
 These providers are activated when COPY instruction copies a file into the source code or when a macro is visited, respectively. They provide a sequence of statements to an arbitrary processor until all statements from the copy or macro definition are provided. After that, if there is no nested invocation, a provider with lower priority is selected.
 
-As HLASM allows macro recursion, the reader may think that macro definition provider may never finish so the main loop may never break. For this purpose, HLASM language itself has restriction for the level of nested macro invocation depending on the complexity of nested macros. We set the limit to 100 as it suffices in all tested code.
+To avoid infinite macro recursion, HLASM language itself has a restriction for the level of nested macro invocation depending on the complexity of nested macros. We set the limit to 100 as it suffices in all tested code.
 
 For COPY members, recursion is forbidden.
 
