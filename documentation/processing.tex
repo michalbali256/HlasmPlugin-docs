@@ -327,7 +327,7 @@ return arithmetic_expression::from_string(value_, 2);
 	
     AND         EQU         1
     NOT         EQU         0
-                AIF         (NOT AND AND AND).LAB   < EVALUATES TO (!(1 & 1))
+                AIF         (NOT AND AND AND).LAB   < EVALUATES TO (!1 & 1)
 	\end{verbatim} 
 	\caption{An example of using keywords (\texttt{AND} and \texttt{NOT}) as variable names resulting in a confusingly valid expression (line 3).}
 	\label{lst:example_ca_expr}

@@ -186,7 +186,7 @@ All the assembler instructions and ordinary symbols must be resolved before the 
            DS    CL(LEN)
 ADDR       DS    CL(SIZE)
 
-HERE       DS    0H
+HERE       DS    0C
 LEN        EQU   HERE-ADDR
 SIZE       EQU   1
 	\end{Verbatim}
@@ -294,7 +294,7 @@ TEST        CSECT
             AIF         (&VAR EQ 4).END
 LBL1        GEN_LABEL
             LR          3,2
-            L           8
+            SR          2,3
 LBL2        GEN_LABEL
 LEN         EQU         LBL2-LBL1
             DC          (LEN)C'HELLO'
