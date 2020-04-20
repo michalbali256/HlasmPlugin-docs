@@ -4,13 +4,13 @@ The IBM High Level Assembler Language (HLASM) is still actively used commerciall
 
 Today, HLASM developers are forced to code in archaic terminals directly on the mainframe. Therefore, they spend a lot of time navigating around the code and the environment. For example, solely due to the fact that the user needs to navigate through plenty of terminal screens it takes around a minute just to get to a screen where it is possible to make a change in a file and recompile. For developers, it would be extremely useful to have an IDE plugin that would minimize contact with the mainframe terminal, could analyze the HLASM program, check its validity and make the code clearer by syntax highlighting. 
 
-We introduce such plugin for Visual Studio Code, which is nowadays one of the most popular code editors. It improves HLASM programming experience, so that it can be compared to coding in modern programming languages, by providing instant code validity checks, advanced highlighting, code analysis, and all the functionality that a programmer currently takes for granted when writing code.
+We introduce such plugin for Visual Studio Code, which is one of the most popular code editors nowadays. It improves HLASM programming experience, so that it can be compared to coding in modern programming languages, by providing instant code validity checks, advanced highlighting, code analysis, and all the functionality that a programmer currently takes for granted when writing code.
 
 Some of the most noteworthy properties and features of the plugin are:
 \begin{itemize}
 	\item It is capable of interpreting and tracing a large subset of HLASM code-generating instructions
 	\item It contains a list of all built-in instructions that is used to validate the generated code
-	\item So called \emph{macro tracer} gives a possibility to trace the compilation of HLASM source code step-by-step in a way similar to common debugging.
+	\item So called \emph{macro tracer} gives a possibility to trace the compilation of a HLASM source code step-by-step in a way similar to common debugging.
 	\item It implements DAP and LSP protocols, providing interface to be easily integrated into numerous modern code editors
 	\item It has been run and tested on over 15 millions lines of real production HLASM code
 \end{itemize}
