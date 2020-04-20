@@ -77,3 +77,18 @@ For instance, a possible path to LLVM is \TT{/usr/local/opt/llvm\@8}
 
 \section{Running tests}
 Once the project is built, there are two test executables in the \TT{bin/} subdirectory of the build folder: \TT{library\_test} and \TT{server\_test}. Just run both of them to verify the build.
+
+\section{Installation}
+The built VSIX can be manually installed into VS Code by following these steps:
+\begin{enumerate}
+	\item Open the extensions tab (Ctrl + Shift + X)
+	\item Select ``More actions ...'' (the $\cdots$ icon)
+	\item Select ``Install from VSIX...''
+	\item Find the VSIX file and confirm the selection.
+	\item The plugin is now installed.
+\end{enumerate}
+
+Alternatively, the plugin can be installed with following command:
+\begin{verbatim}
+code --install-extension <path-to-vsix>
+\end{verbatim}
