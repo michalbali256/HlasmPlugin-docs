@@ -8,17 +8,18 @@ We introduce such plugin for Visual Studio Code, which is one of the most popula
 
 The most significant properties and features of the plugin are:
 \begin{itemize}
-	\item It is capable of interpreting and tracing a large subset of HLASM code-generating instructions
-	\item It contains a list of all built-in instructions that is used to validate the generated code
-	\item So called \emph{macro tracer} gives a possibility to trace the compilation of a HLASM source code step-by-step in a way similar to common debugging.
-	\item It implements DAP and LSP protocols, providing interface to be easily integrated into numerous modern code editors
-	\item It has been run and tested on over 15 millions lines of real production HLASM code
+	\item It is capable of interpreting and tracing a large subset of HLASM code-generating instructions.
+	\item It contains a list of all built-in instructions that is used to validate the generated code.
+	\item \emph{Macro tracer} gives a possibility to trace the compilation of a HLASM source code step-by-step in a way similar to common debugging.
+	\item It implements DAP and LSP protocols, providing interface that can be easily connected to numerous modern code editors.
+	\item It was successfully used on a production HLASM codebase with over 15 million lines of code.
 \end{itemize}
-The plugin is available on the Visual Studio Code Marketplace\footnote{\url{https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support}}
+The plugin is available on the Visual Studio Code Marketplace\footnote{\url{https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support}}.
 
 This document serves as an in-depth documentation for anyone who would like to understand the implementation of the project and the reasons behind it. It is advised that the potential contributors to the project read this documentation first.
 
 User documentation is available on the Visual Studio Code marketplace \footnote{\url{https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support}} or in a markdown file \TT{clients/vscode-hlasmplugin/README.md}. The HLASM plugin project also contains an example workspace that can be used to test out the plugin.
+\makefileindexnotext{clients/vscode-hlasmplugin/README.md}
 
 
 \section{Organisation of this document}
