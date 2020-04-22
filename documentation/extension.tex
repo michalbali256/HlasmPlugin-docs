@@ -8,14 +8,17 @@ Our IDE choice is \emph{Visual Studio Code}, due to its popularity and lightweig
 
 %******************** Standard LSP Extension *************************
 \sectionSrc{Standard LSP Extension}
-{clients/vscode-hlasmplugin/src/extension.ts}
+{clients/vscode-hlasmplugin/src/extension.ts,clients/vscode-hlasmplugin/src/serverFactory.ts,clients/vscode-hlasmplugin/src/eventsHandler.ts}
 The core of the extension is an activation event which starts the plugin for VSCode.
 
 Upon activation, \emph{Language Client} and \emph{Language server}~\ref{chap:lang_server} are started as child processes of VSCode and a pipe is open for their communication. The LSP communication and its features are handled by the \emph{vscodelc} package. 
 
 To be independent of pipes, we have added an option to use TCP, which assigns a random free port for TCP communication.
 
-\section{DAP Extension}
+%******************** DAP Extension *************************
+\sectionSrc{DAP Extension}
+{clients/vscode-hlasmplugin/src/debugProvider.ts}
+
 
 \emph{Macro Tracer}~\ref{macro_tracer} is implemented using DAP, which is also supported out-of-the-box by VSCode. Similarly to LSP TCP support, we dynamically assign a random free port for DAP communication during the activation.
 
@@ -23,7 +26,9 @@ To be independent of pipes, we have added an option to use TCP, which assigns a 
 
 To simplify the work with HLASM in modern editors, several features are added to the extension . These additions are specific for Visual Studio Code (and Theia) and are not a part of the LSP specification.
 
-\subsection{Language Detection}
+%******************** Language Detection *************************
+\subsectionSrc{Language Detection}
+{clients/vscode-hlasmplugin/src/hlasmLanguageDetection.ts}
 \label{section:wildcard}
 The usual workflow with the extension begins with downloading HLASM source codes from mainframe. Typically, these files will not have any file extension and even if they do, they might differ across various products.
 
@@ -55,7 +60,9 @@ All detection layers are visualized in \cref{fig08:lang}.
 	\label{fig08:lang}
 \end{figure}
 
-\subsection{Continuation Handling}
+%******************** Continuation Handling *************************
+\subsectionSrc{Continuation Handling}
+{clients/vscode-hlasmplugin/src/continuationHandler.ts,clients/vscode-hlasmplugin/src/customEditorCommands.ts}
 
 Due to historical reasons, HLASM has a 80 character-per-line limitation. Modern languages do not enforce such restriction and therefore IDEs such as VSCode allow the user to extend their lines freely. This causes 2 major inconveniences.
 
@@ -67,8 +74,9 @@ The first problem is solved by adding two editor commands \emph{insertContinuati
 
 To improve the second problem, the option overrides standard VSCode commands, commonly used when working in editor such as \emph{type}, \emph{deleteLeft}, \emph{deleteRight}, \emph{cut} and \emph{paste}. They offset the continuation character by removing/adding whitespaces in front of it.
 
-
-\subsection{Configuration Prompt}
+%******************** Configuration Prompt *************************
+\subsectionSrc{Configuration Prompt}
+{clients/vscode-hlasmplugin/src/configurationsHandler.ts}
 
 If a workspace contains a HLASM file, but does not have the configuration files set, the user is prompted to create them. The warning message also offers an option to create templates for them.
 
