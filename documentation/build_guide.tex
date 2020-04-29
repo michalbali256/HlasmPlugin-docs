@@ -44,7 +44,7 @@ On Ubuntu 18.04 the following commands install all prerequisites and then build 
 
 \begin{verbatim}
 apt update && sudo apt install cmake g++-8 uuid-dev npm default-jdk
-                       pkg-config maven
+                       pkg-config maven git
 mkdir build && cd build
 cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 ../
 cmake --build .
@@ -55,7 +55,7 @@ cmake --build .
 
 The build works on Alpine linux version 3.10. The following commands install all prerequisites and then build the project into \TT{build} folder:
 \begin{verbatim}
-apk update && apk add linux-headers git g++ cmake util-linux-dev npm ninja
+apk update && apk add linux-headers git g++ cmake util-linux-dev npm
                       pkgconfig openjdk8 maven
 mkdir build && cd build
 cmake ../
@@ -76,7 +76,7 @@ cmake --build .
 For instance, a possible path to LLVM is \TT{/usr/local/opt/llvm\@8}
 
 \section{Running tests}
-Once the project is built, there are two test executables in the \TT{bin/} subdirectory of the build folder: \TT{library\_test} and \TT{server\_test}. Just run both of them to verify the build.
+Once the project is built, there are two test executables in the \TT{bin/} subdirectory of the build folder: \TT{library\_test} and \TT{server\_test}. Just run both of them to verify the build. The tests must be run from the bin folder, because they need to load resources from \TT{bin/test/} directory.
 
 \section{Installation}
 The built VSIX can be manually installed into VS Code by following these steps:
@@ -88,7 +88,7 @@ The built VSIX can be manually installed into VS Code by following these steps:
 	\item The plugin is now installed.
 \end{enumerate}
 
-Alternatively, the plugin can be installed with following command:
+Alternatively, the plugin can be installed with the following command:
 \begin{verbatim}
 code --install-extension <path-to-vsix>
 \end{verbatim}
