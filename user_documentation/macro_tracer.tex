@@ -1,0 +1,27 @@
+\chapter{Macro Tracer}
+The macro tracer functionality allows you to track the process of assembling HLASM code. It lets you see step-by-step how macros are expanded and displays values of variable symbols at different points during the assembly process. You can also set breakpoints in problematic sections of your conditional assembly code. 
+
+The macro tracer is not a debugger. It cannot debug running executables, only track the compilation process.
+
+\section{Configuring the Macro Tracer}
+
+\begin{enumerate}
+	\item Open your workspace.
+	\item In the left sidebar, click the bug icon to open the debugging panel.
+	\item Click the cog icon in the top left of the screen. A \TT{select environment} prompt displays.
+	\item Enter \textbf{HLASM Macro tracer}. Your workspace is now configured for macro tracing.
+\end{enumerate}
+
+\section{Using the Macro Tracer}
+
+To run the macro tracer, open the file that you want to trace. Then press \textbf{F5} to open the debugging panel and start the debugging session.
+
+When the tracer stops at a macro or COPY instruction, you can select \textbf{step into} to open the macro or COPY file, or \textbf{step over} to skip to the next line.
+
+Breakpoints can be set before or during the debugging session.
+
+\begin{figure}[H]
+	\centering
+	\animategraphics[autoplay,loop,width=\linewidth]{12}{img/tracer/tracer-}{0}{398}
+	\caption{\href{https://github.com/eclipse/che-che4z-lsp-for-hlasm/blob/master/readme\_res/tracer.gif}{Macro Tracer usage example.}}
+\end{figure}
