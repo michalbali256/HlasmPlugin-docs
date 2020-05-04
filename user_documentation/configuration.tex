@@ -1,13 +1,13 @@
 \section{External Macro Libraries and COPY Members}
 \label{sec:configuration}
 
-The HLASM Language Support extension looks for locally stored members when a macro or COPY instruction is evaluated. The paths of these members are specified in two configuration files in the \emph{.hlasmplugin} folder of the currently open workspace. Ensure that you configure these files before using macros from separate files or the COPY instruction.
+The HLASM Language Support extension looks for locally stored members when a macro or COPY instruction is evaluated. The paths of these members are specified in two configuration files in the \TT{.hlasmplugin} folder of the currently open workspace. Ensure that you configure these files before using macros from separate files or the COPY instruction.
 
 When you open a HLASM file or manually set the HLASM language for a file, you can choose to automatically create these files for the current program.
 
-The structure of the configuration is based on CA Endevor® SCM. \emph{proc\_grps.json} defines processor groups by assigning a group name to a list of directories which are searched in the order they are listed. \emph{pgm\_conf.json} provides mapping between source files (open code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
+The structure of the configuration is based on CA Endevor® SCM. \TT{proc\_grps.json} defines processor groups by assigning a group name to a list of directories which are searched in the order they are listed. \TT{pgm\_conf.json} provides mapping between source files (open code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
 
-\begin{listing}[H]
+\begin{listing}
 	\begin{verbatim}
 {
   "pgroups": [
@@ -29,11 +29,15 @@ The structure of the configuration is based on CA Endevor® SCM. \emph{proc\_grp
 }
 	\end{verbatim}
 	\caption{This example defines two processor groups, GROUP1 and GROUP2, and a list of directories to search for macros and COPY files.}
+	\label{lst:ex1}
 \end{listing}
 
-If you have the two configuration files configured as above and invoke the MAC1 macro from \emph{source\_code.hlasm}, the folder \emph{ASMMAC/} in the current workspace is searched for a file with the exact name MAC1. If that search is unsuccessful the folder \emph{C:/SYS.ASMMAC} is searched. If that search is unsuccessful an error displays that the macro does not exist.
+An example configuration can be seen in \cref{lst:ex1}:
+If you have the two configuration files configured as above and invoke the MAC1 macro from \TT{source\_code.hlasm}, the folder \TT{ASMMAC/} in the current workspace is searched for a file named exactly MAC1. If that file is not found, the folder \TT{C:/SYS.ASMMAC} is searched. If that search is unsuccessful too, an error displays that the macro does not exist.
 
-\begin{listing}[H]
+Processor groups are assigned to work with different files. Example in \cref{lst:grps} shows how to assign the processor groups to different programs.
+
+\begin{listing}
 	\begin{verbatim}
 {
   "pgms": [
@@ -48,13 +52,14 @@ If you have the two configuration files configured as above and invoke the MAC1 
   ]
 }
 	\end{verbatim}
-	\caption{The following example specifies that GROUP1 is used when working with \emph{source\_code.hlasm} and GROUP2 is used when working with \emph{second\_file.hlasm}}
+	\caption{Example \TT{proc\_grps.json} specifies that GROUP1 is used when working with \TT{source\_code.hlasm} and GROUP2 is used when working with \TT{second\_file.hlasm}}
+	\label{lst:grps}
 \end{listing}
 
-There is also the option \emph{alwaysRecognize} which takes an array of wildcards. It allows you to configure two things:
+There is also the option \TT{alwaysRecognize} which takes an array of wildcards. It allows you to configure two things:
 \begin{itemize}
 	\item All files matching these wildcards will always be recognized as HLASM files. 
-	\item If an extension wildcard is defined, all macro and copy files with such extension may be used in the source code. For example, with the extension wildcard \emph{*.hlasm}, a user may add macro MAC to his source code even if it is in a file called \emph{Mac.hlasm}.
+	\item If an extension wildcard is defined, all macro and copy files with such extension may be used in the source code. For example, with the extension wildcard \TT{*.hlasm}, a user may add macro MAC to his source code even if it is in a file called \TT{Mac.hlasm}.
 \end{itemize}
 
 \begin{listing}[H]
