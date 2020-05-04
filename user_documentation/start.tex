@@ -4,86 +4,23 @@
 \subsection{Installation}
 There are two possible ways to install the HLASM Language Support extension: to download it from Visual Studio Marketplace\footnote{\url{https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support}}, or to build it from source and manually install it.
 
-\paragraph*{Building from source}
-To build the extension from source, you have to first install following prerequisites:
-
-\begin{itemize}
-	\item CMake 3.10 or higher
-	\item C++ compiler with support for C++17
-	\item Java Development Kit (JDK) 8 or higher
-	\item Git
-	\item npm
-	\item Linux only: pkg-config
-	\item Linux only: UUID library
-	\item Mac only: LLVM 8
-\end{itemize}
-
-Type following commands:\\
-
-Windows
-\begin{listing}[H]
-\begin{verbatim}
-mkdir build && cd build
-cmake ../
-cmake --build .
-\end{verbatim}
-\end{listing}
-
-{Ubuntu 18.04}
-\begin{listing}[H]
-\begin{verbatim}
-apt update && sudo apt install cmake g++-8 uuid-dev npm default-jdk
-pkg-config maven git
-mkdir build && cd build
-cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 ../
-cmake --build .
-\end{verbatim}
-\end{listing}
-
-\pagebreak
-{Alpine linux}
-\begin{listing}[H]
-\begin{verbatim}
-apk update && apk add linux-headers git g++ cmake util-linux-dev npm
-pkgconfig openjdk8 maven
-mkdir build && cd build
-cmake ../
-cmake --build .
-\end{verbatim}
-\end{listing}
-
-{MacOS 10.14}
-\begin{listing}[H]
-\begin{verbatim}
-mkdir build && cd build
-cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
--DLLVM_PATH=<path-to-llvm-installation> ../
-cmake --build .
-\end{verbatim}
-\end{listing}
-
-\paragraph*{Installation}
-The built VSIX can be manually installed into VS Code by following these steps:
-\begin{enumerate}
-	\item Open the extensions tab (Ctrl + Shift + X)
-	\item Select ``More actions ...'' (the $\cdots$ icon)
-	\item Select ``Install from VSIX...''
-	\item Find the VSIX file and confirm the selection.
-	\item The plugin is now installed.
-\end{enumerate}
-
-Alternatively, the plugin can be installed with the following command:
-\begin{listing}[H]
-\begin{verbatim}
-code --install-extension <path-to-vsix>
-\end{verbatim}
-\end{listing}
+\begin{description}
+	\item[Installation from Marketplace]
+	The extension can be installed from the Visual Studio Code Marketplace by following these steps:
+	\begin{enumerate}
+		\item Open the extensions tab (Ctrl + Shift + X)
+		\item Search for ``HLASM language support'' and select it.
+		\item Select ``Install''.
+	\end{enumerate}
+	\item[Installation from source]
+	The detailed guide describing how to build and install the extension from source is to be found in the Programmer's documentation.
+\end{description}
 
 \subsection{Usage}
 To start using the HLASM Language Support extension, follow these steps:
 
 \begin{enumerate}
-	\item In \textbf{File} - \textbf{Open Folder...}, select the folder where your HLASM project is located.
+	\item In \textbf{File} - \textbf{Open Folder...}, select the folder with your HLASM sources.
 	\item Open your HLASM source code (no file extension is needed) or create a new file.
 	\item If the extension fails to auto-detect HLASM language, set it manually in the bottom-right corner of the VS Code window.  
 	\item The extension is now enabled on the opened file. If you have macro definitions in separate files or use the COPY instruction, proceed with the steps below to configure the extension to search for external files in the correct directories:
