@@ -3,13 +3,13 @@
 
 The HLASM Language Support extension looks for locally stored members when a macro or COPY instruction is evaluated. The paths of these members are specified in two configuration files in the \TT{.hlasmplugin} folder of the currently open workspace:
 \begin{itemize}
-	\item  \TT{proc\_grps.json} defines \textbf{processor groups} by assigning a group name to a list of directories. Hence, the group name serves as an unique identifier of a HLASM library set defined by a list of directories.
+	\item  \TT{proc\_grps.json} defines \textbf{processor groups} by assigning a group name to a list of directories. Hence, the group name serves as a unique identifier of a HLASM library set defined by a list of directories.
 	
 	
 	\item  \TT{pgm\_conf.json} provides a mapping between \textbf{programs} (open-code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
 \end{itemize}
 
-Therefore, when you want to use a predefined set of macro and copy members in your source code, you do: 
+Therefore, to use a predefined set of macro and copy members, do the following steps: 
 \begin{enumerate}
 	\item Enumerate the library directories in \TT{proc\_grps.json} and name them with an identifier; thus, create a new processor group.
 	\item Use the identifier of the new processor group with the name of your source code file in \TT{pgm\_conf.json} to assign the library members to the program.
@@ -72,7 +72,7 @@ To add a possibility to specify a custom extension for HLASM files in the worksp
 	\item If an extension wildcard is defined, all macro and copy files with such extension may be used in the source code. For example, with the extension wildcard \TT{*.hlasm}, a user may add macro MAC to his source code even if it is in a file called \TT{Mac.hlasm}.
 \end{itemize}
 
-\Cref{lst:alw} demonstrates the mentioned functionality. With this configuration file, processor group \TT{GROUP1} will be assigned to \TT{source} and \TT{source.hlasm} file as well. Also, macro and copy files in the \TT{lib} directory can be referenced in the program without the \TT{.asm} extension  but still be correctly recognized.
+\Cref{lst:alw} demonstrates the mentioned functionality. With this configuration file, processor group \TT{GROUP1} will be assigned to \TT{source} and \TT{source.hlasm} file as well. Also, macro and copy files in the \TT{lib} directory can be referenced and correctly recognized in the program without the \TT{.asm} extension.
 
 
 \begin{listing}
