@@ -39,7 +39,7 @@ The structure of the configuration is based on CA Endevor® SCM.
   ]
 }
 	\end{verbatim}
-	\caption{This example defines two processor groups, GROUP1 and GROUP2, and a list of directories to search for macros and COPY files.}
+	\caption{An example of \TT{proc\_grps.json} configuration file with two processor groups.}
 	\label{lst:ex1}
 \end{listing}
 
@@ -58,7 +58,7 @@ The structure of the configuration is based on CA Endevor® SCM.
   ]
 }
 	\end{verbatim}
-	\caption{Example \TT{proc\_grps.json} specifies that GROUP1 is used when working with file \TT{source} and GROUP2 is used when working with file \TT{asm\_prg}.}
+	\caption{An example of \TT{pgm\_conf.json} configuration file with two programs.}
 	\label{lst:grps}
 \end{listing}
 
@@ -87,11 +87,11 @@ To add a possibility to specify a custom extension for HLASM files in the worksp
    "alwaysRecognize" : ["*.hlasm", "libs/*.asm"]
 }
 	\end{verbatim}
-	\caption{In this example, GROUP1 is used for all open code programs.}
+	\caption{A \TT{pgm\_conf.json} example with the \TT{alwaysRecognize} field.}
 	\label{lst:alw}
 \end{listing}
 
-Lastly, the program field in \TT{pgm\_conf.json} supports wildcards as well (see \cref{lst:wild}). This provides simplified use for users that share one processor group among all their programs.
+Finally, the program field in \TT{pgm\_conf.json} supports wildcards as well (see \cref{lst:wild}). Using this feature, users can easily share one processor group among all their programs.
 
 \begin{listing}
 	\begin{verbatim}
@@ -104,6 +104,6 @@ Lastly, the program field in \TT{pgm\_conf.json} supports wildcards as well (see
   ]
 }
 	\end{verbatim}
-	\caption{In this example, GROUP1 is used for all open code programs.}
+	\caption{An example of a program wildcard.}
 	\label{lst:wild}
 \end{listing}
