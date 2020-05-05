@@ -2,32 +2,39 @@
 \label{sec:start}
 
 \subsection{Installation}
-There are two possible ways to install the HLASM Language Support extension: to download it from Visual Studio Marketplace\footnote{\url{https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support}}, or to build it from source and manually install it.
 
+The extension requires a working installation of Visual Studio Code\footnote{\url{https://code.visualstudio.com/}} to work.
+
+There are two possibilities for installation:
 \begin{description}
-	\item[Installation from Marketplace]
-	The extension can be installed from the Visual Studio Code Marketplace by following these steps:
+	\item[Installation from VS Marketplace]
+	The extension can be installed from the Visual Studio Code Marketplace\footnote{\url{https://marketplace.visualstudio.com/items?itemName=broadcomMFD.hlasm-language-support}} by following these steps:
 	\begin{enumerate}
 		\item Open the extensions tab (Ctrl + Shift + X)
 		\item Search for ``HLASM language support'' and select it.
 		\item Select ``Install''.
 	\end{enumerate}
 	\item[Installation from source]
-	The detailed guide describing how to build and install the extension from source is to be found in the Programmer's documentation.
+	The extension can be built on Windows, Mac OS and most Linux distributions using the standard CMake build procedure. A detailed guide for building and installing the extension from source can be found in the Programmer documentation, chapter 10.
 \end{description}
 
 \subsection{Usage}
-To start using the HLASM Language Support extension, follow these steps:
+
+Opening a HLASM project is done as such:
 
 \begin{enumerate}
-	\item In \textbf{File} - \textbf{Open Folder...}, select the folder with your HLASM sources.
-	\item Open your HLASM source code (no file extension is needed) or create a new file.
-	\item If the extension fails to auto-detect HLASM language, set it manually in the bottom-right corner of the VS Code window.  
-	\item The extension is now enabled on the opened file. If you have macro definitions in separate files or use the COPY instruction, proceed with the steps below to configure the extension to search for external files in the correct directories:
-	\item After opening the HLASM file, two popups display. Select \TT{Create pgm\_conf.json with current program} and \TT{Create empty proc\_grps.json}. The two configuration files are created in the \emph{.hlasmplugin} subfolder.
-	\item In the \emph{proc\_grps.json} file, fill the \emph{libs} array with paths to folders with macro definitions and COPY files. For example, if you have your macro files in the \emph{ASMMAC/} folder, type the string \emph{"ASMMAC"} into the libs array.
+	\item In \textbf{File} - \textbf{Open Folder...}, select the folder with the HLASM sources.
+		(An example workspace is provided in the folder \TT{example\_workspace}.)
+	\item Open any HLASM source file (note that HLASM does not have a standard filename extension) or create a new file.
+	\item If the auto-detection of HLASM language fails with the file, set it manually in the bottom-right corner of the VS Code window.  
+	\item The extension is now enabled on the opened file. If you have macro definitions in separate files or use the COPY instruction, you need to setup the workspace.
 \end{enumerate}
 
-There is an example workspace in the folder \TT{example\_workspace} that can be used to test out the extension.
+\subsection{Setting up a multi-file project environment}
+HLASM COPY instruction copies the source code from various external files, as driven by HLASM evaluation. The source code interpreter in the HLASM Extension needs to be set up correctly to be able to find the same files as the HLASM assembler program. This is done by setting up two files that describe HLASM program config and processor groups:
+\begin{enumerate}
+	\item After opening a HLASM file for the first time, two popups display. Select \TT{Create pgm\_conf.json with current program} and \TT{Create empty proc\_grps.json}. The two configuration files will be created in the \TT{.hlasmplugin} subfolder.
+	\item In the \TT{proc\_grps.json} file, fill the \TT{libs} array with paths to folders with macro definitions and COPY files. For example, if you have your macro files in the \TT{ASMMAC/} folder, add the string \TT{"ASMMAC"} into the libs array.
+\end{enumerate}
 
-For a full explanation of the configuration, see the~\cref{sec:configuration}.
+Follow~\cref{sec:configuration} for more detailed instructions for configuring the environment.

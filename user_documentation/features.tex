@@ -8,7 +8,7 @@ The HLASM Language Support extension highlights statements with different colors
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=10cm]{img/highligting}
-	\caption{An example of highlighting.}
+	\caption{HLASM code with syntax highlighting.}
 \end{figure}
 
 \subsection{Autocomplete}
@@ -16,8 +16,8 @@ Autocomplete is enabled for the instruction field. While typing, a list of instr
 
 \begin{figure}[H]
 	\centering
-	\animategraphics[autoplay,loop,width=\linewidth]{12}{img/autocomplete/autocomplete-}{0}{126}
-	\caption{\href{https://github.com/eclipse/che-che4z-lsp-for-hlasm/blob/master/readme\_res/autocomplete.gif}{Autocomplete usage example.}}
+	\includegraphics[width=\linewidth]{img/autocomplete/autocomplete-32}
+	\caption{Autocomplete usage example.}
 \end{figure}
 
 \subsection{Go To Definition and Find All References}
@@ -25,8 +25,9 @@ The extension adds the functionality of \TT{go to definition} and \TT{find all r
 
 \begin{figure}[H]
 	\centering
-	\animategraphics[autoplay,loop,width=\linewidth]{12}{img/go_to_def/go_to_def-}{0}{90}
-	\caption{\href{https://github.com/eclipse/che-che4z-lsp-for-hlasm/blob/master/readme\_res/go\_to\_def.gif}{Go To Definition usage example.}}
+	\includegraphics[width=.45\linewidth]{img/go_to_def/go_to_def-54}
+	\includegraphics[width=.45\linewidth]{img/go_to_def/go_to_def-56}
+	\caption{Go To Definition usage example; the editor opens the place of definition of the selected R1 symbol.}
 \end{figure}
 
 \subsection{Macro Tracer}
@@ -53,6 +54,6 @@ Breakpoints can be set before or during the debugging session.
 
 \begin{figure}[H]
 	\centering
-	\animategraphics[autoplay,loop,width=\linewidth]{12}{img/tracer/tracer-}{0}{398}
-	\caption{\href{https://github.com/eclipse/che-che4z-lsp-for-hlasm/blob/master/readme\_res/tracer.gif}{Macro Tracer usage example.}}
+	\includegraphics[width=\linewidth]{img/tracer/tracer-175}
+	\caption{Macro tracer interface, showing HLASM source code with highlighted current instruction, call stack and variable listing.}
 \end{figure}
