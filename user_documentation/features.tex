@@ -3,31 +3,34 @@
 The HLASM Language Support extension parses and analyzes all parts of a HLASM program. It resolves all ordinary symbols, variable symbols and checks the validity of most instructions. The extension supports conditional and unconditional branching and can define global and local variable symbols. It can also expand macros and COPY instructions.
 
 \subsection{Highlighting}
-The HLASM Language Support extension highlights statements with different colors for labels, instructions, operands, remarks and variables. Statements containing instructions that can have operands are highlighted differently to statements that do not expect operands. Code that is skipped by branching AIF, AGO or conditional assembly is not colored.
+The HLASM Language Support extension highlights statements with different colors for labels, instructions, operands, remarks and variables. Statements containing instructions that can have operands are highlighted differently to statements that do not expect operands. Code that is skipped by branching AIF, AGO or conditional assembly is not colored (see \cref{fig:high}).
 
-\begin{figure}[h]
+\begin{figure}[p]
 	\centering
 	\includegraphics[width=10cm]{img/highligting}
 	\caption{HLASM code with syntax highlighting.}
+	\label{fig:high}
 \end{figure}
 
 \subsection{Autocomplete}
-Autocomplete is enabled for the instruction field. While typing, a list of instructions starting with the typed characters displays. Selecting an instruction from the list completes it and inserts the default operands. Variables and sequence symbols are also filled with a value from their scope.
+Autocomplete is enabled for the instruction field. While typing, a list of instructions starting with the typed characters displays. Selecting an instruction from the list completes it and inserts the default operands. Variables and sequence symbols are also filled with a value from their scope (see \cref{fig:auto}).
 
-\begin{figure}[H]
+\begin{figure}[p]
 	\centering
 	\includegraphics[width=\linewidth]{img/autocomplete/autocomplete-32}
 	\caption{Autocomplete usage example.}
+	\label{fig:auto}
 \end{figure}
 
 \subsection{Go To Definition and Find All References}
-The extension adds the functionality of \TT{go to definition} and \TT{find all references}. Use the \TT{go to definition} functionality to show definitions of variable symbols, ordinary symbols and macros, or open COPY files directly. Use the \TT{find all references} functionality to show all places where a symbol is used.
+The extension adds the functionality of \TT{go to definition} and \TT{find all references}. Use the \TT{go to definition} functionality to show definitions of variable symbols, ordinary symbols and macros, or open COPY files directly. Use the \TT{find all references} functionality to show all places where a symbol is used \cref{fig:goto}).
 
-\begin{figure}[H]
+\begin{figure}[p]
 	\centering
 	\includegraphics[width=.45\linewidth]{img/go_to_def/go_to_def-54}
 	\includegraphics[width=.45\linewidth]{img/go_to_def/go_to_def-56}
 	\caption{Go To Definition usage example; the editor opens the place of definition of the selected R1 symbol.}
+	\label{fig:goto}
 \end{figure}
 
 \subsection{Macro Tracer}
@@ -50,10 +53,11 @@ To run the macro tracer, open the file that you want to trace. Then press \textb
 
 When the tracer stops at a macro or COPY instruction, you can select \textbf{step into} to open the macro or COPY file, or \textbf{step over} to skip to the next line.
 
-Breakpoints can be set before or during the debugging session.
+Breakpoints can be set before or during the debugging session (see \cref{fig:trac}).
 
-\begin{figure}[H]
+\begin{figure}[p]
 	\centering
-	\includegraphics[width=\linewidth]{img/tracer/tracer-175}
+	\includegraphics[width=0.75\linewidth]{img/tracer/tracer-175}
 	\caption{Macro tracer interface, showing HLASM source code with highlighted current instruction, call stack and variable listing.}
+	\label{fig:trac}
 \end{figure}
