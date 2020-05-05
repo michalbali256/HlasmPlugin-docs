@@ -3,10 +3,10 @@
 
 The HLASM Language Support extension looks for locally stored members when a macro or COPY instruction is evaluated. The paths of these members are specified in two configuration files in the \TT{.hlasmplugin} folder of the currently open workspace:
 \begin{itemize}
-	\item  \TT{proc\_grps.json} defines \textbf{processor groups} by assigning a group name to a list of directories. Hence, the group name serves as a unique identifier of a set of HLASM libraries defined by a list of directories.
+	\item  \TT{proc\_grps.json} defines \emph{processor groups} by assigning a group name to a list of directories. Hence, the group name serves as a unique identifier of a set of HLASM libraries defined by a list of directories.
 	
 	
-	\item  \TT{pgm\_conf.json} provides a mapping between \textbf{programs} (open-code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
+	\item  \TT{pgm\_conf.json} provides a mapping between \emph{programs} (open-code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
 \end{itemize}
 
 Therefore, to use a predefined set of macro and copy members, do the following steps: 
