@@ -58,11 +58,11 @@ The structure of the configuration is based on CA Endevor® SCM.
   ]
 }
 	\end{verbatim}
-	\caption{Example \TT{proc\_grps.json} specifies that GROUP1 is used when working with \TT{source\_code.hlasm} and GROUP2 is used when working with \TT{second\_file.hlasm}}
+	\caption{Example \TT{proc\_grps.json} specifies that GROUP1 is used when working with file \TT{source} and GROUP2 is used when working with file \TT{asm\_prg}.}
 	\label{lst:grps}
 \end{listing}
 
-An example configuration can be seen in \cref{lst:ex1} and \cref{lst:grps}. It describes two processor groups \TT{GROUP1}, \TT{GROUP2} and their respective mappings to programs \TT{source} and \TT{asm\_prg}. If you have the two configuration files configured as above and invoke the MAC1 macro from \TT{source}, the folder \TT{ASMMAC/} in the current workspace is searched for a file named exactly MAC1. If that file is not found, the folder \TT{C:/SYS.ASMMAC} is searched. If that search is unsuccessful too, an error displays that the macro does not exist.
+An example configuration can be seen in \cref{lst:ex1} and \cref{lst:grps}. It describes two processor groups \TT{GROUP1}, \TT{GROUP2} and their respective mappings to programs \TT{source} and \TT{asm\_prg}. If you have the two example configuration files and invoke the \TT{MAC1} macro from \TT{source}, the folder \TT{ASMMAC/} in the current workspace is searched for a file named exactly \TT{MAC1}. If that file is not found, the folder \TT{C:/SYS.ASMMAC} is searched. If that search is unsuccessful too, an error displays that the macro does not exist.
 
 Note that the macro \TT{MAC1} is searched in directories in order as they are listed in the configuration. 
 
