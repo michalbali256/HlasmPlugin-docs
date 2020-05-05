@@ -26,15 +26,17 @@ Opening a HLASM project is done as such:
 	\item In \textbf{File} - \textbf{Open Folder...}, select the folder with the HLASM sources.
 		(An example workspace is provided in the folder \TT{example\_workspace}.)
 	\item Open any HLASM source file (note that HLASM does not have a standard filename extension) or create a new file.
-	\item If the auto-detection of HLASM language fails with the file, set it manually in the bottom-right corner of the VS Code window.  
+	\item If the auto-detection of HLASM language does not recognize the file, set it manually in the bottom-right corner of the VS Code window.  
 	\item The extension is now enabled on the opened file. If you have macro definitions in separate files or use the COPY instruction, you need to setup the workspace.
 \end{enumerate}
 
 \subsection{Setting up a multi-file project environment}
-HLASM COPY instruction copies the source code from various external files, as driven by HLASM evaluation. The source code interpreter in the HLASM Extension needs to be set up correctly to be able to find the same files as the HLASM assembler program. This is done by setting up two files that describe HLASM program config and processor groups:
+HLASM COPY instruction copies the source code from various external files, as driven by HLASM evaluation. The source code interpreter in the HLASM Extension needs to be set up correctly to be able to find the same files as the HLASM assembler program. 
+
+This is done by setting up two configuration files --- \TT{proc\_grps.json} and \TT{pgm\_conf.json}. The extension guides the user in their creation:
 \begin{enumerate}
-	\item After opening a HLASM file for the first time, two popups display. Select \TT{Create pgm\_conf.json with current program} and \TT{Create empty proc\_grps.json}. The two configuration files will be created in the \TT{.hlasmplugin} subfolder.
-	\item In the \TT{proc\_grps.json} file, fill the \TT{libs} array with paths to folders with macro definitions and COPY files. For example, if you have your macro files in the \TT{ASMMAC/} folder, add the string \TT{"ASMMAC"} into the libs array.
+	\item After opening a HLASM file for the first time, two popups display. Select \TT{Create pgm\_conf.json with current program} and \TT{Create empty proc\_grps.json}. The two configuration files are then created with default values. They are written into the \TT{.hlasmplugin} subfolder.
+	\item Navigate to the \TT{proc\_grps.json} file. This is the entry point where you can specify paths to macro definitions and COPY files. To do this, simply fill the \TT{libs} array with the corresponding paths. For example, if you have your macro files in the \TT{ASMMAC/} folder, add the string \TT{"ASMMAC"} into the libs array.
 \end{enumerate}
 
 Follow~\cref{sec:configuration} for more detailed instructions for configuring the environment.
