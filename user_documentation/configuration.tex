@@ -3,7 +3,7 @@
 
 The HLASM Language Support extension looks for locally stored members when a macro or COPY instruction is evaluated. The paths of these members are specified in two configuration files in the \TT{.hlasmplugin} folder of the currently open workspace:
 \begin{itemize}
-	\item  \TT{proc\_grps.json} defines \textbf{processor groups} by assigning a group name to a list of directories. Hence, the group name serves as a unique identifier of a HLASM library set defined by a list of directories.
+	\item  \TT{proc\_grps.json} defines \textbf{processor groups} by assigning a group name to a list of directories. Hence, the group name serves as a unique identifier of a set of HLASM libraries defined by a list of directories.
 	
 	
 	\item  \TT{pgm\_conf.json} provides a mapping between \textbf{programs} (open-code files) and processor groups. It specifies which list of directories is used with which source file. If a relative source file path is specified, it is relative to the current workspace.
@@ -68,7 +68,7 @@ Note that the macro \TT{MAC1} is searched in directories in order as they are li
 
 To add a possibility to specify a custom extension for HLASM files in the workspace, {pgm\_conf.json} has an optional field \TT{alwaysRecognize}. It takes an array of wildcards and provides the following functionality:
 \begin{itemize}
-	\item All files matching these wildcards will always be recognized as HLASM files. Hence, the HLASM plugin will be automatically activated on all the matched files.
+	\item All files matching these wildcards will always be recognized as HLASM files. Hence, the HLASM plugin will be automatically running on all the matched files.
 	\item If an extension wildcard is defined, all macro and copy files with such extension may be used in the source code. For example, with the extension wildcard \TT{*.hlasm}, a user may add macro MAC to his source code even if it is in a file called \TT{Mac.hlasm}.
 \end{itemize}
 
