@@ -5,7 +5,7 @@ The HLASM Language Support extension parses and analyzes all parts of a HLASM pr
 \subsection{Highlighting}
 The HLASM Language Support extension highlights statements with different colors for labels, instructions, operands, remarks and variables. Statements containing instructions that can have operands are highlighted differently to statements that do not expect operands. Code that is skipped by branching AIF, AGO or conditional assembly is not colored (see \cref{fig:high}).
 
-\begin{figure}[p]
+\begin{figure}
 	\centering
 	\includegraphics[width=10cm]{img/highligting}
 	\caption{HLASM code with syntax highlighting.}
@@ -15,7 +15,7 @@ The HLASM Language Support extension highlights statements with different colors
 \subsection{Autocomplete}
 Autocomplete is enabled for the instruction field. While typing, a list of instructions starting with the typed characters displays. Selecting an instruction from the list completes it and inserts the default operands. Variables and sequence symbols are also filled with a value from their scope (see \cref{fig:auto}).
 
-\begin{figure}[p]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.75\linewidth]{img/autocomplete/autocomplete-32}
 	\caption{Autocomplete usage example.}
@@ -23,9 +23,9 @@ Autocomplete is enabled for the instruction field. While typing, a list of instr
 \end{figure}
 
 \subsection{Go To Definition and Find All References}
-The extension adds the functionality of \TT{go to definition} and \TT{find all references}. Use the \TT{go to definition} functionality to show definitions of variable symbols, ordinary symbols and macros, or open COPY files directly. Use the \TT{find all references} functionality to show all places where a symbol is used \cref{fig:goto}).
+The extension adds the functionality of \emph{go to definition} and \emph{find all references}. Use the \emph{go to definition} functionality to show definitions of variable symbols, ordinary symbols and macros, or open COPY files directly. Use the \emph{find all references} functionality to show all places where a symbol is used (see \cref{fig:goto}).
 
-\begin{figure}[p]
+\begin{figure}
 	\centering
 	\includegraphics[width=.45\linewidth]{img/go_to_def/go_to_def-54}
 	\includegraphics[width=.45\linewidth]{img/go_to_def/go_to_def-56}
@@ -43,7 +43,7 @@ The macro tracer is not a debugger. It cannot debug running executables, only tr
 \begin{enumerate}
 	\item Open your workspace.
 	\item In the left sidebar, click the bug icon to open the debugging panel (Ctrl + Shift + D).
-	\item Click create a launch.json file. A \TT{select environment} prompt displays.
+	\item Click create a launch.json file. A \emph{select environment} prompt displays.
 	\item Enter \textbf{HLASM Macro tracer}. Your workspace is now configured for macro tracing.
 \end{enumerate}
 
@@ -55,7 +55,7 @@ When the tracer stops at a macro or COPY instruction, you can select \textbf{ste
 
 Breakpoints can be set before or during the debugging session (see \cref{fig:trac}).
 
-\begin{figure}[p]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.9\linewidth]{img/tracer/tracer-175}
 	\caption{Macro tracer interface, showing HLASM source code with highlighted current instruction, call stack and variable listing.}
